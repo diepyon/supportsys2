@@ -5264,10 +5264,25 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
-      drawer: null
+      drawer: null,
+      items: ['foo', 'bar', 'fizz', 'buzz'],
+      values: ['foo', 'bar'],
+      value: null
     };
   }
 });
@@ -28406,16 +28421,56 @@ var render = function () {
     "v-app",
     { attrs: { id: "inspire" } },
     [
-      _c("v-navigation-drawer", {
-        attrs: { app: "" },
-        model: {
-          value: _vm.drawer,
-          callback: function ($$v) {
-            _vm.drawer = $$v
+      _c(
+        "v-navigation-drawer",
+        {
+          attrs: { app: "" },
+          model: {
+            value: _vm.drawer,
+            callback: function ($$v) {
+              _vm.drawer = $$v
+            },
+            expression: "drawer",
           },
-          expression: "drawer",
         },
-      }),
+        [
+          _c(
+            "div",
+            {
+              staticClass:
+                "v-list v-sheet theme--light v-list--dense v-list--nav",
+            },
+            [
+              _c(
+                "div",
+                {
+                  staticClass:
+                    "v-list v-sheet theme--light v-list--dense v-list--nav",
+                },
+                [_vm._v("\n                ダッシュボード\n            ")]
+              ),
+              _vm._v(" "),
+              _c(
+                "div",
+                {
+                  staticClass:
+                    "v-list v-sheet theme--light v-list--dense v-list--nav",
+                },
+                [_vm._v("\n                記録作成\n            ")]
+              ),
+              _vm._v(" "),
+              _c(
+                "div",
+                {
+                  staticClass:
+                    "v-list v-sheet theme--light v-list--dense v-list--nav",
+                },
+                [_vm._v("\n                ユーザー登録\n            ")]
+              ),
+            ]
+          ),
+        ]
+      ),
       _vm._v(" "),
       _c(
         "v-app-bar",
@@ -28434,7 +28489,37 @@ var render = function () {
         1
       ),
       _vm._v(" "),
-      _c("v-main"),
+      _c(
+        "v-main",
+        [
+          _c(
+            "v-container",
+            [
+              _c("p", [_vm._v("プルダウンテスト")]),
+              _vm._v(" "),
+              _c("v-autocomplete", {
+                attrs: {
+                  items: _vm.items,
+                  dense: "",
+                  filled: "",
+                  label: "機種名",
+                },
+                model: {
+                  value: _vm.value,
+                  callback: function ($$v) {
+                    _vm.value = $$v
+                  },
+                  expression: "value",
+                },
+              }),
+              _vm._v(" "),
+              _c("v-alert", { attrs: { type: "success" } }, [_vm._v("通知")]),
+            ],
+            1
+          ),
+        ],
+        1
+      ),
     ],
     1
   )

@@ -4,6 +4,8 @@ import 'vuetify/dist/vuetify.min.css'
 
 Vue.use(Vuetify)
 
+
+
 const opts = {
   icons: {
     iconfont: 'mdiSvg'
@@ -11,3 +13,4 @@ const opts = {
 }
 
 export default new Vuetify(opts)
+
