@@ -1,25 +1,25 @@
 <template>
     <v-app id="inspire">
         <v-navigation-drawer v-model="drawer" app>
-            <div class="v-list v-sheet theme--light v-list--dense v-list--nav">
-                <div class="v-list v-sheet theme--light v-list--dense v-list--nav">
-                    ダッシュボード
-                </div>
-                <div class="v-list v-sheet theme--light v-list--dense v-list--nav">
-                    記録作成
-                </div>
-                <div class="v-list v-sheet theme--light v-list--dense v-list--nav">
-                    ユーザー登録
-                </div>                                
-            </div>
+            <v-list>
+                <v-list-item v-for="[icon, text,to] in links" :key="icon" :to="to"  link >
+                    <v-list-item-icon>
+                        <v-icon>{{ icon }}</v-icon>
+                    </v-list-item-icon>
+
+                    <v-list-item-content>
+                        <v-list-item-title>{{ text }}</v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
+            </v-list>
         </v-navigation-drawer>
 
         <v-app-bar app>
             <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
-
             <v-toolbar-title>Application</v-toolbar-title>
-
         </v-app-bar>
+
+
         <v-main>
             <v-container>
                 <router-view />
@@ -29,15 +29,15 @@
 </template>
 
 <script>
-
-
     export default {
         data: () => ({
             drawer: null,
+      links: [
+        ['mdi-view-dashboard-outline', 'Dashboard','/'],
+        ['mdi-file-document-multiple-outline', 'Archive','/archive'],
+      ],
 
-            items: ['foo', 'bar', 'fizz', 'buzz'],
-            values: ['foo', 'bar'],
-            value: null,
+
         }),
     }
 
