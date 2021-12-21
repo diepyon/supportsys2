@@ -4,33 +4,74 @@
             受付記録
         </h1>
 
-        <v-row justify="center">
-            <v-dialog v-model="dialog" scrollable max-width="90%">
-                <template v-slot:activator="{ on, attrs }">
-                    <v-btn color="primary" class="ma-2" dark v-bind="attrs" v-on="on">
-                        記録入力
-                    </v-btn>
-                </template>
-                <v-card>
-                    <v-card-title>記録入力</v-card-title>
-                    <v-divider></v-divider>
-                    <v-card-text style="height: 70%;">
+  <v-row justify="space-around">
+    <v-col cols="auto">
+      <v-dialog
+        transition="dialog-bottom-transition"
+        max-width="90%"
+        scrollable
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            color="primary"
+            v-bind="attrs"
+            v-on="on"
+          >  <v-icon>mdi-lead-pencil</v-icon>記録入力</v-btn>
+        </template>
+        <template v-slot:default="dialog">
+          <v-card>
+            <v-toolbar
+              color="primary"
+              dark
+            >Opening from the bottom</v-toolbar>
+            <v-card-text>
+              <div class="text-h2 pa-12">Hello world!</div>
+            </v-card-text>
+            <v-card-actions class="justify-end">
+              <v-btn
+                text
+                @click="dialog.value = false"
+              >Close</v-btn>
+            </v-card-actions>
+          </v-card>
+        </template>
+      </v-dialog>
+    </v-col>
 
-                    </v-card-text>
-                    <v-divider></v-divider>
-                    <v-card-actions>
-                        <v-btn color="blue darken-1" text @click="dialog = false">
-                            登録
-                        </v-btn>
-                        <v-btn color="blue darken-1" text @click="dialog = false">
-                            閉じる
-                        </v-btn>
-                    </v-card-actions>
-                </v-card>
-            </v-dialog>
-        </v-row>
+    <v-col cols="auto">
+      <v-dialog
+        transition="dialog-top-transition"
+        max-width="600"
+        scrollable
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            color="primary"
+            v-bind="attrs"
+            v-on="on"
+          > <v-icon>mdi-magnify</v-icon>記録検索</v-btn>
+        </template>
+        <template v-slot:default="dialog">
+          <v-card>
+            <v-toolbar
+              color="primary"
+              dark
+            >Opening from the top</v-toolbar>
+            <v-card-text>
+              <div class="text-h2 pa-12">Hello world!</div>
+            </v-card-text>
+            <v-card-actions class="justify-end">
+              <v-btn
+                text
+                @click="dialog.value = false"
+              >Close</v-btn>
+            </v-card-actions>
+          </v-card>
+        </template>
+      </v-dialog>
+    </v-col>
+  </v-row>
 
-        
     </div>
 </template>
 <script>

@@ -33,8 +33,9 @@
         data: () => ({
             drawer: null,
       links: [
-        ['mdi-view-dashboard-outline', 'Dashboard','/'],
-        ['mdi-file-document-multiple-outline', 'Archive','/archive'],
+        ['mdi-home', 'ダッシュボード','/'],
+        ['mdi-file-document-multiple-outline', '受付記録','/archive'],
+         ['mdi-account', 'ユーザー登録','/users'],
       ],
 
 
@@ -42,3 +43,20 @@
     }
 
 </script>
+<style scoped>
+main.v-main {
+    background: #E0F2F1;
+}
+.v-navigation-drawer{
+    background-color: #009688 !important;
+}
+a.v-list-item--link.theme--light {
+    color: white !important;
+}
+i.v-icon.notranslate.mdi.theme--light {
+    color: white;
+}
+i.v-icon.notranslate.mdi.mdi-menu.theme--light {
+    color: black;
+}
+</style>
