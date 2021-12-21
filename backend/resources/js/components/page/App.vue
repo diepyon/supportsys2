@@ -22,16 +22,15 @@
         </v-app-bar>
         <v-main>
             <v-container>
-                <p>プルダウンテスト</p>
-                <v-autocomplete v-model="value" :items="items" dense filled label="機種名"></v-autocomplete>
-                <v-alert type="success">通知</v-alert>
-                <!--  -->
+                <router-view />
             </v-container>
         </v-main>
     </v-app>
 </template>
 
 <script>
+
+
     export default {
         data: () => ({
             drawer: null,
