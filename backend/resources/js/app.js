@@ -3,15 +3,16 @@ require('./bootstrap');
 import App from "./components/page/App"
 
 import Vue from 'vue';
-import VueRouter from 'vue-router';
+
 import router from './router'
-
-
-
-import vuetify from './vuetify' // これを追加
+import VueRouter from 'vue-router';
 
 window.Vue = Vue;
 Vue.use(VueRouter);
+
+import vuetify from './vuetify' // これを追加
+
+
 
 new Vue({
   vuetify,

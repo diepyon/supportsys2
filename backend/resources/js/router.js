@@ -1,14 +1,13 @@
 import Router from 'vue-router'
-
-import Home from './components/page/Home'
+import Dashboard from './components/page/Dashboard'
 
 export default new Router({
   mode: 'history',
   routes: [
     {
-      path: '/home',
-      name: 'home',
-      component: Home
-      },    
+      path: '/',
+      name: 'dashboard',
+      component: Dashboard
+    },
   ]
 });
