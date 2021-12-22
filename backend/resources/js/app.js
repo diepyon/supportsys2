@@ -10,6 +10,11 @@ import VueRouter from 'vue-router';
 window.Vue = Vue;
 Vue.use(VueRouter);
 
+
+import * as VeeValidate from 'vee-validate';
+
+Vue.use(VeeValidate);
+
 import vuetify from './vuetify' // これを追加
 
 

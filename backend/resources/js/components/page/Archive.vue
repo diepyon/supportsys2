@@ -4,7 +4,7 @@
             受付記録
         </h1>
 
-        <v-row justify="justify-start">
+        <v-row justify="start">
             <v-col cols="auto">
                 <v-dialog max-width="90%" scrollable>
                     <template v-slot:activator="{ on, attrs }">
@@ -18,7 +18,7 @@
                             <v-card-text>
                                 <div class="text-h2 pa-12">Hello world!</div>
                             </v-card-text>
-                            <v-card-actions class="justify-end">
+                            <v-card-actions class="end">
                                 <v-btn text @click="dialog.value = false">Close</v-btn>
                             </v-card-actions>
                         </v-card>
@@ -39,7 +39,7 @@
                             <v-card-text>
                                 <div class="text-h2 pa-12">Hello world!</div>
                             </v-card-text>
-                            <v-card-actions class="justify-end">
+                            <v-card-actions class="end">
                                 <v-btn text @click="dialog.value = false">Close</v-btn>
                             </v-card-actions>
                         </v-card>
@@ -55,21 +55,32 @@
 
             <v-text-field v-model="value.dealer" label="販売店"></v-text-field>
 
-            <v-text-field v-model="value.questioner" label="問い合わせ者"></v-text-field>
+            <v-row justify="start">
+                <v-col cols="auto">
+                    <v-text-field v-model="value.questioner" label="問い合わせ者"></v-text-field>
+                </v-col>
+                <v-col cols="auto">
+                    <v-text-field id="tel" v-bind:type="'tel'" v-model="value.phoneNumber" :counter="13" label="電話番号"
+                        :rules="[empty,tel]">
+                    </v-text-field>
+                </v-col>
+            </v-row>
 
             <v-text-field v-model="value.customer" label="ユーザー"></v-text-field>
 
-            <validation-provider v-slot="{ errors }" name="phoneNumber" :rules="{
-          required: true,
-          digits: 7,
-          regex: '^(71|72|74|76|81|82|84|85|86|87|88|89)\\d{5}$'
-        }">
-                <v-text-field v-model="phoneNumber" :counter="7" :error-messages="errors" label="Phone Number" required>
-                </v-text-field>
-            </validation-provider>
+            <v-container fluid>
+                <v-radio-group v-model="value.radio" row>
+                    <v-radio label="トラブル" value="radio-1"></v-radio>
+                    <v-radio label="障害" value="radio-2"></v-radio>
+                    <v-radio label="故障" value="radio-3"></v-radio>
+                    <v-radio label="購入前" value="radio-4"></v-radio>
+                    <v-radio label="クレーム" value="radio-5"></v-radio>
+                </v-radio-group>
+            </v-container>
+
         </v-form>
 
-
+        <button @click="hoge">adfdasf</button>
 
     </div>
 </template>
@@ -77,10 +88,12 @@
     export default {
         data() {
             return {
-                dialogm1: '',
                 dialog: false,
-                value: {},
-                valid:null,
+                value: {
+                    phoneNumber: "",
+                },
+
+                valid: null,
 
                 isEditing: false,
                 model: null,
@@ -91,10 +104,20 @@
                     'UTM200',
                     'EEW',
                 ],
-
+                empty: v => !!v || '空は許す',
+                tel: value => /^(0[5-9]0[0-9]{8}|0[1-9][1-9][0-9]{7})$/.test(value.replace(/[━.*‐.*―.*－.*\-.*ー.*\-]/gi,
+                    '')) || '電話番号の形式が正しくありません',
+      
 
             }
         },
+        methods: {
+            hoge() {
+                console.log(this.value)
+
+            },
+        }
+
     }
 
 </script>
