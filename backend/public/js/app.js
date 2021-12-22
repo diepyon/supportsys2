@@ -5370,12 +5370,16 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
       dialogm1: '',
-      dialog: false
+      dialog: false,
+      value: {},
+      valid: null,
+      isEditing: false,
+      model: null,
+      items: ['TDC200', 'TD480', 'UTM100', 'UTM200', 'EEW']
     };
   }
 });
@@ -28971,22 +28975,18 @@ var render = function () {
   return _c(
     "div",
     [
-      _c("h1", [_vm._v("\n          受付記録\n      ")]),
+      _c("h1", [_vm._v("\n        受付記録\n    ")]),
       _vm._v(" "),
       _c(
         "v-row",
-        { attrs: { justify: "space-around" } },
+        { attrs: { justify: "justify-start" } },
         [
           _c(
             "v-col",
             { attrs: { cols: "auto" } },
             [
               _c("v-dialog", {
-                attrs: {
-                  transition: "dialog-bottom-transition",
-                  "max-width": "90%",
-                  scrollable: "",
-                },
+                attrs: { "max-width": "90%", scrollable: "" },
                 scopedSlots: _vm._u([
                   {
                     key: "activator",
@@ -29007,7 +29007,7 @@ var render = function () {
                           ),
                           [
                             _c("v-icon", [_vm._v("mdi-lead-pencil")]),
-                            _vm._v("記録入力"),
+                            _vm._v("記録入力\n                    "),
                           ],
                           1
                         ),
@@ -29094,7 +29094,7 @@ var render = function () {
                           ),
                           [
                             _c("v-icon", [_vm._v("mdi-magnify")]),
-                            _vm._v("記録検索"),
+                            _vm._v("記録検索\n                    "),
                           ],
                           1
                         ),
@@ -29150,6 +29150,114 @@ var render = function () {
             ],
             1
           ),
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c(
+        "v-form",
+        {
+          ref: "form",
+          attrs: { "lazy-validation": "" },
+          model: {
+            value: _vm.valid,
+            callback: function ($$v) {
+              _vm.valid = $$v
+            },
+            expression: "valid",
+          },
+        },
+        [
+          _c("v-autocomplete", {
+            attrs: {
+              items: _vm.items,
+              dense: "",
+              filled: "",
+              label: "機種名",
+              required: "",
+              rules: [
+                function (v) {
+                  return !!v || "必須"
+                },
+              ],
+            },
+            model: {
+              value: _vm.value.type,
+              callback: function ($$v) {
+                _vm.$set(_vm.value, "type", $$v)
+              },
+              expression: "value.type",
+            },
+          }),
+          _vm._v(" "),
+          _c("v-text-field", {
+            attrs: { label: "販売店" },
+            model: {
+              value: _vm.value.dealer,
+              callback: function ($$v) {
+                _vm.$set(_vm.value, "dealer", $$v)
+              },
+              expression: "value.dealer",
+            },
+          }),
+          _vm._v(" "),
+          _c("v-text-field", {
+            attrs: { label: "問い合わせ者" },
+            model: {
+              value: _vm.value.questioner,
+              callback: function ($$v) {
+                _vm.$set(_vm.value, "questioner", $$v)
+              },
+              expression: "value.questioner",
+            },
+          }),
+          _vm._v(" "),
+          _c("v-text-field", {
+            attrs: { label: "ユーザー" },
+            model: {
+              value: _vm.value.customer,
+              callback: function ($$v) {
+                _vm.$set(_vm.value, "customer", $$v)
+              },
+              expression: "value.customer",
+            },
+          }),
+          _vm._v(" "),
+          _c("validation-provider", {
+            attrs: {
+              name: "phoneNumber",
+              rules: {
+                required: true,
+                digits: 7,
+                regex: "^(71|72|74|76|81|82|84|85|86|87|88|89)\\d{5}$",
+              },
+            },
+            scopedSlots: _vm._u([
+              {
+                key: "default",
+                fn: function (ref) {
+                  var errors = ref.errors
+                  return [
+                    _c("v-text-field", {
+                      attrs: {
+                        counter: 7,
+                        "error-messages": errors,
+                        label: "Phone Number",
+                        required: "",
+                      },
+                      model: {
+                        value: _vm.phoneNumber,
+                        callback: function ($$v) {
+                          _vm.phoneNumber = $$v
+                        },
+                        expression: "phoneNumber",
+                      },
+                    }),
+                  ]
+                },
+              },
+            ]),
+          }),
         ],
         1
       ),
