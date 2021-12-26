@@ -5302,6 +5302,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'RecordForm',
   data: function data() {
@@ -5331,8 +5332,35 @@ __webpack_require__.r(__webpack_exports__);
   },
   mounted: function mounted() {},
   methods: {
-    hoge: function hoge() {
-      console.log(this.value);
+    post: function post() {
+      //投稿とボタンが押されたときに発動するメソッド
+      var postData = {
+        //v-modelで取得した入力値の内容を変数に格納
+        answer: this.value.answer,
+        authorizer: this.value.authorizer,
+        customer: this.value.customer,
+        dealer: this.value.dealer,
+        kinds: this.value.kinds,
+        phoneNumber: this.value.phoneNumber,
+        question: this.value.question,
+        questioner: this.value.questioner,
+        remote: this.value.remote,
+        satisfaction: this.value.satisfaction,
+        type: this.value.type,
+        operator_id: 1 //とりあえず1
+
+      };
+      console.log(postData);
+      axios.post('/api/inquiries/create', postData) //api.phpのルートを指定。第2引数には渡したい変数を入れる（今回は入力された内容）
+      .then(function (response) {
+        //ここに成功した時に行いたい処理を記載
+        alert('投稿できました');
+        console.log(response); //成功してたらデータが返ってくる
+      })["catch"](function (error) {
+        // handle error(axiosの処理にエラーが発生した場合に処理させたいことを記述)
+        alert('あかんかったわ、コンソール見て');
+        console.log(error);
+      });
     }
   }
 });
@@ -31378,7 +31406,7 @@ var render = function () {
             1
           ),
           _vm._v(" "),
-          _c("button", { attrs: { type: "button" }, on: { click: _vm.hoge } }, [
+          _c("button", { attrs: { type: "button" }, on: { click: _vm.post } }, [
             _vm._v("adfdasf"),
           ]),
         ],

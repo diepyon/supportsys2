@@ -2,7 +2,7 @@
     <div style="padding-top:16px;">
         <v-form ref="form" v-model="valid" lazy-validation>
             <v-autocomplete v-model="value.type" :items="items" dense filled label="機種名" required
-                :rules="[v => !!v || '必須']"  no-data-text="該当なし"></v-autocomplete>
+                :rules="[v => !!v || '必須']" no-data-text="該当なし"></v-autocomplete>
             <v-text-field v-model="value.dealer" label="販売店"></v-text-field>
             <v-row justify="start">
                 <v-col cols="5">
@@ -40,7 +40,8 @@
                     <v-radio label="オリジナル" value="オリジナル"></v-radio>
                     <v-radio label="TeamViewer" value="TeamViewer"></v-radio>
                     <v-col cols="5">
-                        <v-text-field v-model="value.authorizer" label="承認者" :disabled="value.remote=='なし'"></v-text-field>
+                        <v-text-field v-model="value.authorizer" label="承認者" :disabled="value.remote=='なし'">
+                        </v-text-field>
                     </v-col>
                 </v-radio-group>
 
@@ -53,7 +54,7 @@
                     <v-radio label="不満" value="不満"></v-radio>
                 </v-radio-group>
             </v-container>
-            <button type="button" @click="hoge">adfdasf</button>
+            <button type="button" @click="post">adfdasf</button>
         </v-form>
     </div>
 </template>
@@ -65,8 +66,8 @@
                 value: {
                     phoneNumber: "",
                     kinds: "トラブル",
-                    remote:'なし',
-                    satisfaction:"満足",
+                    remote: 'なし',
+                    satisfaction: "満足",
                 },
                 valid: null,
                 isEditing: false,
@@ -91,9 +92,35 @@
 
         },
         methods: {
-            hoge() {
-                console.log(this.value)
+            post() { //投稿とボタンが押されたときに発動するメソッド
+                let postData = {
+                    //v-modelで取得した入力値の内容を変数に格納
+                    answer: this.value.answer,
+                    authorizer: this.value.authorizer,
+                    customer: this.value.customer,
+                    dealer: this.value.dealer,
+                    kinds: this.value.kinds,
+                    phoneNumber:this.value.phoneNumber,
+                    question:this.value.question,
+                    questioner:this.value.questioner,
+                    remote: this.value.remote,
+                    satisfaction: this.value.satisfaction,
+                    type: this.value.type, 
+                    operator_id:1,//とりあえず1
+                }
+                console.log(postData)
 
+                axios.post('/api/inquiries/create', postData) //api.phpのルートを指定。第2引数には渡したい変数を入れる（今回は入力された内容）
+                    .then(response => {
+                        //ここに成功した時に行いたい処理を記載
+                        alert('投稿できました');
+                        console.log(response); //成功してたらデータが返ってくる
+                    })
+                    .catch(function (error) {
+                        // handle error(axiosの処理にエラーが発生した場合に処理させたいことを記述)
+                        alert('あかんかったわ、コンソール見て');
+                        console.log(error);
+                    })
             },
         }
 
