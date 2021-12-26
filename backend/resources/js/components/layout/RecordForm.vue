@@ -1,0 +1,102 @@
+<template>
+    <div style="padding-top:16px;">
+        <v-form ref="form" v-model="valid" lazy-validation>
+            <v-autocomplete v-model="value.type" :items="items" dense filled label="機種名" required
+                :rules="[v => !!v || '必須']"  no-data-text="該当なし"></v-autocomplete>
+            <v-text-field v-model="value.dealer" label="販売店"></v-text-field>
+            <v-row justify="start">
+                <v-col cols="5">
+                    <v-text-field v-model="value.questioner" label="問い合わせ者"></v-text-field>
+                </v-col>
+                <v-col cols="5">
+                    <v-text-field id="tel" v-bind:type="'tel'" v-model="value.phoneNumber" :counter="13" label="電話番号"
+                        :rules="[rules.empty,rules.tel]">
+                    </v-text-field>
+                </v-col>
+            </v-row>
+
+            <v-text-field v-model="value.customer" label="ユーザー"></v-text-field>
+
+            <v-container fluid>
+                <v-radio-group v-model="value.kinds" row>
+                    <v-radio label="設定" value="設定"></v-radio>
+                    <v-radio label="障害" value="障害"></v-radio>
+                    <v-radio label="トラブル" value="トラブル"></v-radio>
+                    <v-radio label="故障" value="故障"></v-radio>
+                    <v-radio label="購入前" value="購入前"></v-radio>
+                    <v-radio label="クレーム" value="クレーム"></v-radio>
+                </v-radio-group>
+            </v-container>
+
+            <v-textarea v-model="value.question" label="問い合わせ内容" required :rules="[rules.required]"></v-textarea>
+            <v-textarea v-model="value.answer" label="回答内容" required :rules="[rules.required]"></v-textarea>
+
+            <v-container fluid>
+                <v-radio-group v-model="value.remote" row>
+                    <template v-slot:label>
+                        <div>リモートメンテナンス</div>
+                    </template>
+                    <v-radio label="なし" value="なし"></v-radio>
+                    <v-radio label="オリジナル" value="オリジナル"></v-radio>
+                    <v-radio label="TeamViewer" value="TeamViewer"></v-radio>
+                    <v-col cols="5">
+                        <v-text-field v-model="value.authorizer" label="承認者" :disabled="value.remote=='なし'"></v-text-field>
+                    </v-col>
+                </v-radio-group>
+
+                <v-radio-group v-model="value.satisfaction" row>
+                    <template v-slot:label>
+                        <div>満足度</div>
+                    </template>
+                    <v-radio label="満足" value="満足"></v-radio>
+                    <v-radio label="普通" value="普通"></v-radio>
+                    <v-radio label="不満" value="不満"></v-radio>
+                </v-radio-group>
+            </v-container>
+            <button type="button" @click="hoge">adfdasf</button>
+        </v-form>
+    </div>
+</template>
+<script>
+    export default {
+        name: 'RecordForm',
+        data() {
+            return {
+                value: {
+                    phoneNumber: "",
+                    kinds: "トラブル",
+                    remote:'なし',
+                    satisfaction:"満足",
+                },
+                valid: null,
+                isEditing: false,
+                model: null,
+                items: [
+                    'TDC200',
+                    'TD480',
+                    'UTM100',
+                    'UTM200',
+                    'EEW',
+                ],
+                rules: {
+                    empty: v => !!v || '空は許す',
+                    tel: value => /^(0[5-9]0[0-9]{8}|0[1-9][1-9][0-9]{7})$/.test(value.replace(
+                        /[━.*‐.*―.*－.*\-.*ー.*\-]/gi,
+                        '')) || '電話番号の形式が正しくありません',
+                    required: v => !!v || '必須'
+                },
+            }
+        },
+        mounted() {
+
+        },
+        methods: {
+            hoge() {
+                console.log(this.value)
+
+            },
+        }
+
+    }
+
+</script>

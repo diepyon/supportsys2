@@ -5232,6 +5232,113 @@ module.exports = {
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/layout/RecordForm.vue?vue&type=script&lang=js&":
+/*!************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/layout/RecordForm.vue?vue&type=script&lang=js& ***!
+  \************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: 'RecordForm',
+  data: function data() {
+    return {
+      value: {
+        phoneNumber: "",
+        kinds: "トラブル",
+        remote: 'なし',
+        satisfaction: "満足"
+      },
+      valid: null,
+      isEditing: false,
+      model: null,
+      items: ['TDC200', 'TD480', 'UTM100', 'UTM200', 'EEW'],
+      rules: {
+        empty: function empty(v) {
+          return !!v || '空は許す';
+        },
+        tel: function tel(value) {
+          return /^(0[5-9]0[0-9]{8}|0[1-9][1-9][0-9]{7})$/.test(value.replace(/[━.*‐.*―.*－.*\-.*ー.*\-]/gi, '')) || '電話番号の形式が正しくありません';
+        },
+        required: function required(v) {
+          return !!v || '必須';
+        }
+      }
+    };
+  },
+  mounted: function mounted() {},
+  methods: {
+    hoge: function hoge() {
+      console.log(this.value);
+    }
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/page/App.vue?vue&type=script&lang=js&":
 /*!***************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/page/App.vue?vue&type=script&lang=js& ***!
@@ -5243,6 +5350,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+//
 //
 //
 //
@@ -5295,6 +5403,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/* harmony import */ var _layout_RecordForm__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../layout/RecordForm */ "./resources/js/components/layout/RecordForm.vue");
 //
 //
 //
@@ -5347,63 +5456,15 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  components: {
+    RecordForm: _layout_RecordForm__WEBPACK_IMPORTED_MODULE_0__["default"]
+  },
   data: function data() {
     return {
-      dialog: false,
-      value: {
-        phoneNumber: ""
-      },
-      valid: null,
-      isEditing: false,
-      model: null,
-      items: ['TDC200', 'TD480', 'UTM100', 'UTM200', 'EEW'],
-      empty: function empty(v) {
-        return !!v || '空は許す';
-      },
-      tel: function tel(value) {
-        return /^(0[5-9]0[0-9]{8}|0[1-9][1-9][0-9]{7})$/.test(value.replace(/[━.*‐.*―.*－.*\-.*ー.*\-]/gi, '')) || '電話番号の形式が正しくありません';
-      }
+      dialog: false
     };
-  },
-  methods: {
-    hoge: function hoge() {
-      console.log(this.value);
-    }
   }
 });
 
@@ -10686,7 +10747,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\nmain.v-main[data-v-30e50968] {\n    background: #E0F2F1;\n}\n.v-navigation-drawer[data-v-30e50968]{\n    background-color: #009688 !important;\n}\na.v-list-item--link.theme--light[data-v-30e50968] {\n    color: white !important;\n}\ni.v-icon.notranslate.mdi.theme--light[data-v-30e50968] {\n    color: white;\n}\ni.v-icon.notranslate.mdi.mdi-menu.theme--light[data-v-30e50968] {\n    color: black;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\nmain.v-main[data-v-30e50968] {\n    background: #E0F2F1;\n}\n.v-navigation-drawer[data-v-30e50968] {\n    background-color: #009688 !important;\n}\na.v-list-item--link.theme--light[data-v-30e50968] {\n    color: white !important;\n}\ni.v-icon.notranslate.mdi.theme--light[data-v-30e50968] {\n    color: white;\n}\ni.v-icon.notranslate.mdi.mdi-menu.theme--light[data-v-30e50968] {\n    color: black;\n}\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -30737,6 +30798,45 @@ var version = '3.4.14';
 
 /***/ }),
 
+/***/ "./resources/js/components/layout/RecordForm.vue":
+/*!*******************************************************!*\
+  !*** ./resources/js/components/layout/RecordForm.vue ***!
+  \*******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _RecordForm_vue_vue_type_template_id_5e68d11f___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./RecordForm.vue?vue&type=template&id=5e68d11f& */ "./resources/js/components/layout/RecordForm.vue?vue&type=template&id=5e68d11f&");
+/* harmony import */ var _RecordForm_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./RecordForm.vue?vue&type=script&lang=js& */ "./resources/js/components/layout/RecordForm.vue?vue&type=script&lang=js&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+;
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _RecordForm_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _RecordForm_vue_vue_type_template_id_5e68d11f___WEBPACK_IMPORTED_MODULE_0__.render,
+  _RecordForm_vue_vue_type_template_id_5e68d11f___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/layout/RecordForm.vue"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (component.exports);
+
+/***/ }),
+
 /***/ "./resources/js/components/page/App.vue":
 /*!**********************************************!*\
   !*** ./resources/js/components/page/App.vue ***!
@@ -30789,7 +30889,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _Archive_vue_vue_type_template_id_5ebee7ed___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Archive.vue?vue&type=template&id=5ebee7ed& */ "./resources/js/components/page/Archive.vue?vue&type=template&id=5ebee7ed&");
+/* harmony import */ var _Archive_vue_vue_type_template_id_5ebee7ed_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Archive.vue?vue&type=template&id=5ebee7ed&scoped=true& */ "./resources/js/components/page/Archive.vue?vue&type=template&id=5ebee7ed&scoped=true&");
 /* harmony import */ var _Archive_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Archive.vue?vue&type=script&lang=js& */ "./resources/js/components/page/Archive.vue?vue&type=script&lang=js&");
 /* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
@@ -30801,11 +30901,11 @@ __webpack_require__.r(__webpack_exports__);
 ;
 var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
   _Archive_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _Archive_vue_vue_type_template_id_5ebee7ed___WEBPACK_IMPORTED_MODULE_0__.render,
-  _Archive_vue_vue_type_template_id_5ebee7ed___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
+  _Archive_vue_vue_type_template_id_5ebee7ed_scoped_true___WEBPACK_IMPORTED_MODULE_0__.render,
+  _Archive_vue_vue_type_template_id_5ebee7ed_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
   false,
   null,
-  null,
+  "5ebee7ed",
   null
   
 )
@@ -30854,6 +30954,22 @@ component.options.__file = "resources/js/components/page/Dashboard.vue"
 
 /***/ }),
 
+/***/ "./resources/js/components/layout/RecordForm.vue?vue&type=script&lang=js&":
+/*!********************************************************************************!*\
+  !*** ./resources/js/components/layout/RecordForm.vue?vue&type=script&lang=js& ***!
+  \********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_RecordForm_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./RecordForm.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/layout/RecordForm.vue?vue&type=script&lang=js&");
+ /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_5_0_rules_0_use_0_node_modules_vue_loader_lib_index_js_vue_loader_options_RecordForm_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
 /***/ "./resources/js/components/page/App.vue?vue&type=script&lang=js&":
 /*!***********************************************************************!*\
   !*** ./resources/js/components/page/App.vue?vue&type=script&lang=js& ***!
@@ -30899,6 +31015,23 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/layout/RecordForm.vue?vue&type=template&id=5e68d11f&":
+/*!**************************************************************************************!*\
+  !*** ./resources/js/components/layout/RecordForm.vue?vue&type=template&id=5e68d11f& ***!
+  \**************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_RecordForm_vue_vue_type_template_id_5e68d11f___WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_RecordForm_vue_vue_type_template_id_5e68d11f___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */ });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_RecordForm_vue_vue_type_template_id_5e68d11f___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./RecordForm.vue?vue&type=template&id=5e68d11f& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/layout/RecordForm.vue?vue&type=template&id=5e68d11f&");
+
+
+/***/ }),
+
 /***/ "./resources/js/components/page/App.vue?vue&type=template&id=30e50968&scoped=true&":
 /*!*****************************************************************************************!*\
   !*** ./resources/js/components/page/App.vue?vue&type=template&id=30e50968&scoped=true& ***!
@@ -30916,19 +31049,19 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/page/Archive.vue?vue&type=template&id=5ebee7ed&":
-/*!*********************************************************************************!*\
-  !*** ./resources/js/components/page/Archive.vue?vue&type=template&id=5ebee7ed& ***!
-  \*********************************************************************************/
+/***/ "./resources/js/components/page/Archive.vue?vue&type=template&id=5ebee7ed&scoped=true&":
+/*!*********************************************************************************************!*\
+  !*** ./resources/js/components/page/Archive.vue?vue&type=template&id=5ebee7ed&scoped=true& ***!
+  \*********************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "render": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Archive_vue_vue_type_template_id_5ebee7ed___WEBPACK_IMPORTED_MODULE_0__.render),
-/* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Archive_vue_vue_type_template_id_5ebee7ed___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
+/* harmony export */   "render": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Archive_vue_vue_type_template_id_5ebee7ed_scoped_true___WEBPACK_IMPORTED_MODULE_0__.render),
+/* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Archive_vue_vue_type_template_id_5ebee7ed_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Archive_vue_vue_type_template_id_5ebee7ed___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Archive.vue?vue&type=template&id=5ebee7ed& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/page/Archive.vue?vue&type=template&id=5ebee7ed&");
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Archive_vue_vue_type_template_id_5ebee7ed_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Archive.vue?vue&type=template&id=5ebee7ed&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/page/Archive.vue?vue&type=template&id=5ebee7ed&scoped=true&");
 
 
 /***/ }),
@@ -30946,6 +31079,318 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "staticRenderFns": () => (/* reexport safe */ _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Dashboard_vue_vue_type_template_id_080ec002___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns)
 /* harmony export */ });
 /* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Dashboard_vue_vue_type_template_id_080ec002___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Dashboard.vue?vue&type=template&id=080ec002& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/page/Dashboard.vue?vue&type=template&id=080ec002&");
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/layout/RecordForm.vue?vue&type=template&id=5e68d11f&":
+/*!*****************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/layout/RecordForm.vue?vue&type=template&id=5e68d11f& ***!
+  \*****************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* binding */ render),
+/* harmony export */   "staticRenderFns": () => (/* binding */ staticRenderFns)
+/* harmony export */ });
+var render = function () {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    { staticStyle: { "padding-top": "16px" } },
+    [
+      _c(
+        "v-form",
+        {
+          ref: "form",
+          attrs: { "lazy-validation": "" },
+          model: {
+            value: _vm.valid,
+            callback: function ($$v) {
+              _vm.valid = $$v
+            },
+            expression: "valid",
+          },
+        },
+        [
+          _c("v-autocomplete", {
+            attrs: {
+              items: _vm.items,
+              dense: "",
+              filled: "",
+              label: "機種名",
+              required: "",
+              rules: [
+                function (v) {
+                  return !!v || "必須"
+                },
+              ],
+              "no-data-text": "該当なし",
+            },
+            model: {
+              value: _vm.value.type,
+              callback: function ($$v) {
+                _vm.$set(_vm.value, "type", $$v)
+              },
+              expression: "value.type",
+            },
+          }),
+          _vm._v(" "),
+          _c("v-text-field", {
+            attrs: { label: "販売店" },
+            model: {
+              value: _vm.value.dealer,
+              callback: function ($$v) {
+                _vm.$set(_vm.value, "dealer", $$v)
+              },
+              expression: "value.dealer",
+            },
+          }),
+          _vm._v(" "),
+          _c(
+            "v-row",
+            { attrs: { justify: "start" } },
+            [
+              _c(
+                "v-col",
+                { attrs: { cols: "5" } },
+                [
+                  _c("v-text-field", {
+                    attrs: { label: "問い合わせ者" },
+                    model: {
+                      value: _vm.value.questioner,
+                      callback: function ($$v) {
+                        _vm.$set(_vm.value, "questioner", $$v)
+                      },
+                      expression: "value.questioner",
+                    },
+                  }),
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "v-col",
+                { attrs: { cols: "5" } },
+                [
+                  _c("v-text-field", {
+                    attrs: {
+                      id: "tel",
+                      type: "tel",
+                      counter: 13,
+                      label: "電話番号",
+                      rules: [_vm.rules.empty, _vm.rules.tel],
+                    },
+                    model: {
+                      value: _vm.value.phoneNumber,
+                      callback: function ($$v) {
+                        _vm.$set(_vm.value, "phoneNumber", $$v)
+                      },
+                      expression: "value.phoneNumber",
+                    },
+                  }),
+                ],
+                1
+              ),
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _c("v-text-field", {
+            attrs: { label: "ユーザー" },
+            model: {
+              value: _vm.value.customer,
+              callback: function ($$v) {
+                _vm.$set(_vm.value, "customer", $$v)
+              },
+              expression: "value.customer",
+            },
+          }),
+          _vm._v(" "),
+          _c(
+            "v-container",
+            { attrs: { fluid: "" } },
+            [
+              _c(
+                "v-radio-group",
+                {
+                  attrs: { row: "" },
+                  model: {
+                    value: _vm.value.kinds,
+                    callback: function ($$v) {
+                      _vm.$set(_vm.value, "kinds", $$v)
+                    },
+                    expression: "value.kinds",
+                  },
+                },
+                [
+                  _c("v-radio", { attrs: { label: "設定", value: "設定" } }),
+                  _vm._v(" "),
+                  _c("v-radio", { attrs: { label: "障害", value: "障害" } }),
+                  _vm._v(" "),
+                  _c("v-radio", {
+                    attrs: { label: "トラブル", value: "トラブル" },
+                  }),
+                  _vm._v(" "),
+                  _c("v-radio", { attrs: { label: "故障", value: "故障" } }),
+                  _vm._v(" "),
+                  _c("v-radio", {
+                    attrs: { label: "購入前", value: "購入前" },
+                  }),
+                  _vm._v(" "),
+                  _c("v-radio", {
+                    attrs: { label: "クレーム", value: "クレーム" },
+                  }),
+                ],
+                1
+              ),
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _c("v-textarea", {
+            attrs: {
+              label: "問い合わせ内容",
+              required: "",
+              rules: [_vm.rules.required],
+            },
+            model: {
+              value: _vm.value.question,
+              callback: function ($$v) {
+                _vm.$set(_vm.value, "question", $$v)
+              },
+              expression: "value.question",
+            },
+          }),
+          _vm._v(" "),
+          _c("v-textarea", {
+            attrs: {
+              label: "回答内容",
+              required: "",
+              rules: [_vm.rules.required],
+            },
+            model: {
+              value: _vm.value.answer,
+              callback: function ($$v) {
+                _vm.$set(_vm.value, "answer", $$v)
+              },
+              expression: "value.answer",
+            },
+          }),
+          _vm._v(" "),
+          _c(
+            "v-container",
+            { attrs: { fluid: "" } },
+            [
+              _c(
+                "v-radio-group",
+                {
+                  attrs: { row: "" },
+                  scopedSlots: _vm._u([
+                    {
+                      key: "label",
+                      fn: function () {
+                        return [_c("div", [_vm._v("リモートメンテナンス")])]
+                      },
+                      proxy: true,
+                    },
+                  ]),
+                  model: {
+                    value: _vm.value.remote,
+                    callback: function ($$v) {
+                      _vm.$set(_vm.value, "remote", $$v)
+                    },
+                    expression: "value.remote",
+                  },
+                },
+                [
+                  _vm._v(" "),
+                  _c("v-radio", { attrs: { label: "なし", value: "なし" } }),
+                  _vm._v(" "),
+                  _c("v-radio", {
+                    attrs: { label: "オリジナル", value: "オリジナル" },
+                  }),
+                  _vm._v(" "),
+                  _c("v-radio", {
+                    attrs: { label: "TeamViewer", value: "TeamViewer" },
+                  }),
+                  _vm._v(" "),
+                  _c(
+                    "v-col",
+                    { attrs: { cols: "5" } },
+                    [
+                      _c("v-text-field", {
+                        attrs: {
+                          label: "承認者",
+                          disabled: _vm.value.remote == "なし",
+                        },
+                        model: {
+                          value: _vm.value.authorizer,
+                          callback: function ($$v) {
+                            _vm.$set(_vm.value, "authorizer", $$v)
+                          },
+                          expression: "value.authorizer",
+                        },
+                      }),
+                    ],
+                    1
+                  ),
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "v-radio-group",
+                {
+                  attrs: { row: "" },
+                  scopedSlots: _vm._u([
+                    {
+                      key: "label",
+                      fn: function () {
+                        return [_c("div", [_vm._v("満足度")])]
+                      },
+                      proxy: true,
+                    },
+                  ]),
+                  model: {
+                    value: _vm.value.satisfaction,
+                    callback: function ($$v) {
+                      _vm.$set(_vm.value, "satisfaction", $$v)
+                    },
+                    expression: "value.satisfaction",
+                  },
+                },
+                [
+                  _vm._v(" "),
+                  _c("v-radio", { attrs: { label: "満足", value: "満足" } }),
+                  _vm._v(" "),
+                  _c("v-radio", { attrs: { label: "普通", value: "普通" } }),
+                  _vm._v(" "),
+                  _c("v-radio", { attrs: { label: "不満", value: "不満" } }),
+                ],
+                1
+              ),
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _c("button", { attrs: { type: "button" }, on: { click: _vm.hoge } }, [
+            _vm._v("adfdasf"),
+          ]),
+        ],
+        1
+      ),
+    ],
+    1
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
 
 
 /***/ }),
@@ -31043,10 +31488,10 @@ render._withStripped = true
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/page/Archive.vue?vue&type=template&id=5ebee7ed&":
-/*!************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/page/Archive.vue?vue&type=template&id=5ebee7ed& ***!
-  \************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/page/Archive.vue?vue&type=template&id=5ebee7ed&scoped=true&":
+/*!************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/page/Archive.vue?vue&type=template&id=5ebee7ed&scoped=true& ***!
+  \************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -31111,14 +31556,10 @@ var render = function () {
                             _c(
                               "v-toolbar",
                               { attrs: { color: "primary", dark: "" } },
-                              [_vm._v("Opening from the bottom")]
+                              [_vm._v("記録入力")]
                             ),
                             _vm._v(" "),
-                            _c("v-card-text", [
-                              _c("div", { staticClass: "text-h2 pa-12" }, [
-                                _vm._v("Hello world!"),
-                              ]),
-                            ]),
+                            _c("v-card-text", [_c("RecordForm")], 1),
                             _vm._v(" "),
                             _c(
                               "v-card-actions",
@@ -31241,156 +31682,7 @@ var render = function () {
         1
       ),
       _vm._v(" "),
-      _c(
-        "v-form",
-        {
-          ref: "form",
-          attrs: { "lazy-validation": "" },
-          model: {
-            value: _vm.valid,
-            callback: function ($$v) {
-              _vm.valid = $$v
-            },
-            expression: "valid",
-          },
-        },
-        [
-          _c("v-autocomplete", {
-            attrs: {
-              items: _vm.items,
-              dense: "",
-              filled: "",
-              label: "機種名",
-              required: "",
-              rules: [
-                function (v) {
-                  return !!v || "必須"
-                },
-              ],
-            },
-            model: {
-              value: _vm.value.type,
-              callback: function ($$v) {
-                _vm.$set(_vm.value, "type", $$v)
-              },
-              expression: "value.type",
-            },
-          }),
-          _vm._v(" "),
-          _c("v-text-field", {
-            attrs: { label: "販売店" },
-            model: {
-              value: _vm.value.dealer,
-              callback: function ($$v) {
-                _vm.$set(_vm.value, "dealer", $$v)
-              },
-              expression: "value.dealer",
-            },
-          }),
-          _vm._v(" "),
-          _c(
-            "v-row",
-            { attrs: { justify: "start" } },
-            [
-              _c(
-                "v-col",
-                { attrs: { cols: "auto" } },
-                [
-                  _c("v-text-field", {
-                    attrs: { label: "問い合わせ者" },
-                    model: {
-                      value: _vm.value.questioner,
-                      callback: function ($$v) {
-                        _vm.$set(_vm.value, "questioner", $$v)
-                      },
-                      expression: "value.questioner",
-                    },
-                  }),
-                ],
-                1
-              ),
-              _vm._v(" "),
-              _c(
-                "v-col",
-                { attrs: { cols: "auto" } },
-                [
-                  _c("v-text-field", {
-                    attrs: {
-                      id: "tel",
-                      type: "tel",
-                      counter: 13,
-                      label: "電話番号",
-                      rules: [_vm.empty, _vm.tel],
-                    },
-                    model: {
-                      value: _vm.value.phoneNumber,
-                      callback: function ($$v) {
-                        _vm.$set(_vm.value, "phoneNumber", $$v)
-                      },
-                      expression: "value.phoneNumber",
-                    },
-                  }),
-                ],
-                1
-              ),
-            ],
-            1
-          ),
-          _vm._v(" "),
-          _c("v-text-field", {
-            attrs: { label: "ユーザー" },
-            model: {
-              value: _vm.value.customer,
-              callback: function ($$v) {
-                _vm.$set(_vm.value, "customer", $$v)
-              },
-              expression: "value.customer",
-            },
-          }),
-          _vm._v(" "),
-          _c(
-            "v-container",
-            { attrs: { fluid: "" } },
-            [
-              _c(
-                "v-radio-group",
-                {
-                  attrs: { row: "" },
-                  model: {
-                    value: _vm.value.radio,
-                    callback: function ($$v) {
-                      _vm.$set(_vm.value, "radio", $$v)
-                    },
-                    expression: "value.radio",
-                  },
-                },
-                [
-                  _c("v-radio", {
-                    attrs: { label: "トラブル", value: "radio-1" },
-                  }),
-                  _vm._v(" "),
-                  _c("v-radio", { attrs: { label: "障害", value: "radio-2" } }),
-                  _vm._v(" "),
-                  _c("v-radio", { attrs: { label: "故障", value: "radio-3" } }),
-                  _vm._v(" "),
-                  _c("v-radio", {
-                    attrs: { label: "購入前", value: "radio-4" },
-                  }),
-                  _vm._v(" "),
-                  _c("v-radio", {
-                    attrs: { label: "クレーム", value: "radio-5" },
-                  }),
-                ],
-                1
-              ),
-            ],
-            1
-          ),
-        ],
-        1
-      ),
-      _vm._v(" "),
-      _c("button", { on: { click: _vm.hoge } }, [_vm._v("adfdasf")]),
+      _c("RecordForm"),
     ],
     1
   )
