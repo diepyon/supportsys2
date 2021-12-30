@@ -19,8 +19,6 @@
             <v-toolbar-title>Application</v-toolbar-title>
         </v-app-bar>
 
-
-
         <v-main>
             <v-container>
                 <router-view />

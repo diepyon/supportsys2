@@ -9,11 +9,11 @@ class InquiryController extends Controller
     public function create(Request $request ,Inquiry $inquiry) 
     {
         $inquiry->answer =$request->input('answer');
-        $inquiry->authorizer=$request->input('authorizer');
+        $inquiry->authorizer=$request->input('authorizer');//remoteがなしなら登録しなくていいかも
         $inquiry->customer=$request->input('customer');
         $inquiry->dealer=$request->input('dealer');
         $inquiry->kinds=$request->input('kinds');
-        $inquiry->phoneNumber=$request->input('phoneNumber');
+        $inquiry->phoneNumber=$request->input('phoneNumber');//ハイフン以外の文字列があったら取り除きたい
         $inquiry->question=$request->input('question');
         $inquiry->questioner=$request->input('questioner');
         $inquiry->remote=$request->input('remote');

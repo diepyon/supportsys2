@@ -8,7 +8,7 @@
     <title>Example</title>
 <link rel="stylesheet" href="{{ mix('css/app.css') }}">
 </head>
-<body>
+<body onfocus="top.focus()">
     <div id="app">
         <App />
     </div>

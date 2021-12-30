@@ -5303,6 +5303,15 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'RecordForm',
   data: function data() {
@@ -5330,7 +5339,9 @@ __webpack_require__.r(__webpack_exports__);
       }
     };
   },
-  mounted: function mounted() {},
+  mounted: function mounted() {
+    this.$emit('parentMethod', this.value);
+  },
   methods: {
     post: function post() {
       //投稿とボタンが押されたときに発動するメソッド
@@ -5351,16 +5362,22 @@ __webpack_require__.r(__webpack_exports__);
 
       };
       console.log(postData);
-      axios.post('/api/inquiries/create', postData) //api.phpのルートを指定。第2引数には渡したい変数を入れる（今回は入力された内容）
-      .then(function (response) {
-        //ここに成功した時に行いたい処理を記載
-        alert('投稿できました');
-        console.log(response); //成功してたらデータが返ってくる
-      })["catch"](function (error) {
-        // handle error(axiosの処理にエラーが発生した場合に処理させたいことを記述)
-        alert('あかんかったわ、コンソール見て');
-        console.log(error);
-      });
+
+      if (this.$refs.test_form.validate()) {
+        axios.post('/api/inquiries/create', postData) //api.phpのルートを指定。第2引数には渡したい変数を入れる（今回は入力された内容）
+        .then(function (response) {
+          //ここに成功した時に行いたい処理を記載
+          alert('投稿できました');
+          console.log(response); //成功してたらデータが返ってくる
+        })["catch"](function (error) {
+          // handle error(axiosの処理にエラーが発生した場合に処理させたいことを記述)
+          alert('あかんかったわ、コンソール見て');
+          console.log(error);
+        });
+        this.success = true;
+      } else {
+        alert('入力内容に不備があります。');
+      }
     }
   }
 });
@@ -5378,8 +5395,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-//
-//
 //
 //
 //
@@ -5484,6 +5499,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
@@ -5491,8 +5507,37 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
-      dialog: false
+      dialog: false,
+      value: ''
     };
+  },
+  methods: {
+    submit: function submit(value) {
+      this.$refs.RecordForm.post();
+      /*                 var result = this.judge(this.value)
+                      if(result === true){
+                          console.log('送信')
+                          //this.$refs.RecordForm.post()
+                      }else{
+                          alert('入力内容に不備があります。')//何があかんのかもわかるようにしたい
+                          //https://qiita.com/tekunikaruza_jp/items/0a68d86084d961d632ac
+                      } */
+    },
+    getValue: function getValue(value) {
+      this.value = value;
+    },
+    //子コンポーネントから送られてくる入力情報を受け取る
+    judge: function judge(value) {
+      //この関数要らんかも
+      if (value.answer && value.type && value.kinds && value.remote && value.satisfaction && value.question && value.authorizer) {
+        return true;
+      } else if ((value.remote == 'なし' || value.remote == 'オリジナル') && value.answer && value.type && value.kinds && value.remote && value.satisfaction && value.question) {
+        return false; //リモートメンテナンスはチームビューアーではないので承認者名はなくても許す
+      } else {
+        return false;
+      }
+    } //入力内容に問題がないかチェック　なければtrueをreturn
+
   }
 });
 
@@ -31134,7 +31179,7 @@ var render = function () {
       _c(
         "v-form",
         {
-          ref: "form",
+          ref: "test_form",
           attrs: { "lazy-validation": "" },
           model: {
             value: _vm.valid,
@@ -31152,12 +31197,9 @@ var render = function () {
               filled: "",
               label: "機種名",
               required: "",
-              rules: [
-                function (v) {
-                  return !!v || "必須"
-                },
-              ],
+              rules: [_vm.rules.required],
               "no-data-text": "該当なし",
+              tabindex: "",
             },
             model: {
               value: _vm.value.type,
@@ -31188,7 +31230,7 @@ var render = function () {
                 { attrs: { cols: "5" } },
                 [
                   _c("v-text-field", {
-                    attrs: { label: "問い合わせ者" },
+                    attrs: { label: "問い合わせ者", tabindex: "" },
                     model: {
                       value: _vm.value.questioner,
                       callback: function ($$v) {
@@ -31210,8 +31252,9 @@ var render = function () {
                       id: "tel",
                       type: "tel",
                       counter: 13,
-                      label: "電話番号",
+                      label: "TEL(「 - 」有無どちらでも可)",
                       rules: [_vm.rules.empty, _vm.rules.tel],
+                      tabindex: "",
                     },
                     model: {
                       value: _vm.value.phoneNumber,
@@ -31229,7 +31272,7 @@ var render = function () {
           ),
           _vm._v(" "),
           _c("v-text-field", {
-            attrs: { label: "ユーザー" },
+            attrs: { label: "ユーザー", tabindex: "" },
             model: {
               value: _vm.value.customer,
               callback: function ($$v) {
@@ -31261,7 +31304,11 @@ var render = function () {
                   _c("v-radio", { attrs: { label: "障害", value: "障害" } }),
                   _vm._v(" "),
                   _c("v-radio", {
-                    attrs: { label: "トラブル", value: "トラブル" },
+                    attrs: {
+                      label: "トラブル",
+                      value: "トラブル",
+                      tabindex: "",
+                    },
                   }),
                   _vm._v(" "),
                   _c("v-radio", { attrs: { label: "故障", value: "故障" } }),
@@ -31285,6 +31332,7 @@ var render = function () {
               label: "問い合わせ内容",
               required: "",
               rules: [_vm.rules.required],
+              tabindex: "",
             },
             model: {
               value: _vm.value.question,
@@ -31300,6 +31348,7 @@ var render = function () {
               label: "回答内容",
               required: "",
               rules: [_vm.rules.required],
+              tabindex: "",
             },
             model: {
               value: _vm.value.answer,
@@ -31337,7 +31386,9 @@ var render = function () {
                 },
                 [
                   _vm._v(" "),
-                  _c("v-radio", { attrs: { label: "なし", value: "なし" } }),
+                  _c("v-radio", {
+                    attrs: { label: "なし", value: "なし", tabindex: "" },
+                  }),
                   _vm._v(" "),
                   _c("v-radio", {
                     attrs: { label: "オリジナル", value: "オリジナル" },
@@ -31351,19 +31402,48 @@ var render = function () {
                     "v-col",
                     { attrs: { cols: "5" } },
                     [
-                      _c("v-text-field", {
-                        attrs: {
-                          label: "承認者",
-                          disabled: _vm.value.remote == "なし",
-                        },
-                        model: {
-                          value: _vm.value.authorizer,
-                          callback: function ($$v) {
-                            _vm.$set(_vm.value, "authorizer", $$v)
-                          },
-                          expression: "value.authorizer",
-                        },
-                      }),
+                      _vm.value.remote == "なし"
+                        ? _c("v-text-field", {
+                            attrs: { label: "承認者", disabled: "" },
+                            model: {
+                              value: _vm.value.authorizer,
+                              callback: function ($$v) {
+                                _vm.$set(_vm.value, "authorizer", $$v)
+                              },
+                              expression: "value.authorizer",
+                            },
+                          })
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _vm.value.remote == "オリジナル"
+                        ? _c("v-text-field", {
+                            attrs: { label: "承認者" },
+                            model: {
+                              value: _vm.value.authorizer,
+                              callback: function ($$v) {
+                                _vm.$set(_vm.value, "authorizer", $$v)
+                              },
+                              expression: "value.authorizer",
+                            },
+                          })
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _vm.value.remote == "TeamViewer"
+                        ? _c("v-text-field", {
+                            attrs: {
+                              label: "承認者",
+                              required: "",
+                              rules: [_vm.rules.required],
+                            },
+                            model: {
+                              value: _vm.value.authorizer,
+                              callback: function ($$v) {
+                                _vm.$set(_vm.value, "authorizer", $$v)
+                              },
+                              expression: "value.authorizer",
+                            },
+                          })
+                        : _vm._e(),
                     ],
                     1
                   ),
@@ -31394,7 +31474,9 @@ var render = function () {
                 },
                 [
                   _vm._v(" "),
-                  _c("v-radio", { attrs: { label: "満足", value: "満足" } }),
+                  _c("v-radio", {
+                    attrs: { label: "満足", value: "満足", tabindex: "1100" },
+                  }),
                   _vm._v(" "),
                   _c("v-radio", { attrs: { label: "普通", value: "普通" } }),
                   _vm._v(" "),
@@ -31406,9 +31488,14 @@ var render = function () {
             1
           ),
           _vm._v(" "),
-          _c("button", { attrs: { type: "button" }, on: { click: _vm.post } }, [
-            _vm._v("adfdasf"),
-          ]),
+          _c(
+            "button",
+            {
+              attrs: { type: "button", tabindex: "" },
+              on: { click: _vm.post },
+            },
+            [_vm._v("adfdasf")]
+          ),
         ],
         1
       ),
@@ -31558,7 +31645,7 @@ var render = function () {
                           "v-btn",
                           _vm._g(
                             _vm._b(
-                              { attrs: { color: "primary" } },
+                              { attrs: { color: "primary", tabindex: "1" } },
                               "v-btn",
                               attrs,
                               false
@@ -31587,7 +31674,18 @@ var render = function () {
                               [_vm._v("記録入力")]
                             ),
                             _vm._v(" "),
-                            _c("v-card-text", [_c("RecordForm")], 1),
+                            _c(
+                              "v-card-text",
+                              [
+                                _c("RecordForm", {
+                                  ref: "RecordForm",
+                                  on: { parentMethod: _vm.getValue },
+                                }),
+                                _vm._v(" "),
+                                _c("p", [_vm._v(_vm._s(_vm.value))]),
+                              ],
+                              1
+                            ),
                             _vm._v(" "),
                             _c(
                               "v-card-actions",
@@ -31596,7 +31694,16 @@ var render = function () {
                                 _c(
                                   "v-btn",
                                   {
-                                    attrs: { text: "" },
+                                    attrs: { text: "", tabindex: "" },
+                                    on: { click: _vm.submit },
+                                  },
+                                  [_vm._v("登録")]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "v-btn",
+                                  {
+                                    attrs: { text: "", tabindex: "" },
                                     on: {
                                       click: function ($event) {
                                         dialog.value = false
@@ -31641,7 +31748,7 @@ var render = function () {
                           "v-btn",
                           _vm._g(
                             _vm._b(
-                              { attrs: { color: "primary" } },
+                              { attrs: { color: "primary", tabindex: "2" } },
                               "v-btn",
                               attrs,
                               false
@@ -31683,7 +31790,7 @@ var render = function () {
                                 _c(
                                   "v-btn",
                                   {
-                                    attrs: { text: "" },
+                                    attrs: { text: "", tabindex: "" },
                                     on: {
                                       click: function ($event) {
                                         dialog.value = false
@@ -31709,8 +31816,6 @@ var render = function () {
         ],
         1
       ),
-      _vm._v(" "),
-      _c("RecordForm"),
     ],
     1
   )
