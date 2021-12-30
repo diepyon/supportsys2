@@ -10,7 +10,7 @@
                 </v-col>
                 <v-col cols="5">
                     <v-text-field id="tel" v-bind:type="'tel'" v-model="value.phoneNumber" :counter="13"
-                        label="TEL(「 - 」有無どちらでも可)" :rules="[rules.empty,rules.tel]" tabindex="">
+                        label="TEL(「 - 」有無どちらでも可)" :rules="[rules.tel]" tabindex="">
                     </v-text-field>
                 </v-col>
             </v-row>
@@ -63,7 +63,6 @@
                     <v-radio label="不満" value="不満"></v-radio>
                 </v-radio-group>
             </v-container>
-            <button type="button" @click="post" tabindex="">adfdasf</button>
         </v-form>
     </div>
 </template>
@@ -89,16 +88,16 @@
                     'EEW',
                 ],
                 rules: {
-                    empty: v => !!v || '空は許す',
-                    tel: value => /^(0[5-9]0[0-9]{8}|0[1-9][1-9][0-9]{7})$/.test(value.replace(
+                    tel: value => (/^(0[5-9]0[0-9]{8}|0[1-9][1-9][0-9]{7})$/.test(value.replace(
                         /[━.*‐.*―.*－.*\-.*ー.*\-]/gi,
-                        '')) || '電話番号の形式が正しくありません',
-                    required: v => !!v || '必須'
+                        '')) || value == '') || '電話番号の形式が正しくありません',
+                    required: v => !!v || '必須',
+
                 },
             }
         },
         mounted() {
-            this.$emit('parentMethod', this.value)
+            
         },
         methods: {
             post() { //投稿とボタンが押されたときに発動するメソッド
@@ -131,7 +130,7 @@
                             alert('あかんかったわ、コンソール見て');
                             console.log(error);
                         })
-                    this.success = true;
+
                 } else {
                     alert('入力内容に不備があります。')
                 }

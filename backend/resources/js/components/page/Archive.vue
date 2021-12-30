@@ -15,8 +15,7 @@
                         <v-card>
                             <v-toolbar color="primary" dark>記録入力</v-toolbar>
                             <v-card-text>
-                                <RecordForm ref="RecordForm" @parentMethod="getValue"></RecordForm>
-                                <p>{{ value }}</p>
+                                <RecordForm ref="RecordForm"></RecordForm>
                             </v-card-text>
                             <v-card-actions class="end">
                                 <v-btn text @click="submit" tabindex="">登録</v-btn>
@@ -49,6 +48,8 @@
             </v-col>
         </v-row>
 
+
+
     </div>
 </template>
 <script>
@@ -61,36 +62,13 @@
         data() {
             return {
                 dialog: false,
-                value: '',
+              
             }
         },
         methods: {
-            submit(value) {
+            submit() {
                 this.$refs.RecordForm.post()
-/*                 var result = this.judge(this.value)
-                if(result === true){
-                    console.log('送信')
-                    //this.$refs.RecordForm.post()
-                }else{
-                    alert('入力内容に不備があります。')//何があかんのかもわかるようにしたい
-                    //https://qiita.com/tekunikaruza_jp/items/0a68d86084d961d632ac
-                } */
             },
-            
-            getValue(value) {
-                this.value = value
-            },//子コンポーネントから送られてくる入力情報を受け取る
-
-            judge(value){
-                //この関数要らんかも
-                if(value.answer && value.type && value.kinds && value.remote && value.satisfaction && value.question && value.authorizer){
-                    return true
-                }else if((value.remote=='なし'|| value.remote=='オリジナル') && value.answer && value.type && value.kinds && value.remote && value.satisfaction && value.question){
-                   return false //リモートメンテナンスはチームビューアーではないので承認者名はなくても許す
-                }else{
-                    return false 
-                }
-            }//入力内容に問題がないかチェック　なければtrueをreturn
         }
     }
 

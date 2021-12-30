@@ -9,7 +9,9 @@ class InquiryController extends Controller
     public function create(Request $request ,Inquiry $inquiry) 
     {
         $inquiry->answer =$request->input('answer');
-        $inquiry->authorizer=$request->input('authorizer');//remoteがなしなら登録しなくていいかも
+        if($request->input('remote') !='なし'){//remoteがなしなら承認者は登録しない
+            $inquiry->authorizer=$request->input('authorizer');
+        }
         $inquiry->customer=$request->input('customer');
         $inquiry->dealer=$request->input('dealer');
         $inquiry->kinds=$request->input('kinds');

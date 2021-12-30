@@ -5311,7 +5311,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'RecordForm',
   data: function data() {
@@ -5327,11 +5326,8 @@ __webpack_require__.r(__webpack_exports__);
       model: null,
       items: ['TDC200', 'TD480', 'UTM100', 'UTM200', 'EEW'],
       rules: {
-        empty: function empty(v) {
-          return !!v || '空は許す';
-        },
         tel: function tel(value) {
-          return /^(0[5-9]0[0-9]{8}|0[1-9][1-9][0-9]{7})$/.test(value.replace(/[━.*‐.*―.*－.*\-.*ー.*\-]/gi, '')) || '電話番号の形式が正しくありません';
+          return /^(0[5-9]0[0-9]{8}|0[1-9][1-9][0-9]{7})$/.test(value.replace(/[━.*‐.*―.*－.*\-.*ー.*\-]/gi, '')) || value == '' || '電話番号の形式が正しくありません';
         },
         required: function required(v) {
           return !!v || '必須';
@@ -5339,9 +5335,7 @@ __webpack_require__.r(__webpack_exports__);
       }
     };
   },
-  mounted: function mounted() {
-    this.$emit('parentMethod', this.value);
-  },
+  mounted: function mounted() {},
   methods: {
     post: function post() {
       //投稿とボタンが押されたときに発動するメソッド
@@ -5374,7 +5368,6 @@ __webpack_require__.r(__webpack_exports__);
           alert('あかんかったわ、コンソール見て');
           console.log(error);
         });
-        this.success = true;
       } else {
         alert('入力内容に不備があります。');
       }
@@ -5500,6 +5493,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
@@ -5507,37 +5501,13 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
-      dialog: false,
-      value: ''
+      dialog: false
     };
   },
   methods: {
-    submit: function submit(value) {
+    submit: function submit() {
       this.$refs.RecordForm.post();
-      /*                 var result = this.judge(this.value)
-                      if(result === true){
-                          console.log('送信')
-                          //this.$refs.RecordForm.post()
-                      }else{
-                          alert('入力内容に不備があります。')//何があかんのかもわかるようにしたい
-                          //https://qiita.com/tekunikaruza_jp/items/0a68d86084d961d632ac
-                      } */
-    },
-    getValue: function getValue(value) {
-      this.value = value;
-    },
-    //子コンポーネントから送られてくる入力情報を受け取る
-    judge: function judge(value) {
-      //この関数要らんかも
-      if (value.answer && value.type && value.kinds && value.remote && value.satisfaction && value.question && value.authorizer) {
-        return true;
-      } else if ((value.remote == 'なし' || value.remote == 'オリジナル') && value.answer && value.type && value.kinds && value.remote && value.satisfaction && value.question) {
-        return false; //リモートメンテナンスはチームビューアーではないので承認者名はなくても許す
-      } else {
-        return false;
-      }
-    } //入力内容に問題がないかチェック　なければtrueをreturn
-
+    }
   }
 });
 
@@ -31253,7 +31223,7 @@ var render = function () {
                       type: "tel",
                       counter: 13,
                       label: "TEL(「 - 」有無どちらでも可)",
-                      rules: [_vm.rules.empty, _vm.rules.tel],
+                      rules: [_vm.rules.tel],
                       tabindex: "",
                     },
                     model: {
@@ -31487,15 +31457,6 @@ var render = function () {
             ],
             1
           ),
-          _vm._v(" "),
-          _c(
-            "button",
-            {
-              attrs: { type: "button", tabindex: "" },
-              on: { click: _vm.post },
-            },
-            [_vm._v("adfdasf")]
-          ),
         ],
         1
       ),
@@ -31676,14 +31637,7 @@ var render = function () {
                             _vm._v(" "),
                             _c(
                               "v-card-text",
-                              [
-                                _c("RecordForm", {
-                                  ref: "RecordForm",
-                                  on: { parentMethod: _vm.getValue },
-                                }),
-                                _vm._v(" "),
-                                _c("p", [_vm._v(_vm._s(_vm.value))]),
-                              ],
+                              [_c("RecordForm", { ref: "RecordForm" })],
                               1
                             ),
                             _vm._v(" "),
