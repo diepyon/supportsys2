@@ -20,3 +20,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('/inquiries/create', [InquiryController::class, 'create']);
+
+Route::get('/inquiries/edit', [InquiryController::class, 'edit']);
+Route::post('/inquiries/edit', [InquiryController::class, 'edit']);
+
+Route::get('/inquiries/archive', [InquiryController::class, 'show']);
+
+Route::get('/inquiries/{id}', [InquiryController::class, 'single']);
+
+Route::post('/inquiries/delete', [InquiryController::class, 'delete']);

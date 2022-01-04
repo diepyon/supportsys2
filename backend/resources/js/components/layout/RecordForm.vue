@@ -2,55 +2,52 @@
     <div style="padding-top:16px;">
         <v-form ref="test_form" v-model="valid" lazy-validation>
             <v-autocomplete v-model="value.type" :items="items" dense filled label="機種名" required
-                :rules="[rules.required]" no-data-text="該当なし" tabindex=""></v-autocomplete>
+                :rules="[rules.required]" no-data-text="該当なし"></v-autocomplete>
             <v-text-field v-model="value.dealer" label="販売店"></v-text-field>
             <v-row justify="start">
                 <v-col cols="5">
-                    <v-text-field v-model="value.questioner" label="問い合わせ者" tabindex=""></v-text-field>
+                    <v-text-field v-model="value.questioner" label="問い合わせ者"></v-text-field>
                 </v-col>
                 <v-col cols="5">
                     <v-text-field id="tel" v-bind:type="'tel'" v-model="value.phoneNumber" :counter="13"
-                        label="TEL(「 - 」有無どちらでも可)" :rules="[rules.tel]" tabindex="">
+                        label="TEL(「 - 」有無どちらでも可)" :rules="[rules.tel]">
                     </v-text-field>
                 </v-col>
             </v-row>
 
-            <v-text-field v-model="value.customer" label="ユーザー" tabindex=""></v-text-field>
+            <v-text-field v-model="value.customer" label="ユーザー"></v-text-field>
 
             <v-container fluid>
                 <v-radio-group v-model="value.kinds" row>
                     <v-radio label="設定" value="設定"></v-radio>
                     <v-radio label="障害" value="障害"></v-radio>
-                    <v-radio label="トラブル" value="トラブル" tabindex=""></v-radio>
+                    <v-radio label="トラブル" value="トラブル"></v-radio>
                     <v-radio label="故障" value="故障"></v-radio>
                     <v-radio label="購入前" value="購入前"></v-radio>
                     <v-radio label="クレーム" value="クレーム"></v-radio>
                 </v-radio-group>
             </v-container>
 
-            <v-textarea v-model="value.question" label="問い合わせ内容" required :rules="[rules.required]" tabindex="">
+            <v-textarea v-model="value.question" label="問い合わせ内容" required :rules="[rules.required]">
             </v-textarea>
-            <v-textarea v-model="value.answer" label="回答内容" required :rules="[rules.required]" tabindex=""></v-textarea>
+            <v-textarea v-model="value.answer" label="回答内容" required :rules="[rules.required]"></v-textarea>
 
             <v-container fluid>
                 <v-radio-group v-model="value.remote" row>
                     <template v-slot:label>
                         <div>リモートメンテナンス</div>
                     </template>
-                    <v-radio label="なし" value="なし" tabindex=""></v-radio>
+                    <v-radio label="なし" value="なし"></v-radio>
                     <v-radio label="オリジナル" value="オリジナル"></v-radio>
                     <v-radio label="TeamViewer" value="TeamViewer"></v-radio>
                     <v-col cols="5">
                         <v-text-field v-if="value.remote=='なし'" v-model="value.authorizer" label="承認者" disabled>
                         </v-text-field>
-
                         <v-text-field v-if="value.remote=='オリジナル'" v-model="value.authorizer" label="承認者">
                         </v-text-field>
-
                         <v-text-field v-if="value.remote=='TeamViewer'" v-model="value.authorizer" label="承認者" required
                             :rules="[rules.required]">
                         </v-text-field>
-
                     </v-col>
                 </v-radio-group>
 
@@ -69,8 +66,11 @@
 <script>
     export default {
         name: 'RecordForm',
+        props: ["id"],
         data() {
             return {
+                //もしIDが指定されていないならvalueは下記（editで指定されてる版も別途指定が必要）
+
                 value: {
                     phoneNumber: "",
                     kinds: "トラブル",
@@ -97,7 +97,18 @@
             }
         },
         mounted() {
-            
+            if (this.id) {
+                axios.get('/api/inquiries/' + this.id)
+                    .then(response => {
+                        this.inquiry = response.data.data
+                        this.value = {
+                            phoneNumber: this.inquiry.phoneNumber,
+                            kinds: this.inquiry.kinds,
+                            remote: this.inquiry.remote,
+                            satisfaction: this.inquiry.satisfaction,
+                        }
+                    })
+            }
         },
         methods: {
             post() { //投稿とボタンが押されたときに発動するメソッド
@@ -124,6 +135,10 @@
                             //ここに成功した時に行いたい処理を記載
                             alert('投稿できました');
                             console.log(response); //成功してたらデータが返ってくる
+                            this.$router.go({
+                                path: this.$router.currentRoute.path,
+                                force: true
+                            })
                         })
                         .catch(function (error) {
                             // handle error(axiosの処理にエラーが発生した場合に処理させたいことを記述)

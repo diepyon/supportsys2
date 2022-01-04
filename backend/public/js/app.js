@@ -5308,13 +5308,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'RecordForm',
+  props: ["id"],
   data: function data() {
     return {
+      //もしIDが指定されていないならvalueは下記（editで指定されてる版も別途指定が必要）
       value: {
         phoneNumber: "",
         kinds: "トラブル",
@@ -5335,9 +5334,25 @@ __webpack_require__.r(__webpack_exports__);
       }
     };
   },
-  mounted: function mounted() {},
+  mounted: function mounted() {
+    var _this = this;
+
+    if (this.id) {
+      axios.get('/api/inquiries/' + this.id).then(function (response) {
+        _this.inquiry = response.data.data;
+        _this.value = {
+          phoneNumber: _this.inquiry.phoneNumber,
+          kinds: _this.inquiry.kinds,
+          remote: _this.inquiry.remote,
+          satisfaction: _this.inquiry.satisfaction
+        };
+      });
+    }
+  },
   methods: {
     post: function post() {
+      var _this2 = this;
+
       //投稿とボタンが押されたときに発動するメソッド
       var postData = {
         //v-modelで取得した入力値の内容を変数に格納
@@ -5363,6 +5378,11 @@ __webpack_require__.r(__webpack_exports__);
           //ここに成功した時に行いたい処理を記載
           alert('投稿できました');
           console.log(response); //成功してたらデータが返ってくる
+
+          _this2.$router.go({
+            path: _this2.$router.currentRoute.path,
+            force: true
+          });
         })["catch"](function (error) {
           // handle error(axiosの処理にエラーが発生した場合に処理させたいことを記述)
           alert('あかんかったわ、コンソール見て');
@@ -5494,6 +5514,137 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
@@ -5501,12 +5652,67 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
-      dialog: false
+      dialog: false,
+      inquiries: null,
+      cardMenus: [{
+        title: '削除',
+        method: 'delete'
+      }, {
+        title: 'ダミー',
+        method: 'delete'
+      }],
+      snackbar: false,
+      text: "\u524A\u9664\u3057\u307E\u3057\u305F"
     };
+  },
+  mounted: function mounted() {
+    var _this = this;
+
+    axios.get('/api/inquiries/archive').then(function (response) {
+      _this.inquiries = response.data.data.reverse();
+      console.log(_this.inquiries);
+    });
   },
   methods: {
     submit: function submit() {
       this.$refs.RecordForm.post();
+    },
+    copyToClipboard: function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(function () {
+        alert('copied');
+      })["catch"](function (e) {
+        console.error(e);
+      });
+    },
+    triggerClick: function triggerClick(method, id) {
+      if (method === "delete") {
+        this["delete"](id);
+      }
+    },
+    "delete": function _delete(id) {
+      var activeClass = document.getElementById(id);
+      activeClass.classList.add("activeCard");
+      var postdata = {
+        id: id
+      }; //消したい記事のidをオブジェクトidに格納
+
+      setTimeout(function () {
+        if (confirm('削除しますか')) {
+          axios.post('/api/inquiries/delete', postdata).then(function (response) {
+            //ここに成功した時に行いたい処理を記載
+            //alert('削除しました。');
+            console.log(response); //成功してたらデータが返ってくる
+
+            activeClass.classList.add("delete");
+          })["catch"](function (error) {
+            alert('削除できませんでした。');
+            console.log(error);
+          });
+        } else {
+          //やっぱり削除しなかったときの処理
+          activeClass.classList.remove("activeCard");
+        }
+      }, 10);
     }
   }
 });
@@ -10791,6 +10997,30 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, "\nmain.v-main[data-v-30e50968] {\n    background: #E0F2F1;\n}\n.v-navigation-drawer[data-v-30e50968] {\n    background-color: #009688 !important;\n}\na.v-list-item--link.theme--light[data-v-30e50968] {\n    color: white !important;\n}\ni.v-icon.notranslate.mdi.theme--light[data-v-30e50968] {\n    color: white;\n}\ni.v-icon.notranslate.mdi.mdi-menu.theme--light[data-v-30e50968] {\n    color: black;\n}\n\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/page/Archive.vue?vue&type=style&index=0&id=5ebee7ed&scoped=true&lang=css&":
+/*!***************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/page/Archive.vue?vue&type=style&index=0&id=5ebee7ed&scoped=true&lang=css& ***!
+  \***************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.inquiry[data-v-5ebee7ed] {\n    margin: 2em 0;\n}\n.bigFont[data-v-5ebee7ed] {\n    font-size: 1.0rem !important;\n    white-space: break-spaces;\n}\n.people[data-v-5ebee7ed] {\n    font-size: 0.75em;\n}\n.overflow[data-v-5ebee7ed] {\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.id[data-v-5ebee7ed] {\n    bottom: 1em;\n    right: 1em;\n    position: absolute;\n}\n.subject[data-v-5ebee7ed] {\n    color: #009688;\n}\n.hover[data-v-5ebee7ed]:hover {\n    opacity: 0.7;\n    background-color: rgba(49, 49, 49, 0.767);\n    cursor: pointer;\n    color: #FFF !important;\n}\n.activeCard[data-v-5ebee7ed] {\n    opacity: 0.5;\n    transition: .5s;\n}\n.delete[data-v-5ebee7ed] {\n    display: none;\n}\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -28501,6 +28731,36 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 /***/ }),
 
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/page/Archive.vue?vue&type=style&index=0&id=5ebee7ed&scoped=true&lang=css&":
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/page/Archive.vue?vue&type=style&index=0&id=5ebee7ed&scoped=true&lang=css& ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Archive_vue_vue_type_style_index_0_id_5ebee7ed_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Archive.vue?vue&type=style&index=0&id=5ebee7ed&scoped=true&lang=css& */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/page/Archive.vue?vue&type=style&index=0&id=5ebee7ed&scoped=true&lang=css&");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Archive_vue_vue_type_style_index_0_id_5ebee7ed_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Archive_vue_vue_type_style_index_0_id_5ebee7ed_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
 /***/ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js":
 /*!****************************************************************************!*\
   !*** ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js ***!
@@ -30934,15 +31194,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _Archive_vue_vue_type_template_id_5ebee7ed_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Archive.vue?vue&type=template&id=5ebee7ed&scoped=true& */ "./resources/js/components/page/Archive.vue?vue&type=template&id=5ebee7ed&scoped=true&");
 /* harmony import */ var _Archive_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Archive.vue?vue&type=script&lang=js& */ "./resources/js/components/page/Archive.vue?vue&type=script&lang=js&");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _Archive_vue_vue_type_style_index_0_id_5ebee7ed_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Archive.vue?vue&type=style&index=0&id=5ebee7ed&scoped=true&lang=css& */ "./resources/js/components/page/Archive.vue?vue&type=style&index=0&id=5ebee7ed&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
+;
 
 
 /* normalize component */
-;
-var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+
+var component = (0,_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
   _Archive_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
   _Archive_vue_vue_type_template_id_5ebee7ed_scoped_true___WEBPACK_IMPORTED_MODULE_0__.render,
   _Archive_vue_vue_type_template_id_5ebee7ed_scoped_true___WEBPACK_IMPORTED_MODULE_0__.staticRenderFns,
@@ -31058,6 +31320,19 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/page/Archive.vue?vue&type=style&index=0&id=5ebee7ed&scoped=true&lang=css&":
+/*!***********************************************************************************************************!*\
+  !*** ./resources/js/components/page/Archive.vue?vue&type=style&index=0&id=5ebee7ed&scoped=true&lang=css& ***!
+  \***********************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_0_rules_0_use_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Archive_vue_vue_type_style_index_0_id_5ebee7ed_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader/dist/cjs.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!../../../../node_modules/vue-loader/lib/index.js??vue-loader-options!./Archive.vue?vue&type=style&index=0&id=5ebee7ed&scoped=true&lang=css& */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[1]!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9[0].rules[0].use[2]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/page/Archive.vue?vue&type=style&index=0&id=5ebee7ed&scoped=true&lang=css&");
+
+
+/***/ }),
+
 /***/ "./resources/js/components/layout/RecordForm.vue?vue&type=template&id=5e68d11f&":
 /*!**************************************************************************************!*\
   !*** ./resources/js/components/layout/RecordForm.vue?vue&type=template&id=5e68d11f& ***!
@@ -31169,7 +31444,6 @@ var render = function () {
               required: "",
               rules: [_vm.rules.required],
               "no-data-text": "該当なし",
-              tabindex: "",
             },
             model: {
               value: _vm.value.type,
@@ -31200,7 +31474,7 @@ var render = function () {
                 { attrs: { cols: "5" } },
                 [
                   _c("v-text-field", {
-                    attrs: { label: "問い合わせ者", tabindex: "" },
+                    attrs: { label: "問い合わせ者" },
                     model: {
                       value: _vm.value.questioner,
                       callback: function ($$v) {
@@ -31224,7 +31498,6 @@ var render = function () {
                       counter: 13,
                       label: "TEL(「 - 」有無どちらでも可)",
                       rules: [_vm.rules.tel],
-                      tabindex: "",
                     },
                     model: {
                       value: _vm.value.phoneNumber,
@@ -31242,7 +31515,7 @@ var render = function () {
           ),
           _vm._v(" "),
           _c("v-text-field", {
-            attrs: { label: "ユーザー", tabindex: "" },
+            attrs: { label: "ユーザー" },
             model: {
               value: _vm.value.customer,
               callback: function ($$v) {
@@ -31274,11 +31547,7 @@ var render = function () {
                   _c("v-radio", { attrs: { label: "障害", value: "障害" } }),
                   _vm._v(" "),
                   _c("v-radio", {
-                    attrs: {
-                      label: "トラブル",
-                      value: "トラブル",
-                      tabindex: "",
-                    },
+                    attrs: { label: "トラブル", value: "トラブル" },
                   }),
                   _vm._v(" "),
                   _c("v-radio", { attrs: { label: "故障", value: "故障" } }),
@@ -31302,7 +31571,6 @@ var render = function () {
               label: "問い合わせ内容",
               required: "",
               rules: [_vm.rules.required],
-              tabindex: "",
             },
             model: {
               value: _vm.value.question,
@@ -31318,7 +31586,6 @@ var render = function () {
               label: "回答内容",
               required: "",
               rules: [_vm.rules.required],
-              tabindex: "",
             },
             model: {
               value: _vm.value.answer,
@@ -31356,9 +31623,7 @@ var render = function () {
                 },
                 [
                   _vm._v(" "),
-                  _c("v-radio", {
-                    attrs: { label: "なし", value: "なし", tabindex: "" },
-                  }),
+                  _c("v-radio", { attrs: { label: "なし", value: "なし" } }),
                   _vm._v(" "),
                   _c("v-radio", {
                     attrs: { label: "オリジナル", value: "オリジナル" },
@@ -31583,7 +31848,7 @@ var render = function () {
   return _c(
     "div",
     [
-      _c("h1", [_vm._v("\n        受付記録\n    ")]),
+      _c("h1", [_vm._v("受付記録")]),
       _vm._v(" "),
       _c(
         "v-row",
@@ -31648,7 +31913,7 @@ var render = function () {
                                 _c(
                                   "v-btn",
                                   {
-                                    attrs: { text: "", tabindex: "" },
+                                    attrs: { text: "" },
                                     on: { click: _vm.submit },
                                   },
                                   [_vm._v("登録")]
@@ -31657,14 +31922,14 @@ var render = function () {
                                 _c(
                                   "v-btn",
                                   {
-                                    attrs: { text: "", tabindex: "" },
+                                    attrs: { text: "" },
                                     on: {
                                       click: function ($event) {
                                         dialog.value = false
                                       },
                                     },
                                   },
-                                  [_vm._v("Close")]
+                                  [_vm._v("閉じる")]
                                 ),
                               ],
                               1
@@ -31744,14 +32009,14 @@ var render = function () {
                                 _c(
                                   "v-btn",
                                   {
-                                    attrs: { text: "", tabindex: "" },
+                                    attrs: { text: "" },
                                     on: {
                                       click: function ($event) {
                                         dialog.value = false
                                       },
                                     },
                                   },
-                                  [_vm._v("Close")]
+                                  [_vm._v("閉じる")]
                                 ),
                               ],
                               1
@@ -31770,8 +32035,523 @@ var render = function () {
         ],
         1
       ),
+      _vm._v(" "),
+      _vm._l(_vm.inquiries, function (inquiry) {
+        return _c(
+          "v-card",
+          {
+            key: inquiry.id,
+            staticClass: "inquiry",
+            attrs: { flat: "", id: inquiry.id },
+          },
+          [
+            _c(
+              "span",
+              { staticClass: "inquiryBox" },
+              [
+                _c(
+                  "v-toolbar",
+                  { attrs: { color: "primary", dark: "", dense: "" } },
+                  [
+                    _c("span", { staticClass: "overflow" }, [
+                      _vm._v(_vm._s(inquiry.created_at)),
+                    ]),
+                    _vm._v(" "),
+                    _c("span", { staticClass: "overflow" }, [
+                      _vm._v("機種名: " + _vm._s(inquiry.type)),
+                    ]),
+                    _vm._v(" "),
+                    _c("span", { staticClass: "overflow" }, [
+                      _vm._v("シリアル:不明"),
+                    ]),
+                    _vm._v(" "),
+                    _c("v-spacer"),
+                    _vm._v(" "),
+                    _c(
+                      "v-btn",
+                      { attrs: { icon: "" } },
+                      [_c("v-icon", [_vm._v("mdi-subdirectory-arrow-left")])],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c("v-dialog", {
+                      attrs: { "max-width": "90%", scrollable: "" },
+                      scopedSlots: _vm._u(
+                        [
+                          {
+                            key: "activator",
+                            fn: function (ref) {
+                              var on = ref.on
+                              var attrs = ref.attrs
+                              return [
+                                _c(
+                                  "v-btn",
+                                  _vm._g(
+                                    _vm._b(
+                                      { attrs: { icon: "" } },
+                                      "v-btn",
+                                      attrs,
+                                      false
+                                    ),
+                                    on
+                                  ),
+                                  [
+                                    _c("v-icon", [
+                                      _vm._v("mdi-square-edit-outline"),
+                                    ]),
+                                  ],
+                                  1
+                                ),
+                              ]
+                            },
+                          },
+                          {
+                            key: "default",
+                            fn: function (dialog) {
+                              return [
+                                _c(
+                                  "v-card",
+                                  [
+                                    _c(
+                                      "v-toolbar",
+                                      { attrs: { color: "primary", dark: "" } },
+                                      [_vm._v("記録編集")]
+                                    ),
+                                    _vm._v(" "),
+                                    _c(
+                                      "v-card-text",
+                                      [
+                                        _vm._v(
+                                          "\n                                この記事のIDは" +
+                                            _vm._s(inquiry.id) +
+                                            "\n                                "
+                                        ),
+                                        _c("RecordForm", {
+                                          ref: "RecordForm",
+                                          refInFor: true,
+                                          attrs: { id: _vm.number },
+                                        }),
+                                      ],
+                                      1
+                                    ),
+                                    _vm._v(" "),
+                                    _c(
+                                      "v-card-actions",
+                                      { staticClass: "end" },
+                                      [
+                                        _c(
+                                          "v-btn",
+                                          {
+                                            attrs: { text: "" },
+                                            on: { click: _vm.submit },
+                                          },
+                                          [_vm._v("更新")]
+                                        ),
+                                        _vm._v(" "),
+                                        _c(
+                                          "v-btn",
+                                          {
+                                            attrs: { text: "" },
+                                            on: {
+                                              click: function ($event) {
+                                                dialog.value = false
+                                              },
+                                            },
+                                          },
+                                          [_vm._v("閉じる")]
+                                        ),
+                                      ],
+                                      1
+                                    ),
+                                  ],
+                                  1
+                                ),
+                              ]
+                            },
+                          },
+                        ],
+                        null,
+                        true
+                      ),
+                    }),
+                    _vm._v(" "),
+                    _c(
+                      "v-btn",
+                      { attrs: { icon: "" } },
+                      [_c("v-icon", [_vm._v("mdi-flag-variant-outline")])],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "v-menu",
+                      {
+                        attrs: { "offset-y": "" },
+                        scopedSlots: _vm._u(
+                          [
+                            {
+                              key: "activator",
+                              fn: function (ref) {
+                                var on = ref.on
+                                var attrs = ref.attrs
+                                return [
+                                  _c(
+                                    "v-btn",
+                                    _vm._g(
+                                      _vm._b(
+                                        { attrs: { icon: "" } },
+                                        "v-btn",
+                                        attrs,
+                                        false
+                                      ),
+                                      on
+                                    ),
+                                    [
+                                      _c("v-icon", [
+                                        _vm._v("mdi-dots-horizontal"),
+                                      ]),
+                                    ],
+                                    1
+                                  ),
+                                ]
+                              },
+                            },
+                          ],
+                          null,
+                          true
+                        ),
+                      },
+                      [
+                        _vm._v(" "),
+                        _c(
+                          "v-list",
+                          _vm._l(
+                            _vm.cardMenus,
+                            function (cardMenu, method, index) {
+                              return _c(
+                                "v-list-item",
+                                { key: index, staticClass: "hover" },
+                                [
+                                  _c(
+                                    "v-list-item-title",
+                                    {
+                                      on: {
+                                        click: function ($event) {
+                                          return _vm.triggerClick(
+                                            cardMenu.method,
+                                            inquiry.id
+                                          )
+                                        },
+                                      },
+                                    },
+                                    [
+                                      _vm._v(
+                                        "\n                                " +
+                                          _vm._s(cardMenu.title) +
+                                          "\n                            "
+                                      ),
+                                    ]
+                                  ),
+                                ],
+                                1
+                              )
+                            }
+                          ),
+                          1
+                        ),
+                      ],
+                      1
+                    ),
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _c(
+                  "v-card-text",
+                  [
+                    _c(
+                      "v-container",
+                      { staticClass: "lighten-5" },
+                      [
+                        _c(
+                          "v-row",
+                          { attrs: { "no-gutters": "" } },
+                          [
+                            _c(
+                              "v-col",
+                              { attrs: { cols: "2", xs: "0" } },
+                              [
+                                _c(
+                                  "v-layout",
+                                  { attrs: { "justify-center": "" } },
+                                  [
+                                    _c(
+                                      "v-avatar",
+                                      {
+                                        attrs: { color: "primary", size: "56" },
+                                      },
+                                      [
+                                        _c("img", {
+                                          staticStyle: { width: "auto" },
+                                          attrs: {
+                                            src: "/storage/img/customer.jpeg",
+                                            alt: "お客様",
+                                          },
+                                        }),
+                                      ]
+                                    ),
+                                  ],
+                                  1
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "div",
+                                  { staticClass: "people" },
+                                  [
+                                    inquiry.questioner
+                                      ? _c(
+                                          "v-layout",
+                                          { attrs: { "justify-center": "" } },
+                                          [_vm._v(_vm._s(inquiry.questioner))]
+                                        )
+                                      : _c(
+                                          "v-layout",
+                                          { attrs: { "justify-center": "" } },
+                                          [_vm._v("不明")]
+                                        ),
+                                    _vm._v(" "),
+                                    inquiry.phoneNumber
+                                      ? _c(
+                                          "span",
+                                          {
+                                            staticStyle: {
+                                              "text-align": "center",
+                                            },
+                                          },
+                                          [
+                                            _c(
+                                              "v-icon",
+                                              { attrs: { size: "4" } },
+                                              [_vm._v("mdi-phone")]
+                                            ),
+                                            _vm._v(" "),
+                                            _c("span", [
+                                              _vm._v(
+                                                _vm._s(inquiry.phoneNumber)
+                                              ),
+                                            ]),
+                                            _vm._v(" "),
+                                            _c(
+                                              "v-btn",
+                                              {
+                                                staticStyle: {},
+                                                attrs: { icon: "" },
+                                                on: {
+                                                  click: function ($event) {
+                                                    return _vm.copyToClipboard(
+                                                      inquiry.phoneNumber
+                                                    )
+                                                  },
+                                                },
+                                              },
+                                              [
+                                                _c(
+                                                  "v-icon",
+                                                  { attrs: { size: "4" } },
+                                                  [_vm._v("mdi-content-copy")]
+                                                ),
+                                              ],
+                                              1
+                                            ),
+                                          ],
+                                          1
+                                        )
+                                      : _vm._e(),
+                                  ],
+                                  1
+                                ),
+                              ],
+                              1
+                            ),
+                            _vm._v(" "),
+                            _c("v-col", { attrs: { cols: "6" } }, [
+                              _c("span", { staticClass: "bigFont" }, [
+                                _vm._v(_vm._s(inquiry.question)),
+                              ]),
+                            ]),
+                            _vm._v(" "),
+                            _c("v-col", { attrs: { cols: "4" } }, [
+                              _c("span", {}, [
+                                _c("div", [
+                                  _c("span", { staticClass: "subject" }, [
+                                    _vm._v("販売店:"),
+                                  ]),
+                                  _vm._v(" "),
+                                  inquiry.dealer
+                                    ? _c("span", [
+                                        _vm._v(_vm._s(inquiry.dealer)),
+                                      ])
+                                    : _c("span", [_vm._v("不明")]),
+                                ]),
+                                _vm._v(" "),
+                                _c("div", [
+                                  _c("span", { staticClass: "subject" }, [
+                                    _vm._v("ユーザー:"),
+                                  ]),
+                                  _vm._v(" "),
+                                  inquiry.customer
+                                    ? _c("span", [
+                                        _vm._v(_vm._s(inquiry.customer)),
+                                      ])
+                                    : _c("span", [_vm._v("不明")]),
+                                ]),
+                                _vm._v(" "),
+                                _c("div", [
+                                  _c("span", { staticClass: "subject" }, [
+                                    _vm._v("満足度:"),
+                                  ]),
+                                  _vm._v(_vm._s(inquiry.satisfaction)),
+                                ]),
+                              ]),
+                            ]),
+                          ],
+                          1
+                        ),
+                      ],
+                      1
+                    ),
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _c("v-divider", { staticClass: "mx-4" }),
+                _vm._v(" "),
+                _c(
+                  "v-card-text",
+                  [
+                    _c(
+                      "v-container",
+                      { staticClass: "lighten-5" },
+                      [
+                        _c(
+                          "v-row",
+                          { attrs: { "no-gutters": "" } },
+                          [
+                            _c(
+                              "v-col",
+                              { attrs: { cols: "2" } },
+                              [
+                                _c(
+                                  "v-layout",
+                                  { attrs: { "justify-center": "" } },
+                                  [
+                                    _c(
+                                      "v-avatar",
+                                      {
+                                        attrs: { color: "primary", size: "56" },
+                                      },
+                                      [_vm._v("オペ")]
+                                    ),
+                                  ],
+                                  1
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "v-layout",
+                                  { attrs: { "justify-center": "" } },
+                                  [
+                                    _vm._v(
+                                      "\n                                " +
+                                        _vm._s(inquiry.operator_id) +
+                                        "\n                            "
+                                    ),
+                                  ]
+                                ),
+                              ],
+                              1
+                            ),
+                            _vm._v(" "),
+                            _c("v-col", { attrs: { cols: "6" } }, [
+                              _c("span", { staticClass: "bigFont" }, [
+                                _vm._v(_vm._s(inquiry.answer)),
+                              ]),
+                            ]),
+                            _vm._v(" "),
+                            _c("v-col", { attrs: { cols: "4" } }, [
+                              _c("span", {}, [
+                                _c("div", { staticClass: "id" }, [
+                                  _vm._v("ID:" + _vm._s(inquiry.inquiry_id)),
+                                ]),
+                              ]),
+                            ]),
+                          ],
+                          1
+                        ),
+                      ],
+                      1
+                    ),
+                  ],
+                  1
+                ),
+              ],
+              1
+            ),
+          ]
+        )
+      }),
+      _vm._v(" "),
+      _c(
+        "div",
+        { staticClass: "text-center ma-2" },
+        [
+          _c(
+            "v-snackbar",
+            {
+              scopedSlots: _vm._u([
+                {
+                  key: "action",
+                  fn: function (ref) {
+                    var attrs = ref.attrs
+                    return [
+                      _c(
+                        "v-btn",
+                        _vm._b(
+                          {
+                            attrs: { color: "pink", text: "" },
+                            on: {
+                              click: function ($event) {
+                                _vm.snackbar = false
+                              },
+                            },
+                          },
+                          "v-btn",
+                          attrs,
+                          false
+                        ),
+                        [
+                          _vm._v(
+                            "\n                    Close\n                "
+                          ),
+                        ]
+                      ),
+                    ]
+                  },
+                },
+              ]),
+              model: {
+                value: _vm.snackbar,
+                callback: function ($$v) {
+                  _vm.snackbar = $$v
+                },
+                expression: "snackbar",
+              },
+            },
+            [_vm._v("\n            " + _vm._s(_vm.text) + "\n            ")]
+          ),
+        ],
+        1
+      ),
     ],
-    1
+    2
   )
 }
 var staticRenderFns = []
