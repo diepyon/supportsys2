@@ -5646,6 +5646,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
@@ -5665,10 +5669,11 @@ __webpack_require__.r(__webpack_exports__);
       centerSnackbar: {
         snackbar: false,
         text: "",
-        rebornButton: true,
+        deleteButton: false,
+        rebornButton: false,
         timeout: 20000
       },
-      deletedId: null
+      deleteId: null
     };
   },
   mounted: function mounted() {
@@ -5692,41 +5697,45 @@ __webpack_require__.r(__webpack_exports__);
     },
     triggerClick: function triggerClick(method, id) {
       if (method === "delete") {
-        this["delete"](id);
+        this.deleteConfirm(id);
       }
     },
-    "delete": function _delete(id) {
-      var _this2 = this;
-
+    deleteConfirm: function deleteConfirm(id) {
       var activeClass = document.getElementById(id);
       activeClass.classList.add("activeCard");
+      this.centerSnackbar.rebornButton = false;
+      this.centerSnackbar.deleteButton = true;
+      this.centerSnackbar.text = '削除しますか？';
+      this.centerSnackbar.snackbar = true; //スナックバーを表示 
+
+      this.deleteId = id; //deleteやrebornメソッドで削除・復活させたいときに参照するID
+    },
+    ddd: function ddd(id) {
+      var _this2 = this;
+
       var postdata = {
         id: id
       }; //消したい記事のidをオブジェクトidに格納
 
-      this.deletedId = id; //rebornメソッドで復活させたいときに参照するID
+      axios.post('/api/inquiries/delete', postdata).then(function (response) {
+        //ここに成功した時に行いたい処理を記載                             
+        console.log(response); //成功してたらデータが返ってくる
 
-      if (confirm('削除しますか')) {
-        axios.post('/api/inquiries/delete', postdata).then(function (response) {
-          //ここに成功した時に行いたい処理を記載                             
-          console.log(response); //成功してたらデータが返ってくる
+        var activeClass = document.getElementById(id);
+        activeClass.classList.add("deleting");
+        setTimeout(function () {
+          activeClass.classList.add("delete");
+        }, 500);
+        _this2.centerSnackbar.text = '削除しました。';
+        _this2.centerSnackbar.deleteButton = false; //削除ボタンを非表示
 
-          activeClass.classList.add("deleting");
-          setTimeout(function () {
-            activeClass.classList.add("delete");
-          }, 500);
-          _this2.centerSnackbar.text = '削除しました。';
-          _this2.centerSnackbar.rebornButton = true; //元に戻すボタンを表示
+        _this2.centerSnackbar.rebornButton = true; //元に戻すボタンを表示
 
-          _this2.centerSnackbar.snackbar = true; //スナックバーを表示                             
-        })["catch"](function (error) {
-          alert('削除できませんでした。');
-          console.log(error);
-        });
-      } else {
-        //やっぱり削除しなかったときの処理
-        activeClass.classList.remove("activeCard");
-      }
+        _this2.centerSnackbar.snackbar = true; //スナックバーを表示                             
+      })["catch"](function (error) {
+        alert('削除できませんでした。');
+        console.log(error);
+      });
     },
     reborn: function reborn(id) {
       var _this3 = this;
@@ -5752,6 +5761,12 @@ __webpack_require__.r(__webpack_exports__);
         this.centerSnackbar.text = '復活させました。';
         console.log(error);
       });
+    },
+    closeCenterSnackbar: function closeCenterSnackbar(id) {
+      this.centerSnackbar.snackbar = false;
+      var activeClass = document.getElementById(id);
+      activeClass.classList.remove("activeCard");
+      this.centerSnackbar.deleteButton = false;
     }
   }
 });
@@ -32552,6 +32567,30 @@ var render = function () {
                   fn: function (ref) {
                     var attrs = ref.attrs
                     return [
+                      _vm.centerSnackbar.deleteButton
+                        ? _c(
+                            "v-btn",
+                            _vm._b(
+                              {
+                                attrs: { color: "pink", text: "" },
+                                on: {
+                                  click: function ($event) {
+                                    return _vm.ddd(_vm.deleteId)
+                                  },
+                                },
+                              },
+                              "v-btn",
+                              attrs,
+                              false
+                            ),
+                            [
+                              _vm._v(
+                                "\n                    削除\n                "
+                              ),
+                            ]
+                          )
+                        : _vm._e(),
+                      _vm._v(" "),
                       _vm.centerSnackbar.rebornButton
                         ? _c(
                             "v-btn",
@@ -32560,7 +32599,7 @@ var render = function () {
                                 attrs: { color: "pink", text: "" },
                                 on: {
                                   click: function ($event) {
-                                    return _vm.reborn(_vm.deletedId)
+                                    return _vm.reborn(_vm.deleteId)
                                   },
                                 },
                               },
@@ -32583,7 +32622,7 @@ var render = function () {
                             attrs: { color: "pink", text: "" },
                             on: {
                               click: function ($event) {
-                                _vm.centerSnackbar.snackbar = false
+                                return _vm.closeCenterSnackbar(_vm.deleteId)
                               },
                             },
                           },

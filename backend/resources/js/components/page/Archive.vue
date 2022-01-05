@@ -170,11 +170,15 @@
             <v-snackbar v-model="centerSnackbar.snackbar" :timeout="centerSnackbar.timeout">
                 {{ centerSnackbar.text }}
                 <template v-slot:action="{ attrs }">
+                    <v-btn v-if="centerSnackbar.deleteButton" color="pink" text v-bind="attrs"
+                        @click="ddd(deleteId)">
+                        削除
+                    </v-btn>
                     <v-btn v-if="centerSnackbar.rebornButton" color="pink" text v-bind="attrs"
-                        @click="reborn(deletedId)">
+                        @click="reborn(deleteId)">
                         元に戻す
                     </v-btn>
-                    <v-btn color="pink" text v-bind="attrs" @click="centerSnackbar.snackbar = false">
+                    <v-btn color="pink" text v-bind="attrs" @click="closeCenterSnackbar(deleteId)">
                         閉じる
                     </v-btn>
                 </template>
@@ -208,10 +212,11 @@
                 centerSnackbar: {
                     snackbar: false,
                     text: "",
-                    rebornButton: true,
-                    timeout:20000,
+                    deleteButton: false,
+                    rebornButton: false,
+                    timeout: 20000,
                 },
-                deletedId: null,
+                deleteId: null,
             }
         },
         mounted() {
@@ -236,45 +241,46 @@
             },
             triggerClick(method, id) {
                 if (method === "delete") {
-                    this.delete(id)
+                    this.deleteConfirm(id)
                 }
             },
-            delete(id) {
+            deleteConfirm(id) {
                 var activeClass = document.getElementById(id);
                 activeClass.classList.add("activeCard");
 
+                this.centerSnackbar.rebornButton = false
+                this.centerSnackbar.deleteButton = true
+                this.centerSnackbar.text = '削除しますか？'
+                this.centerSnackbar.snackbar = true; //スナックバーを表示 
+                this.deleteId = id //deleteやrebornメソッドで削除・復活させたいときに参照するID
+            },
+            ddd(id) {
                 let postdata = {
                     id: id
                 } //消したい記事のidをオブジェクトidに格納
-
-                this.deletedId = id //rebornメソッドで復活させたいときに参照するID
-
-                if (confirm('削除しますか')) {
-                    axios.post('/api/inquiries/delete', postdata)
-                        .then(response => {
-                            //ここに成功した時に行いたい処理を記載                             
-                            console.log(response); //成功してたらデータが返ってくる
-                            activeClass.classList.add("deleting");
-                            setTimeout(function () {
-                                activeClass.classList.add("delete");
-                            }, 500);
-                            this.centerSnackbar.text = '削除しました。'
-                            this.centerSnackbar.rebornButton = true //元に戻すボタンを表示
-                            this.centerSnackbar.snackbar = true; //スナックバーを表示                             
-                        })
-                        .catch(function (error) {
-                            alert('削除できませんでした。');
-                            console.log(error);
-                        })
-                } else { //やっぱり削除しなかったときの処理
-                    activeClass.classList.remove("activeCard");
-                }
+                axios.post('/api/inquiries/delete', postdata)
+                    .then(response => {
+                        //ここに成功した時に行いたい処理を記載                             
+                        console.log(response); //成功してたらデータが返ってくる
+                        var activeClass = document.getElementById(id);
+                        activeClass.classList.add("deleting");
+                        setTimeout(function () {
+                            activeClass.classList.add("delete");
+                        }, 500);
+                        this.centerSnackbar.text = '削除しました。'
+                        this.centerSnackbar.deleteButton = false//削除ボタンを非表示
+                        this.centerSnackbar.rebornButton = true //元に戻すボタンを表示
+                        this.centerSnackbar.snackbar = true; //スナックバーを表示                             
+                    })
+                    .catch(function (error) {
+                        alert('削除できませんでした。');
+                        console.log(error);
+                    })
             },
             reborn(id) {
                 let postdata = {
                     id: id
                 } //復活させたい記事のidをオブジェクトidに格納
-
                 axios.post('/api/inquiries/reborn', postdata)
                     .then(response => {
                         console.log(id + '復活')
@@ -296,6 +302,12 @@
                         console.log(error);
                     })
             },
+            closeCenterSnackbar(id){
+                this.centerSnackbar.snackbar = false
+                var activeClass = document.getElementById(id);
+                activeClass.classList.remove("activeCard");
+                this.centerSnackbar.deleteButton = false
+            }
         },
     }
 
