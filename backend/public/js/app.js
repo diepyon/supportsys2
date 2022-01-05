@@ -5645,6 +5645,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
@@ -5661,8 +5662,13 @@ __webpack_require__.r(__webpack_exports__);
         title: 'ダミー',
         method: 'delete'
       }],
-      snackbar: false,
-      text: "\u524A\u9664\u3057\u307E\u3057\u305F"
+      centerSnackbar: {
+        snackbar: false,
+        text: "",
+        rebornButton: true,
+        timeout: 20000
+      },
+      deletedId: null
     };
   },
   mounted: function mounted() {
@@ -5690,29 +5696,62 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     "delete": function _delete(id) {
+      var _this2 = this;
+
       var activeClass = document.getElementById(id);
       activeClass.classList.add("activeCard");
       var postdata = {
         id: id
       }; //消したい記事のidをオブジェクトidに格納
 
-      setTimeout(function () {
-        if (confirm('削除しますか')) {
-          axios.post('/api/inquiries/delete', postdata).then(function (response) {
-            //ここに成功した時に行いたい処理を記載
-            //alert('削除しました。');
-            console.log(response); //成功してたらデータが返ってくる
+      this.deletedId = id; //rebornメソッドで復活させたいときに参照するID
 
+      if (confirm('削除しますか')) {
+        axios.post('/api/inquiries/delete', postdata).then(function (response) {
+          //ここに成功した時に行いたい処理を記載                             
+          console.log(response); //成功してたらデータが返ってくる
+
+          activeClass.classList.add("deleting");
+          setTimeout(function () {
             activeClass.classList.add("delete");
-          })["catch"](function (error) {
-            alert('削除できませんでした。');
-            console.log(error);
-          });
-        } else {
-          //やっぱり削除しなかったときの処理
+          }, 500);
+          _this2.centerSnackbar.text = '削除しました。';
+          _this2.centerSnackbar.rebornButton = true; //元に戻すボタンを表示
+
+          _this2.centerSnackbar.snackbar = true; //スナックバーを表示                             
+        })["catch"](function (error) {
+          alert('削除できませんでした。');
+          console.log(error);
+        });
+      } else {
+        //やっぱり削除しなかったときの処理
+        activeClass.classList.remove("activeCard");
+      }
+    },
+    reborn: function reborn(id) {
+      var _this3 = this;
+
+      var postdata = {
+        id: id
+      }; //復活させたい記事のidをオブジェクトidに格納
+
+      axios.post('/api/inquiries/reborn', postdata).then(function (response) {
+        console.log(id + '復活');
+        _this3.centerSnackbar.text = '復活させました。';
+        _this3.centerSnackbar.rebornButton = false; //元に戻すボタンを非表示
+
+        var activeClass = document.getElementById(id);
+        activeClass.classList.remove("delete");
+        setTimeout(function () {
+          activeClass.classList.remove("deleting");
+        }, 500);
+        setTimeout(function () {
           activeClass.classList.remove("activeCard");
-        }
-      }, 10);
+        }, 1000);
+      })["catch"](function (error) {
+        this.centerSnackbar.text = '復活させました。';
+        console.log(error);
+      });
     }
   }
 });
@@ -11020,7 +11059,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.inquiry[data-v-5ebee7ed] {\n    margin: 2em 0;\n}\n.bigFont[data-v-5ebee7ed] {\n    font-size: 1.0rem !important;\n    white-space: break-spaces;\n}\n.people[data-v-5ebee7ed] {\n    font-size: 0.75em;\n}\n.overflow[data-v-5ebee7ed] {\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.id[data-v-5ebee7ed] {\n    bottom: 1em;\n    right: 1em;\n    position: absolute;\n}\n.subject[data-v-5ebee7ed] {\n    color: #009688;\n}\n.hover[data-v-5ebee7ed]:hover {\n    opacity: 0.7;\n    background-color: rgba(49, 49, 49, 0.767);\n    cursor: pointer;\n    color: #FFF !important;\n}\n.activeCard[data-v-5ebee7ed] {\n    opacity: 0.5;\n    transition: .5s;\n}\n.delete[data-v-5ebee7ed] {\n    display: none;\n}\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.inquiry[data-v-5ebee7ed] {\n    margin: 2em 0;\n}\n.bigFont[data-v-5ebee7ed] {\n    font-size: 1.0rem !important;\n    white-space: break-spaces;\n}\n.people[data-v-5ebee7ed] {\n    font-size: 0.75em;\n}\n.overflow[data-v-5ebee7ed] {\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.id[data-v-5ebee7ed] {\n    bottom: 1em;\n    right: 1em;\n    position: absolute;\n}\n.subject[data-v-5ebee7ed] {\n    color: #009688;\n}\n.hover[data-v-5ebee7ed]:hover {\n    opacity: 0.7;\n    background-color: rgba(49, 49, 49, 0.767);\n    cursor: pointer;\n    color: #FFF !important;\n}\n.activeCard[data-v-5ebee7ed] {\n    opacity: 0.5;\n    transition: .5s;\n}\n.deleting[data-v-5ebee7ed] {\n    opacity: 0.1;\n    transition: .5s;\n}\n.delete[data-v-5ebee7ed] {\n    display: none;\n}\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -32506,12 +32545,37 @@ var render = function () {
           _c(
             "v-snackbar",
             {
+              attrs: { timeout: _vm.centerSnackbar.timeout },
               scopedSlots: _vm._u([
                 {
                   key: "action",
                   fn: function (ref) {
                     var attrs = ref.attrs
                     return [
+                      _vm.centerSnackbar.rebornButton
+                        ? _c(
+                            "v-btn",
+                            _vm._b(
+                              {
+                                attrs: { color: "pink", text: "" },
+                                on: {
+                                  click: function ($event) {
+                                    return _vm.reborn(_vm.deletedId)
+                                  },
+                                },
+                              },
+                              "v-btn",
+                              attrs,
+                              false
+                            ),
+                            [
+                              _vm._v(
+                                "\n                    元に戻す\n                "
+                              ),
+                            ]
+                          )
+                        : _vm._e(),
+                      _vm._v(" "),
                       _c(
                         "v-btn",
                         _vm._b(
@@ -32519,7 +32583,7 @@ var render = function () {
                             attrs: { color: "pink", text: "" },
                             on: {
                               click: function ($event) {
-                                _vm.snackbar = false
+                                _vm.centerSnackbar.snackbar = false
                               },
                             },
                           },
@@ -32529,7 +32593,7 @@ var render = function () {
                         ),
                         [
                           _vm._v(
-                            "\n                    Close\n                "
+                            "\n                    閉じる\n                "
                           ),
                         ]
                       ),
@@ -32538,14 +32602,20 @@ var render = function () {
                 },
               ]),
               model: {
-                value: _vm.snackbar,
+                value: _vm.centerSnackbar.snackbar,
                 callback: function ($$v) {
-                  _vm.snackbar = $$v
+                  _vm.$set(_vm.centerSnackbar, "snackbar", $$v)
                 },
-                expression: "snackbar",
+                expression: "centerSnackbar.snackbar",
               },
             },
-            [_vm._v("\n            " + _vm._s(_vm.text) + "\n            ")]
+            [
+              _vm._v(
+                "\n            " +
+                  _vm._s(_vm.centerSnackbar.text) +
+                  "\n            "
+              ),
+            ]
           ),
         ],
         1

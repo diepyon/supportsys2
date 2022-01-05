@@ -48,5 +48,9 @@ class InquiryController extends Controller
     public function delete(Request $request,Inquiry $inquiry){
         $inquiry = $inquiry::where('id',$request->input('id'));
         $inquiry->update(['status' => 'delete']);
-    }   
+    }
+    public function reborn(Request $request,Inquiry $inquiry){
+        $inquiry = $inquiry::where('id',$request->input('id'));
+        $inquiry->update(['status' => 'publish']);
+    }      
 }
