@@ -66,16 +66,24 @@
 <script>
     export default {
         name: 'RecordForm',
-        props: ["id"],
+        props: ["inquiry"],
         data() {
             return {
                 //もしIDが指定されていないならvalueは下記（editで指定されてる版も別途指定が必要）
-
                 value: {
-                    phoneNumber: "",
+                    answer: "",
+                    authorizer: "",
+                    customer: "",
+                    dealer: "",
+                    id: "",
                     kinds: "トラブル",
+                    phoneNumber: "",
+                    question: "",
+                    questioner: "",
                     remote: 'なし',
                     satisfaction: "満足",
+                    operator_id: "",
+                    type: "",
                 },
                 valid: null,
                 isEditing: false,
@@ -92,23 +100,13 @@
                         /[━.*‐.*―.*－.*\-.*ー.*\-]/gi,
                         '')) || value == '') || '電話番号の形式が正しくありません',
                     required: v => !!v || '必須',
-
                 },
             }
         },
         mounted() {
-            if (this.id) {
-                axios.get('/api/inquiries/' + this.id)
-                    .then(response => {
-                        this.inquiry = response.data.data
-                        this.value = {
-                            phoneNumber: this.inquiry.phoneNumber,
-                            kinds: this.inquiry.kinds,
-                            remote: this.inquiry.remote,
-                            satisfaction: this.inquiry.satisfaction,
-                        }
-                    })
-            }
+            if(this.inquiry){this.value = Object.fromEntries(
+                Object.entries(this.inquiry).map(([k,v]) => [k,v===null ? "" : v])
+            );}
         },
         methods: {
             post() { //投稿とボタンが押されたときに発動するメソッド
@@ -145,11 +143,14 @@
                             alert('あかんかったわ、コンソール見て');
                             console.log(error);
                         })
-
                 } else {
                     alert('入力内容に不備があります。')
                 }
             },
+            update() {
+                alert('hoge')
+            },
+
 
         }
 

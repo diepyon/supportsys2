@@ -13,7 +13,7 @@
                         <v-card>
                             <v-toolbar color="primary" dark>記録入力</v-toolbar>
                             <v-card-text>
-                                <RecordForm ref="RecordForm"></RecordForm>
+                                <RecordForm  ref="RecordForm"></RecordForm>
                             </v-card-text>
                             <v-card-actions class="end">
                                 <v-btn text @click="submit">登録</v-btn>
@@ -67,11 +67,10 @@
                             <v-card>
                                 <v-toolbar color="primary" dark>記録編集</v-toolbar>
                                 <v-card-text>
-                                    この記事のIDは{{inquiry.id}}
-                                    <RecordForm v-bind:id="number" ref="RecordForm"></RecordForm>
+                                    <RecordForm :inquiry="inquiry" ref="RecordForm"></RecordForm>
                                 </v-card-text>
                                 <v-card-actions class="end">
-                                    <v-btn text @click="submit">更新</v-btn>
+                                    <v-btn text @click="edit" >更新</v-btn>
                                     <v-btn text @click="dialog.value = false">閉じる</v-btn>
                                 </v-card-actions>
                             </v-card>
@@ -171,7 +170,7 @@
                 {{ centerSnackbar.text }}
                 <template v-slot:action="{ attrs }">
                     <v-btn v-if="centerSnackbar.deleteButton" color="pink" text v-bind="attrs"
-                        @click="ddd(deleteId)">
+                        @click="del(deleteId)">
                         削除
                     </v-btn>
                     <v-btn v-if="centerSnackbar.rebornButton" color="pink" text v-bind="attrs"
@@ -217,6 +216,7 @@
                     timeout: 20000,
                 },
                 deleteId: null,
+               
             }
         },
         mounted() {
@@ -229,6 +229,9 @@
         methods: {
             submit() {
                 this.$refs.RecordForm.post()
+            },
+            edit() {
+                this.$refs.RecordForm.update()
             },
             copyToClipboard(text) {
                 navigator.clipboard.writeText(text)
@@ -254,7 +257,7 @@
                 this.centerSnackbar.snackbar = true; //スナックバーを表示 
                 this.deleteId = id //deleteやrebornメソッドで削除・復活させたいときに参照するID
             },
-            ddd(id) {
+            del(id) {
                 let postdata = {
                     id: id
                 } //消したい記事のidをオブジェクトidに格納
@@ -283,7 +286,6 @@
                 } //復活させたい記事のidをオブジェクトidに格納
                 axios.post('/api/inquiries/reborn', postdata)
                     .then(response => {
-                        console.log(id + '復活')
                         this.centerSnackbar.text = '復活させました。'
                         this.centerSnackbar.rebornButton = false //元に戻すボタンを非表示
                         var activeClass = document.getElementById(id);

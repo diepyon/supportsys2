@@ -5243,6 +5243,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
 //
 //
 //
@@ -5310,15 +5322,24 @@ __webpack_require__.r(__webpack_exports__);
 //
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'RecordForm',
-  props: ["id"],
+  props: ["inquiry"],
   data: function data() {
     return {
       //もしIDが指定されていないならvalueは下記（editで指定されてる版も別途指定が必要）
       value: {
-        phoneNumber: "",
+        answer: "",
+        authorizer: "",
+        customer: "",
+        dealer: "",
+        id: "",
         kinds: "トラブル",
+        phoneNumber: "",
+        question: "",
+        questioner: "",
         remote: 'なし',
-        satisfaction: "満足"
+        satisfaction: "満足",
+        operator_id: "",
+        type: ""
       },
       valid: null,
       isEditing: false,
@@ -5335,23 +5356,19 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   mounted: function mounted() {
-    var _this = this;
+    if (this.inquiry) {
+      this.value = Object.fromEntries(Object.entries(this.inquiry).map(function (_ref) {
+        var _ref2 = _slicedToArray(_ref, 2),
+            k = _ref2[0],
+            v = _ref2[1];
 
-    if (this.id) {
-      axios.get('/api/inquiries/' + this.id).then(function (response) {
-        _this.inquiry = response.data.data;
-        _this.value = {
-          phoneNumber: _this.inquiry.phoneNumber,
-          kinds: _this.inquiry.kinds,
-          remote: _this.inquiry.remote,
-          satisfaction: _this.inquiry.satisfaction
-        };
-      });
+        return [k, v === null ? "" : v];
+      }));
     }
   },
   methods: {
     post: function post() {
-      var _this2 = this;
+      var _this = this;
 
       //投稿とボタンが押されたときに発動するメソッド
       var postData = {
@@ -5379,8 +5396,8 @@ __webpack_require__.r(__webpack_exports__);
           alert('投稿できました');
           console.log(response); //成功してたらデータが返ってくる
 
-          _this2.$router.go({
-            path: _this2.$router.currentRoute.path,
+          _this.$router.go({
+            path: _this.$router.currentRoute.path,
             force: true
           });
         })["catch"](function (error) {
@@ -5391,6 +5408,9 @@ __webpack_require__.r(__webpack_exports__);
       } else {
         alert('入力内容に不備があります。');
       }
+    },
+    update: function update() {
+      alert('hoge');
     }
   }
 });
@@ -5649,7 +5669,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
@@ -5688,6 +5707,9 @@ __webpack_require__.r(__webpack_exports__);
     submit: function submit() {
       this.$refs.RecordForm.post();
     },
+    edit: function edit() {
+      this.$refs.RecordForm.update();
+    },
     copyToClipboard: function copyToClipboard(text) {
       navigator.clipboard.writeText(text).then(function () {
         alert('copied');
@@ -5710,7 +5732,7 @@ __webpack_require__.r(__webpack_exports__);
 
       this.deleteId = id; //deleteやrebornメソッドで削除・復活させたいときに参照するID
     },
-    ddd: function ddd(id) {
+    del: function del(id) {
       var _this2 = this;
 
       var postdata = {
@@ -5745,7 +5767,6 @@ __webpack_require__.r(__webpack_exports__);
       }; //復活させたい記事のidをオブジェクトidに格納
 
       axios.post('/api/inquiries/reborn', postdata).then(function (response) {
-        console.log(id + '復活');
         _this3.centerSnackbar.text = '復活させました。';
         _this3.centerSnackbar.rebornButton = false; //元に戻すボタンを非表示
 
@@ -32175,15 +32196,10 @@ var render = function () {
                                     _c(
                                       "v-card-text",
                                       [
-                                        _vm._v(
-                                          "\n                                この記事のIDは" +
-                                            _vm._s(inquiry.id) +
-                                            "\n                                "
-                                        ),
                                         _c("RecordForm", {
                                           ref: "RecordForm",
                                           refInFor: true,
-                                          attrs: { id: _vm.number },
+                                          attrs: { inquiry: inquiry },
                                         }),
                                       ],
                                       1
@@ -32197,7 +32213,7 @@ var render = function () {
                                           "v-btn",
                                           {
                                             attrs: { text: "" },
-                                            on: { click: _vm.submit },
+                                            on: { click: _vm.edit },
                                           },
                                           [_vm._v("更新")]
                                         ),
@@ -32575,7 +32591,7 @@ var render = function () {
                                 attrs: { color: "pink", text: "" },
                                 on: {
                                   click: function ($event) {
-                                    return _vm.ddd(_vm.deleteId)
+                                    return _vm.del(_vm.deleteId)
                                   },
                                 },
                               },
