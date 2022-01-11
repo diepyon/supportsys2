@@ -3,21 +3,29 @@
         <h1>受付記録</h1>
         <v-row justify="start">
             <v-col cols="auto">
-                <v-dialog max-width="90%" scrollable>
+                <v-dialog max-width="90%" scrollable >
                     <template v-slot:activator="{ on, attrs }">
                         <v-btn color="primary" v-bind="attrs" v-on="on" tabindex="1">
                             <v-icon>mdi-lead-pencil</v-icon>記録入力
                         </v-btn>
                     </template>
                     <template v-slot:default="dialog">
-                        <v-card>
-                            <v-toolbar color="primary" dark>記録入力</v-toolbar>
-                            <v-card-text>
-                                <RecordForm  ref="RecordForm"></RecordForm>
+                        <v-card class="dialogBg">
+                            <v-toolbar color="primary" dark>記録入力
+                                <v-spacer></v-spacer>
+                                <v-btn icon @click="dialog.value = false">
+                                    <v-icon>mdi-window-close</v-icon>
+                                </v-btn>
+                            </v-toolbar>
+                            <v-card-text >
+                                <p class="text-right" style="padding-top:16px;">
+                                    <v-icon>mdi-open-in-new</v-icon> <a href="/recordpost">新しいタブで入力画面を開く</a>
+                                </p>
+                                <RecordForm ref="RecordForm"></RecordForm>
                             </v-card-text>
                             <v-card-actions class="end">
-                                <v-btn text @click="submit">登録</v-btn>
-                                <v-btn text @click="dialog.value = false">閉じる</v-btn>
+                                <v-btn text @click="submit" color="primary">登録</v-btn>
+                                <v-btn text @click="dialog.value = false" color="primary">閉じる</v-btn>
                             </v-card-actions>
                         </v-card>
                     </template>
@@ -46,16 +54,38 @@
             </v-col>
         </v-row>
 
-        <v-card v-for="inquiry in inquiries" :key="inquiry.id" class="inquiry" flat :id="inquiry.id">
+        <v-card v-for="(inquiry,index) in inquiries" :key="inquiry.id" class="inquiry" flat :id="inquiry.id">
             <span class="inquiryBox">
                 <v-toolbar color="primary" dark dense>
                     <span class="overflow">{{inquiry.created_at}}</span>
                     <span class="overflow">機種名: {{inquiry.type}}</span>
-                    <span class="overflow">シリアル:不明</span>
+                    <span class="overflow">シリアル:{{inquiry.serial}}</span>
                     <v-spacer></v-spacer>
-                    <v-btn icon>
-                        <v-icon>mdi-subdirectory-arrow-left</v-icon>
-                    </v-btn>
+
+                    <v-dialog max-width="90%" scrollable >
+                        <template v-slot:activator="{ on, attrs }">
+                            <v-btn icon v-bind="attrs" v-on="on">
+                                <v-icon>mdi-subdirectory-arrow-left</v-icon>
+                            </v-btn>
+                        </template>
+                        <template v-slot:default="dialog">
+                            <v-card>
+                                <v-toolbar color="primary" dark>記録引き継ぎ
+                                    <v-spacer></v-spacer>
+                                    <v-btn icon @click="dialog.value = false">
+                                        <v-icon>mdi-window-close</v-icon>
+                                    </v-btn>
+                                </v-toolbar>
+                                <v-card-text>
+                                    <RecordForm :inquiry="inquiry" :ref="RecordForm + index"></RecordForm>
+                                </v-card-text>
+                                <v-card-actions class="end">
+                                    <v-btn text @click="inhert(index,inquiry.id)" color="primary">引継</v-btn>
+                                    <v-btn text @click="dialog.value = false" color="primary">閉じる</v-btn>
+                                </v-card-actions>
+                            </v-card>
+                        </template>
+                    </v-dialog>
 
                     <v-dialog max-width="90%" scrollable>
                         <template v-slot:activator="{ on, attrs }">
@@ -65,13 +95,18 @@
                         </template>
                         <template v-slot:default="dialog">
                             <v-card>
-                                <v-toolbar color="primary" dark>記録編集</v-toolbar>
+                                <v-toolbar color="primary" dark>記録編集
+                                    <v-spacer></v-spacer>
+                                    <v-btn icon @click="dialog.value = false">
+                                        <v-icon>mdi-window-close</v-icon>
+                                    </v-btn>
+                                </v-toolbar>
                                 <v-card-text>
-                                    <RecordForm :inquiry="inquiry" ref="RecordForm"></RecordForm>
+                                    <RecordForm :inquiry="inquiry" :ref="'RecordForm' + index"></RecordForm>
                                 </v-card-text>
                                 <v-card-actions class="end">
-                                    <v-btn text @click="edit" >更新</v-btn>
-                                    <v-btn text @click="dialog.value = false">閉じる</v-btn>
+                                    <v-btn text @click="edit(index,inquiry.id)" color="primary">更新</v-btn>
+                                    <v-btn text @click="dialog.value = false" color="primary">閉じる</v-btn>
                                 </v-card-actions>
                             </v-card>
                         </template>
@@ -169,8 +204,7 @@
             <v-snackbar v-model="centerSnackbar.snackbar" :timeout="centerSnackbar.timeout">
                 {{ centerSnackbar.text }}
                 <template v-slot:action="{ attrs }">
-                    <v-btn v-if="centerSnackbar.deleteButton" color="pink" text v-bind="attrs"
-                        @click="del(deleteId)">
+                    <v-btn v-if="centerSnackbar.deleteButton" color="pink" text v-bind="attrs" @click="del(deleteId)">
                         削除
                     </v-btn>
                     <v-btn v-if="centerSnackbar.rebornButton" color="pink" text v-bind="attrs"
@@ -216,7 +250,7 @@
                     timeout: 20000,
                 },
                 deleteId: null,
-               
+
             }
         },
         mounted() {
@@ -230,9 +264,20 @@
             submit() {
                 this.$refs.RecordForm.post()
             },
-            edit() {
-                this.$refs.RecordForm.update()
+            edit(index, id) {
+                const RecordFormStr = 'RecordForm'+index
+                console.log(RecordFormStr)
+
+                console.log(this.$refs[RecordFormStr][0])
+                this.$refs[RecordFormStr][0].update(id)
+                //this.$refs.RecordForm[index].hoge(id)
             },
+            inhert(index, id) {
+                console.log('親コンポーネントのinhertメソッド')
+                this.$refs.RecordForm[index].inhert(id)
+                //更新じゃなくて新規投稿
+            },
+
             copyToClipboard(text) {
                 navigator.clipboard.writeText(text)
                     .then(() => {
@@ -250,7 +295,6 @@
             deleteConfirm(id) {
                 var activeClass = document.getElementById(id);
                 activeClass.classList.add("activeCard");
-
                 this.centerSnackbar.rebornButton = false
                 this.centerSnackbar.deleteButton = true
                 this.centerSnackbar.text = '削除しますか？'
@@ -271,7 +315,7 @@
                             activeClass.classList.add("delete");
                         }, 500);
                         this.centerSnackbar.text = '削除しました。'
-                        this.centerSnackbar.deleteButton = false//削除ボタンを非表示
+                        this.centerSnackbar.deleteButton = false //削除ボタンを非表示
                         this.centerSnackbar.rebornButton = true //元に戻すボタンを表示
                         this.centerSnackbar.snackbar = true; //スナックバーを表示                             
                     })
@@ -304,7 +348,7 @@
                         console.log(error);
                     })
             },
-            closeCenterSnackbar(id){
+            closeCenterSnackbar(id) {
                 this.centerSnackbar.snackbar = false
                 var activeClass = document.getElementById(id);
                 activeClass.classList.remove("activeCard");
@@ -364,5 +408,10 @@
     .delete {
         display: none;
     }
+    .v-dialog>.v-card{
+        background: #ffffffde !important;
+    }
+
+
 
 </style>

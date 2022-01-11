@@ -34,6 +34,7 @@ class InquiryResource extends JsonResource
             'operator_id'=> $this->operator_id,
             'inquiry_id'=> $this->inquiry_id,
             'answer' => $this->answer,
+            'serial' => $this->serial,
         ];
     }
 }
