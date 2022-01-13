@@ -13,17 +13,12 @@ class InquiryController extends Controller
 {
     public function create(Request $request ,Inquiry $inquiry) 
     {
-
-
         $inquiry->answer =$request->input('answer');
         if($request->input('remote') !='なし'){//remoteがなしなら承認者は登録しない
             $inquiry->authorizer=$request->input('authorizer');
         }
         $inquiry->customer=$request->input('customer');
         $inquiry->dealer=$request->input('dealer');
-
-
-        
 
         if($request->input('anchor')){
             $inquiry->anchor=$request->input('anchor');//引き継ぎID手入力
@@ -73,10 +68,10 @@ class InquiryController extends Controller
         return InquiryResource::collection(Inquiry::where('status','publish')->get());//公開中の記事のみ表示
     }
 
+
     public function single($id){//url上の数値を取得
         $inquiry = Inquiry::find($id);//受け取った数値と一致するIDのレコードを取得
         return new InquiryResource($inquiry);
-
     }
 
     public function edit(Request $request ,Inquiry $inquiry){
@@ -106,8 +101,6 @@ class InquiryController extends Controller
         $inquiry->update(['updated_at' => date("Y/m/d H:i:s")]);
         //投稿者IDはアップデートしない
     }
-
-
    
     public function delete(Request $request,Inquiry $inquiry){
         $inquiry = $inquiry::where('id',$request->input('id'));

@@ -11,7 +11,7 @@
                     </template>
                     <template v-slot:default="dialog">
                         <v-card class="dialogBg">
-                            <v-toolbar color="primary" dark>記録入力
+                            <v-toolbar color="primary" dark dense>記録入力
                                 <v-spacer></v-spacer>
                                 <v-btn icon @click="dialog.value = false">
                                     <v-icon>mdi-window-close</v-icon>
@@ -41,7 +41,7 @@
                     </template>
                     <template v-slot:default="dialog">
                         <v-card>
-                            <v-toolbar color="primary" dark>Opening from the top</v-toolbar>
+                            <v-toolbar color="primary" dark dense>Opening from the top</v-toolbar>
                             <v-card-text>
                                 <div class="text-h2 pa-12">Hello world!</div>
                             </v-card-text>
@@ -54,7 +54,7 @@
             </v-col>
         </v-row>
 
-        <v-card v-for="(inquiry,index) in inquiries" :key="inquiry.id" class="inquiry" flat :id="inquiry.id">
+        <v-card v-for="(inquiry,index) in inquiries" :key="inquiry.id" class="inquiry" flat :id="inquiry.id" >
             <span class="inquiryBox">
                 <v-toolbar color="primary" dark dense>
                     <span class="overflow">{{inquiry.created_at}}</span>
@@ -70,14 +70,14 @@
                         </template>
                         <template v-slot:default="dialog">
                             <v-card>
-                                <v-toolbar color="primary" dark>記録引き継ぎ
+                                <v-toolbar color="primary" dark dense>記録引き継ぎ
                                     <v-spacer></v-spacer>
                                     <v-btn icon @click="dialog.value = false">
                                         <v-icon>mdi-window-close</v-icon>
                                     </v-btn>
                                 </v-toolbar>
                                 <v-card-text>
-                                    <RecordForm :inquiry="inquiry" :ref="RecordForm + index"></RecordForm>
+                                   <RecordForm :inquiry="inquiry" :action="'inhert'" :ref="'RecordForm' + index"></RecordForm>
                                 </v-card-text>
                                 <v-card-actions class="end">
                                     <v-btn text @click="inhert(index,inquiry.id)" color="primary">引継</v-btn>
@@ -95,7 +95,7 @@
                         </template>
                         <template v-slot:default="dialog">
                             <v-card>
-                                <v-toolbar color="primary" dark>記録編集
+                                <v-toolbar color="primary" dark dense>記録編集
                                     <v-spacer></v-spacer>
                                     <v-btn icon @click="dialog.value = false">
                                         <v-icon>mdi-window-close</v-icon>
@@ -191,7 +191,8 @@
                             </v-col>
                             <v-col cols="4">
                                 <span class="">
-                                    <div class="id">ID:{{inquiry.inquiry_id}}</div>
+                                    <div class="id">ID:
+                                        {{inquiry.previewAnchor}}</div>
                                 </span>
                             </v-col>
                         </v-row>
@@ -218,6 +219,7 @@
             </v-snackbar>
         </div>
 
+    
 
     </div>
 </template>
@@ -250,15 +252,14 @@
                     timeout: 20000,
                 },
                 deleteId: null,
-
+                anchor:[],
             }
         },
         mounted() {
             axios.get('/api/inquiries/archive')
                 .then(response => {
                     this.inquiries = response.data.data.reverse()
-                    console.log(this.inquiries)
-                })
+              })
         },
         methods: {
             submit() {
@@ -266,18 +267,18 @@
             },
             edit(index, id) {
                 const RecordFormStr = 'RecordForm'+index
-                console.log(RecordFormStr)
-
-                console.log(this.$refs[RecordFormStr][0])
                 this.$refs[RecordFormStr][0].update(id)
-                //this.$refs.RecordForm[index].hoge(id)
             },
             inhert(index, id) {
-                console.log('親コンポーネントのinhertメソッド')
-                this.$refs.RecordForm[index].inhert(id)
+                console.log('親のinhert')
+
+                const RecordFormStr = 'RecordForm'+index
+
+               console.log(RecordFormStr)
+                
+                this.$refs[RecordFormStr][0].inhert(id)
                 //更新じゃなくて新規投稿
             },
-
             copyToClipboard(text) {
                 navigator.clipboard.writeText(text)
                     .then(() => {
@@ -344,7 +345,7 @@
                         }, 1000);
                     })
                     .catch(function (error) {
-                        this.centerSnackbar.text = '復活させました。'
+                        this.centerSnackbar.text = '復活させられませんでした。'
                         console.log(error);
                     })
             },
@@ -353,7 +354,7 @@
                 var activeClass = document.getElementById(id);
                 activeClass.classList.remove("activeCard");
                 this.centerSnackbar.deleteButton = false
-            }
+            },
         },
     }
 

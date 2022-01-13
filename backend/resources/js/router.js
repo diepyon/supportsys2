@@ -2,6 +2,7 @@ import Router from 'vue-router'
 import Dashboard from './components/page/Dashboard'
 import Archive from './components/page/Archive'
 import RecordPost from './components/page/RecordPost'
+import Types from './components/page/Types'
 
 export default new Router({
   mode: 'history',
@@ -20,6 +21,11 @@ export default new Router({
       path: '/recordpost',
       name: 'recordpost',
       component: RecordPost
-    },         
+    },    
+    {
+      path: '/types',
+      name: 'types',
+      component: Types
+    },           
   ]
 });

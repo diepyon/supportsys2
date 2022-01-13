@@ -26,3 +26,5 @@ Route::get('/inquiries/archive', [InquiryController::class, 'show']);
 Route::get('/inquiries/{id}', [InquiryController::class, 'single']);
 Route::post('/inquiries/delete', [InquiryController::class, 'delete']);
 Route::post('/inquiries/reborn', [InquiryController::class, 'reborn']);
+
+Route::post('/types/create', [InquiryController::class, 'create']);
