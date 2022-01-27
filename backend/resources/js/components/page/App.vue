@@ -35,7 +35,7 @@
                 ['mdi-home', 'ダッシュボード', '/'],
                 ['mdi-file-document-multiple-outline', '受付記録', '/archive'],
                 ['mdi-lead-pencil', '記録入力', '/recordpost'],
-                ['mdi-account', 'ユーザー登録', '/users'],
+                ['mdi-account', 'ユーザー登録', '/customer'],
                 ['mdi-alpha-p-box', '機種登録', '/types'],
             ],
         }),

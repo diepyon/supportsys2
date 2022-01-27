@@ -3,7 +3,7 @@
         <h1>受付記録</h1>
         <v-row justify="start">
             <v-col cols="auto">
-                <v-dialog max-width="90%" scrollable >
+                <v-dialog max-width="90%" scrollable>
                     <template v-slot:activator="{ on, attrs }">
                         <v-btn color="primary" v-bind="attrs" v-on="on" tabindex="1">
                             <v-icon>mdi-lead-pencil</v-icon>記録入力
@@ -17,7 +17,7 @@
                                     <v-icon>mdi-window-close</v-icon>
                                 </v-btn>
                             </v-toolbar>
-                            <v-card-text >
+                            <v-card-text>
                                 <p class="text-right" style="padding-top:16px;">
                                     <v-icon>mdi-open-in-new</v-icon> <a href="/recordpost">新しいタブで入力画面を開く</a>
                                 </p>
@@ -54,7 +54,7 @@
             </v-col>
         </v-row>
 
-        <v-card v-for="(inquiry,index) in inquiries" :key="inquiry.id" class="inquiry" flat :id="inquiry.id" >
+        <v-card v-for="(inquiry,index) in inquiries" :key="inquiry.id" class="inquiry" flat :id="inquiry.id">
             <span class="inquiryBox">
                 <v-toolbar color="primary" dark dense>
                     <span class="overflow">{{inquiry.created_at}}</span>
@@ -62,7 +62,7 @@
                     <span class="overflow">シリアル:{{inquiry.serial}}</span>
                     <v-spacer></v-spacer>
 
-                    <v-dialog max-width="90%" scrollable >
+                    <v-dialog max-width="90%" scrollable>
                         <template v-slot:activator="{ on, attrs }">
                             <v-btn icon v-bind="attrs" v-on="on">
                                 <v-icon>mdi-subdirectory-arrow-left</v-icon>
@@ -77,7 +77,8 @@
                                     </v-btn>
                                 </v-toolbar>
                                 <v-card-text>
-                                   <RecordForm :inquiry="inquiry" :action="'inhert'" :ref="'RecordForm' + index"></RecordForm>
+                                    <RecordForm :inquiry="inquiry" :action="'inhert'" :ref="'RecordForm' + index">
+                                    </RecordForm>
                                 </v-card-text>
                                 <v-card-actions class="end">
                                     <v-btn text @click="inhert(index,inquiry.id)" color="primary">引継</v-btn>
@@ -218,9 +219,6 @@
                 </template>
             </v-snackbar>
         </div>
-
-    
-
     </div>
 </template>
 <script>
@@ -252,30 +250,30 @@
                     timeout: 20000,
                 },
                 deleteId: null,
-                anchor:[],
+                anchor: [],
             }
         },
         mounted() {
             axios.get('/api/inquiries/archive')
                 .then(response => {
                     this.inquiries = response.data.data.reverse()
-              })
+                })
         },
         methods: {
             submit() {
                 this.$refs.RecordForm.post()
             },
             edit(index, id) {
-                const RecordFormStr = 'RecordForm'+index
+                const RecordFormStr = 'RecordForm' + index
                 this.$refs[RecordFormStr][0].update(id)
             },
             inhert(index, id) {
                 console.log('親のinhert')
 
-                const RecordFormStr = 'RecordForm'+index
+                constRecordFormStr = 'RecordForm' + index
 
-               console.log(RecordFormStr)
-                
+                console.log(RecordFormStr)
+
                 this.$refs[RecordFormStr][0].inhert(id)
                 //更新じゃなくて新規投稿
             },
@@ -409,10 +407,9 @@
     .delete {
         display: none;
     }
-    .v-dialog>.v-card{
+
+    .v-dialog>.v-card {
         background: #ffffffde !important;
     }
-
-
 
 </style>

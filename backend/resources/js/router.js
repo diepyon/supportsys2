@@ -3,7 +3,7 @@ import Dashboard from './components/page/Dashboard'
 import Archive from './components/page/Archive'
 import RecordPost from './components/page/RecordPost'
 import Types from './components/page/Types'
-
+import Customer from './components/page/Customer'
 export default new Router({
   mode: 'history',
   routes: [
@@ -26,6 +26,11 @@ export default new Router({
       path: '/types',
       name: 'types',
       component: Types
-    },           
+    },
+    {
+      path: '/customer',
+      name: 'customer',
+      component: Customer
+    },       
   ]
 });
