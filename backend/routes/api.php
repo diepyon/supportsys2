@@ -30,5 +30,7 @@ Route::post('/inquiries/delete', [InquiryController::class, 'delete']);
 Route::post('/inquiries/reborn', [InquiryController::class, 'reborn']);
 
 Route::post('/types/create', [TypeController::class, 'create']);
+Route::post('/types/delete', [TypeController::class, 'delete']);
+Route::post('/types/reborn', [TypeController::class, 'reborn']);
 
 Route::get('/types/archive', [TypeController::class, 'show']);

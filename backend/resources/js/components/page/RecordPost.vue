@@ -14,6 +14,10 @@
         methods: {
             submit() {
                 this.$refs.RecordForm.post()
+                this.$router.go({
+                    path: this.$router.currentRoute.path,
+                    force: true,
+                });
             },
         }
     }

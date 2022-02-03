@@ -254,14 +254,23 @@
             }
         },
         mounted() {
-            axios.get('/api/inquiries/archive')
-                .then(response => {
-                    this.inquiries = response.data.data.reverse()
-                })
+            this.showArchive()
         },
         methods: {
+            showArchive() {
+                axios.get('/api/inquiries/archive')
+                    .then(response => {
+                        this.inquiries = response.data.data.reverse()
+                    })
+            },
+
+            closeDialog(){
+                this.dialog.value=false
+            },
+
             submit() {
                 this.$refs.RecordForm.post()
+                this.showArchive()                
             },
             edit(index, id) {
                 const RecordFormStr = 'RecordForm' + index
@@ -308,15 +317,14 @@
                     .then(response => {
                         //ここに成功した時に行いたい処理を記載                             
                         console.log(response); //成功してたらデータが返ってくる
-                        var activeClass = document.getElementById(id);
-                        activeClass.classList.add("deleting");
-                        setTimeout(function () {
-                            activeClass.classList.add("delete");
-                        }, 500);
+                        //var activeClass = document.getElementById(id);
+                        
                         this.centerSnackbar.text = '削除しました。'
                         this.centerSnackbar.deleteButton = false //削除ボタンを非表示
                         this.centerSnackbar.rebornButton = true //元に戻すボタンを表示
-                        this.centerSnackbar.snackbar = true; //スナックバーを表示                             
+                        this.centerSnackbar.snackbar = true; //スナックバーを表示   
+                        
+                        this.showArchive()
                     })
                     .catch(function (error) {
                         alert('削除できませんでした。');
@@ -331,16 +339,8 @@
                     .then(response => {
                         this.centerSnackbar.text = '復活させました。'
                         this.centerSnackbar.rebornButton = false //元に戻すボタンを非表示
-                        var activeClass = document.getElementById(id);
-                        activeClass.classList.remove("delete");
-
-                        setTimeout(function () {
-                            activeClass.classList.remove("deleting");
-                        }, 500);
-
-                        setTimeout(function () {
-                            activeClass.classList.remove("activeCard");
-                        }, 1000);
+                    
+                        this.showArchive()
                     })
                     .catch(function (error) {
                         this.centerSnackbar.text = '復活させられませんでした。'

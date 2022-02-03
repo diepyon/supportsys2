@@ -13,13 +13,11 @@
                 <v-text-field v-model="search" append-icon="mdi-magnify" label="検索" single-line hide-details>
                 </v-text-field>
             </v-card-title>
-            <v-data-table :headers="headers" :items="items" hide-default-footer :search="search" >
-
-                    <template v-slot:[`item.action`]="{ item }">
-                        <v-btn @click="onClickShow(item)">編集</v-btn>
-                        <v-btn @click="onClickShow(item)">削除</v-btn>
-                    </template>
-
+            <v-data-table :headers="headers" :items="items" hide-default-footer :search="search">
+                <template v-slot:[`item.action`]="{ item }">
+                    <v-btn>編集</v-btn>
+                    <v-btn @click="onClickShow(item)">削除</v-btn>
+                </template>
             </v-data-table>
         </v-card>
 
@@ -95,35 +93,49 @@
             },
             onClickShow(item) {
                 console.log(`${item.name}:${item.id}`);
-                this.deleteConfirm(item.id)
+                this.deleteConfirm(item.id, item.name)
             },
-            deleteConfirm(id) {
-                console.log('わたっている')
-                //var activeClass = document.getElementByIdid);
-                //activeClass.classList.add("activeCard");
+            deleteConfirm(id, name) {
                 this.centerSnackbar.rebornButton = false
                 this.centerSnackbar.deleteButton = true
-                this.centerSnackbar.text = '削除しますか？'
+                this.centerSnackbar.text = name + 'を削除しますか？'
                 this.centerSnackbar.snackbar = true; //スナックバーを表示 
                 this.deleteId = id //deleteやrebornメソッドで削除・復活させたいときに参照するID
             },
-            del(id){
-                console.log(id+'を削除')
-                //削除に成功した時のメッセージはアクシオスに書く
+            del(id) {
+                const postdata = {
+                    id: id
+                }
+                axios.post('/api/types/delete', postdata)
+                    .then(response => {
+                        if (response.data === 0) { //削除したレコードの数がリターンされる
+                            this.centerSnackbar.text = '削除できませんでした。'
+                        } else {
+                            this.centerSnackbar.text = '削除しました。'
+                            this.centerSnackbar.deleteButton = false //削除ボタンを非表示
+                            //this.centerSnackbar.rebornButton = true //元に戻すボタンを表示
+                            this.centerSnackbar.snackbar = true; //スナックバーを表示  
+                            this.showArchive()                         
+                        }
+                    })
+                    .catch(function (error) {
+                        this.centerSnackbar.text = '削除できませんでした。'
+                        console.log(error);
+                    })
             },
             closeCenterSnackbar(id) {
                 this.centerSnackbar.snackbar = false
-                //var activeClass = document.getElementById(id);
-                //activeClass.classList.remove("activeCard");
                 this.centerSnackbar.deleteButton = false
-            },            
+            },
+            showArchive() {
+                axios.get('/api/types/archive')
+                    .then(response => {
+                        this.items = response.data.data.reverse()
+                    })
+            }
         },
         mounted() {
-            axios.get('/api/types/archive')
-                .then(response => {
-                    this.items = response.data.data.reverse()
-                })
-
+            this.showArchive()
         },
     })
 

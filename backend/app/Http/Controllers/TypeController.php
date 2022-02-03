@@ -14,9 +14,10 @@ class TypeController extends Controller
         $type->name =$request->input('name');
         $type->save();
     }
-    
     public function show(Request $request,Type $type) {
         return TypeResource::collection(Type::all());
-
     }
+    public function delete(Request $request,Type $type) {
+        return  $type->Where('id', $request->id)->delete();
+    }    
 }

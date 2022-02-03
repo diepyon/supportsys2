@@ -138,10 +138,7 @@
                         .then((response) => {
                             alert("投稿しました。");
                             console.log(response); //成功してたらデータが返ってくる
-                            this.$router.go({
-                                path: this.$router.currentRoute.path,
-                                force: true,
-                            });
+
                         })
                         .catch(function (error) {
                             // handle error(axiosの処理にエラーが発生した場合に処理させたいことを記述)
@@ -183,10 +180,6 @@
                             //ここに成功した時に行いたい処理を記載
                             alert('更新しました。');
                             console.log(response); //成功してたらデータが返ってくる
-                            this.$router.go({
-                                path: this.$router.currentRoute.path,
-                                force: true
-                            })
                         })
                         .catch(function (error) {
                             // handle error(axiosの処理にエラーが発生した場合に処理させたいことを記述)
@@ -206,10 +199,7 @@
                             //ここに成功した時に行いたい処理を記載
                             alert("引き継ぎました。");
                             console.log(response); //成功してたらデータが返ってくる
-                            this.$router.go({
-                                path: this.$router.currentRoute.path,
-                                force: true,
-                            });
+
                         })
                         .catch(function (error) {
                             // handle error(axiosの処理にエラーが発生した場合に処理させたいことを記述)

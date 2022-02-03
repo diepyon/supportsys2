@@ -36,6 +36,7 @@ class InquiryResource extends JsonResource
             'inquiry_id'=> $this->inquiry_id,
             'answer' => $this->answer,
             'serial' => $this->serial,
+            'type' => $this->type,
             'anchor' => $this->anchor,
             'previewAnchor'=> $inquiry->anchorRelation($this->id),//リレー形式で関連記事を表示する部分
         ];
