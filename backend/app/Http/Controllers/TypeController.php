@@ -19,5 +19,10 @@ class TypeController extends Controller
     }
     public function delete(Request $request,Type $type) {
         return  $type->Where('id', $request->id)->delete();
-    }    
+    }
+    public function update(Request $request,Type $type) {
+        $type = $type::where('id',$request->input('id'));
+        return $type->update(['name' => $request->input('name')]);
+
+    }           
 }

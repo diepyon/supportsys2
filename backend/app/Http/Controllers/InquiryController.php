@@ -87,8 +87,7 @@ class InquiryController extends Controller
         $inquiry->update(['dealer' => $request->input('dealer')]);
 
         //入力欄に引き継ぎ元IDフォームを新たに出現させる？
-        $inquiry->update(['anchor' => $request->input('anchor')]);
-        
+        $inquiry->update(['anchor' => $request->input('anchor')]); 
         $inquiry->update(['kinds' => $request->input('kinds')]);
         $inquiry->update(['phoneNumber' => $request->input('phoneNumber')]);
         $inquiry->update(['question' => $request->input('question')]);

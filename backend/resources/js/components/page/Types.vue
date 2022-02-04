@@ -15,7 +15,34 @@
             </v-card-title>
             <v-data-table :headers="headers" :items="items" hide-default-footer :search="search">
                 <template v-slot:[`item.action`]="{ item }">
-                    <v-btn>編集</v-btn>
+                    <v-dialog max-width="500px" scrollable>
+                        <template v-slot:activator="{ on, attrs }">
+                            <v-btn color="primary" v-bind="attrs" v-on="on" tabindex="1">
+                                <v-icon>mdi-lead-pencil</v-icon>編集
+                            </v-btn>
+                        </template>
+                        <template v-slot:default="dialog">
+                            <v-form ref="test_form" v-model="valid" lazy-validation>
+                                <v-card class="dialogBg">
+                                    <v-toolbar color="primary" dark dense>機種編集
+                                        <v-spacer></v-spacer>
+                                        <v-btn icon @click="dialog.value = false">
+                                            <v-icon>mdi-window-close</v-icon>
+                                        </v-btn>
+                                    </v-toolbar>
+                                    <v-card-text>
+                                        <v-text-field v-model="item.name" label="機種名" required
+                                            :rules="[rules.required]"></v-text-field>
+                                    </v-card-text>
+                                    <v-card-actions class="end">
+                                        <v-btn text @click="update(item.name,item.id)" color="primary">編集</v-btn>
+                                        <v-btn text @click="dialog.value = false;showArchive()" color="primary">閉じる
+                                        </v-btn>
+                                    </v-card-actions>
+                                </v-card>
+                            </v-form>
+                        </template>
+                    </v-dialog>
                     <v-btn @click="onClickShow(item)">削除</v-btn>
                 </template>
             </v-data-table>
@@ -80,16 +107,22 @@
         },
         methods: {
             submit() {
-                console.log('types.vueのメソッド')
                 let postData = {
                     name: this.value.name,
                 };
-                axios.post('/api/types/create', postData)
-                    .then(response => {})
-                    .catch(function (error) {
-                        this.centerSnackbar.text = '登録できませんでした。'
-                        console.log(error);
-                    })
+
+                if (this.$refs.test_form.validate()) {
+                    axios.post('/api/types/create', postData)
+                        .then(response => {
+                            console.log(response)
+                        })
+                        .catch(function (error) {
+                            this.centerSnackbar.text = '登録できませんでした。'
+                            console.log(error);
+                        })
+                } else {
+                    alert("入力してください。");
+                }
             },
             onClickShow(item) {
                 console.log(`${item.name}:${item.id}`);
@@ -115,7 +148,7 @@
                             this.centerSnackbar.deleteButton = false //削除ボタンを非表示
                             //this.centerSnackbar.rebornButton = true //元に戻すボタンを表示
                             this.centerSnackbar.snackbar = true; //スナックバーを表示  
-                            this.showArchive()                         
+                            this.showArchive()
                         }
                     })
                     .catch(function (error) {
@@ -132,6 +165,23 @@
                     .then(response => {
                         this.items = response.data.data.reverse()
                     })
+            },
+            update(name, id) {
+                let postData = {
+                    name: name,
+                    id: id
+                }
+                 if (this.$refs.test_form.validate()) {
+                axios.post('/api/types/update', postData)
+                    .then(response => {
+                        console.log(response.statusText)
+                    })
+                    .catch(function (error) {
+                        this.centerSnackbar.text = '編集できませんでした。'
+                        console.log(error);
+                    })}else{
+                        alert('入力してください。')
+                    }
             }
         },
         mounted() {

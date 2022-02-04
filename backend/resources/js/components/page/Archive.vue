@@ -9,7 +9,7 @@
                             <v-icon>mdi-lead-pencil</v-icon>記録入力
                         </v-btn>
                     </template>
-                    <template v-slot:default="dialog">
+                    <template  v-slot:default="dialog">
                         <v-card class="dialogBg">
                             <v-toolbar color="primary" dark dense>記録入力
                                 <v-spacer></v-spacer>
@@ -32,7 +32,7 @@
                 </v-dialog>
             </v-col>
 
-            <v-col cols="auto">
+            <!-- <v-col cols="auto">
                 <v-dialog transition="dialog-top-transition" max-width="600" scrollable>
                     <template v-slot:activator="{ on, attrs }">
                         <v-btn color="primary" v-bind="attrs" v-on="on" tabindex="2">
@@ -51,10 +51,10 @@
                         </v-card>
                     </template>
                 </v-dialog>
-            </v-col>
+            </v-col> -->
         </v-row>
 
-        <v-card v-for="(inquiry,index) in inquiries" :key="inquiry.id" class="inquiry" flat :id="inquiry.id">
+        <!-- <v-card v-for="(inquiry,index) in inquiries" :key="inquiry.id" class="inquiry" flat :id="inquiry.id">
             <span class="inquiryBox">
                 <v-toolbar color="primary" dark dense>
                     <span class="overflow">{{inquiry.created_at}}</span>
@@ -200,7 +200,7 @@
                     </v-container>
                 </v-card-text>
             </span>
-        </v-card>
+        </v-card> -->
 
         <div class="text-center ma-2">
             <v-snackbar v-model="centerSnackbar.snackbar" :timeout="centerSnackbar.timeout">
@@ -230,7 +230,7 @@
         },
         data() {
             return {
-                dialog: false,
+                //dialog:{value:null},
                 inquiries: null,
                 cardMenus: [{
                         title: '削除',
@@ -270,7 +270,8 @@
 
             submit() {
                 this.$refs.RecordForm.post()
-                this.showArchive()                
+                this.closeDialog()
+                this.showArchive()                     
             },
             edit(index, id) {
                 const RecordFormStr = 'RecordForm' + index
