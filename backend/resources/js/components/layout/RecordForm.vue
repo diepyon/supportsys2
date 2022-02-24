@@ -2,23 +2,23 @@
     <div style="padding-top: 16px">
         <v-form ref="test_form" v-model="valid" lazy-validation>
             <v-autocomplete v-model="value.type" :items="items" dense filled label="機種名" required
-                :rules="[rules.required]" no-data-text="該当なし" ></v-autocomplete>
+                :rules="[rules.required]" no-data-text="該当なし"></v-autocomplete>
 
-            <v-text-field v-model="value.serial" label="シリアル番号" :rules="[rules.alphaNum]" ></v-text-field>
+            <v-text-field v-model="value.serial" label="シリアル番号" :rules="[rules.alphaNum]"></v-text-field>
 
-            <v-text-field v-model="value.dealer" label="販売店" ></v-text-field>
+            <v-text-field v-model="value.dealer" label="販売店"></v-text-field>
             <v-row justify="start">
                 <v-col cols="5">
-                    <v-text-field v-model="value.questioner" label="問い合わせ者" ></v-text-field>
+                    <v-text-field v-model="value.questioner" label="問い合わせ者"></v-text-field>
                 </v-col>
                 <v-col cols="5">
                     <v-text-field id="tel" v-bind:type="'tel'" v-model="value.phoneNumber" :counter="13"
-                        label="TEL(「 - 」有無どちらでも可)" :rules="[rules.tel]" >
+                        label="TEL(「 - 」有無どちらでも可)" :rules="[rules.tel]">
                     </v-text-field>
                 </v-col>
             </v-row>
 
-            <v-text-field v-model="value.customer" label="ユーザー" ></v-text-field>
+            <v-text-field v-model="value.customer" label="ユーザー"></v-text-field>
 
             <v-container fluid>
                 <v-radio-group v-model="value.kinds" row>
@@ -31,9 +31,9 @@
                 </v-radio-group>
             </v-container>
 
-            <v-textarea v-model="value.question" label="問い合わせ内容" required :rules="[rules.required]" >
+            <v-textarea v-model="value.question" label="問い合わせ内容" required :rules="[rules.required]">
             </v-textarea>
-            <v-textarea v-model="value.answer" label="回答内容" required :rules="[rules.required]" ></v-textarea>
+            <v-textarea v-model="value.answer" label="回答内容" required :rules="[rules.required]"></v-textarea>
 
             <v-container fluid>
                 <v-radio-group v-model="value.remote" row>
@@ -44,12 +44,12 @@
                     <v-radio label="オリジナル" value="オリジナル"></v-radio>
                     <v-radio label="TeamViewer" value="TeamViewer"></v-radio>
                     <v-col cols="5">
-                        <v-text-field v-if="value.remote == 'なし'" v-model="value.authorizer" label="承認者" disabled >
+                        <v-text-field v-if="value.remote == 'なし'" v-model="value.authorizer" label="承認者" disabled>
                         </v-text-field>
-                        <v-text-field v-if="value.remote == 'オリジナル'" v-model="value.authorizer" label="承認者" >
+                        <v-text-field v-if="value.remote == 'オリジナル'" v-model="value.authorizer" label="承認者">
                         </v-text-field>
                         <v-text-field v-if="value.remote == 'TeamViewer'" v-model="value.authorizer" label="承認者"
-                            required :rules="[rules.required]" >
+                            required :rules="[rules.required]">
                         </v-text-field>
                     </v-col>
                 </v-radio-group>
@@ -63,7 +63,7 @@
                     <v-radio label="不満" value="不満"></v-radio>
                 </v-radio-group>
                 <v-text-field v-model="value.anchor" label="引き継ぎ元ID（調整中）" :rules="[rules.alphaNum]"
-                    hint="引き継ぎ元のIDを1つだけ入力" tabindex="-1" ></v-text-field>
+                    hint="引き継ぎ元のIDを1つだけ入力" tabindex="-1"></v-text-field>
             </v-container>
         </v-form>
     </div>
@@ -71,9 +71,9 @@
 <script>
     export default {
         name: "RecordForm",
-        props:{
-            inquiry:Object,
-            action:String
+        props: {
+            inquiry: Object,
+            action: String,
         },
         data() {
             return {
@@ -95,6 +95,7 @@
                     operator_id: "",
                     type: "",
                 },
+
                 valid: null,
                 model: null,
                 items: ["TDC200", "TD480", "UTM100", "UTM200", "EEW"],
@@ -111,22 +112,20 @@
                         return pattern.test(value) || "半角英数字のみで入力してください。";
                     },
                 },
+                result:'',
             };
         },
         mounted() {
             if (this.inquiry) {
                 this.value = Object.fromEntries(
                     Object.entries(this.inquiry).map(([k, v]) => [k, v === null ? "" : v])
-                );//投稿済み記事を参照する処理する場合は変数を上書き
+                ); //投稿済み記事を参照する処理する場合は変数を上書き
             }
-            if(this.action=='inhert'){
+            if (this.action == 'inhert') {
                 this.value.anchor = this.inquiry.inquiry_id
             }
         },
         methods: {
-            hoge(id) {
-                console.log(id);
-            },
             post(id) {
                 //投稿とボタンが押されたときに発動するメソッド
                 let postData = this.postData(id);
@@ -137,8 +136,8 @@
                         .post("/api/inquiries/create", postData) //api.phpのルートを指定。第2引数には渡したい変数を入れる（今回は入力された内容）
                         .then((response) => {
                             alert("投稿しました。");
-                            console.log(response); //成功してたらデータが返ってくる
-
+                            this.result=response.statusText;
+                            this.$emit('parentMethod', this.result) //結果を親コンポーネントに受け渡し
                         })
                         .catch(function (error) {
                             // handle error(axiosの処理にエラーが発生した場合に処理させたいことを記述)
@@ -172,14 +171,14 @@
             update(id) {
                 let postData = this.postData(id);
 
-                console.log("postData");
-
                 if (this.$refs.test_form.validate()) {
                     axios.post('/api/inquiries/edit', postData) //api.phpのルートを指定。第2引数には渡したい変数を入れる（今回は入力された内容）
                         .then(response => {
                             //ここに成功した時に行いたい処理を記載
                             alert('更新しました。');
-                            console.log(response); //成功してたらデータが返ってくる
+                            this.result=response.statusText
+                            console.log(this.result)
+                            this.$emit('refresh') //結果を親コンポーネントに受け渡し   
                         })
                         .catch(function (error) {
                             // handle error(axiosの処理にエラーが発生した場合に処理させたいことを記述)
@@ -198,7 +197,8 @@
                         .then((response) => {
                             //ここに成功した時に行いたい処理を記載
                             alert("引き継ぎました。");
-                            console.log(response); //成功してたらデータが返ってくる
+                            console.log(response.statusText); //成功してたらデータが返ってくる
+                            this.$emit('refresh')
 
                         })
                         .catch(function (error) {

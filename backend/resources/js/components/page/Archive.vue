@@ -3,36 +3,37 @@
         <h1>受付記録</h1>
         <v-row justify="start">
             <v-col cols="auto">
-                <v-dialog max-width="90%" scrollable>
+                <v-dialog max-width="90%" scrollable v-model="dialog.post">
                     <template v-slot:activator="{ on, attrs }">
                         <v-btn color="primary" v-bind="attrs" v-on="on" tabindex="1">
                             <v-icon>mdi-lead-pencil</v-icon>記録入力
                         </v-btn>
                     </template>
-                    <template  v-slot:default="dialog">
+                    <template v-slot:default="postDialog">
                         <v-card class="dialogBg">
                             <v-toolbar color="primary" dark dense>記録入力
                                 <v-spacer></v-spacer>
-                                <v-btn icon @click="dialog.value = false">
+                                <v-btn icon @click="postDialog.value = false">
                                     <v-icon>mdi-window-close</v-icon>
                                 </v-btn>
                             </v-toolbar>
                             <v-card-text>
-                                <p class="text-right" style="padding-top:16px;">
-                                    <v-icon>mdi-open-in-new</v-icon> <a href="/recordpost">新しいタブで入力画面を開く</a>
+                                <p class="text-right" style="padding-top: 16px">
+                                    <v-icon>mdi-open-in-new</v-icon>
+                                    <a href="/recordpost">新しいタブで入力画面を開く</a>
                                 </p>
-                                <RecordForm ref="RecordForm"></RecordForm>
+                                <RecordForm v-if="resetFlag" ref="RecordForm" @parentMethod="judge"></RecordForm>
                             </v-card-text>
                             <v-card-actions class="end">
                                 <v-btn text @click="submit" color="primary">登録</v-btn>
-                                <v-btn text @click="dialog.value = false" color="primary">閉じる</v-btn>
+                                <v-btn text @click="postDialog.value = false" color="primary">閉じる</v-btn>
                             </v-card-actions>
                         </v-card>
                     </template>
                 </v-dialog>
             </v-col>
 
-            <!-- <v-col cols="auto">
+            <v-col cols="auto">
                 <v-dialog transition="dialog-top-transition" max-width="600" scrollable>
                     <template v-slot:activator="{ on, attrs }">
                         <v-btn color="primary" v-bind="attrs" v-on="on" tabindex="2">
@@ -51,15 +52,15 @@
                         </v-card>
                     </template>
                 </v-dialog>
-            </v-col> -->
+            </v-col>
         </v-row>
 
-        <!-- <v-card v-for="(inquiry,index) in inquiries" :key="inquiry.id" class="inquiry" flat :id="inquiry.id">
+        <v-card v-for="(inquiry, index) in inquiries" :key="inquiry.id" class="inquiry" flat :id="inquiry.id">
             <span class="inquiryBox">
                 <v-toolbar color="primary" dark dense>
-                    <span class="overflow">{{inquiry.created_at}}</span>
-                    <span class="overflow">機種名: {{inquiry.type}}</span>
-                    <span class="overflow">シリアル:{{inquiry.serial}}</span>
+                    <span class="overflow">{{ inquiry.created_at }}</span>
+                    <span class="overflow">機種名: {{ inquiry.type }}</span>
+                    <span class="overflow">シリアル:{{ inquiry.serial }}</span>
                     <v-spacer></v-spacer>
 
                     <v-dialog max-width="90%" scrollable>
@@ -77,42 +78,41 @@
                                     </v-btn>
                                 </v-toolbar>
                                 <v-card-text>
-                                    <RecordForm :inquiry="inquiry" :action="'inhert'" :ref="'RecordForm' + index">
+                                    <RecordForm :inquiry="inquiry" :action="'inhert'" :ref="'RecordForm' + index" @refresh="$listeners['refresh']">
                                     </RecordForm>
                                 </v-card-text>
                                 <v-card-actions class="end">
-                                    <v-btn text @click="inhert(index,inquiry.id)" color="primary">引継</v-btn>
+                                    <v-btn text @click="inhert(index, inquiry.id)" color="primary">引継</v-btn>
                                     <v-btn text @click="dialog.value = false" color="primary">閉じる</v-btn>
                                 </v-card-actions>
                             </v-card>
                         </template>
                     </v-dialog>
 
-                    <v-dialog max-width="90%" scrollable>
+                    <v-dialog max-width="90%" scrollable v-model="dialog[edit + index]">
                         <template v-slot:activator="{ on, attrs }">
                             <v-btn icon v-bind="attrs" v-on="on">
                                 <v-icon>mdi-square-edit-outline</v-icon>
                             </v-btn>
                         </template>
-                        <template v-slot:default="dialog">
+                        <template v-slot:default="aaa" :ref="'RecordForm' + index">
                             <v-card>
                                 <v-toolbar color="primary" dark dense>記録編集
                                     <v-spacer></v-spacer>
-                                    <v-btn icon @click="dialog.value = false">
+                                    <v-btn icon @click="aaa.value = false">
                                         <v-icon>mdi-window-close</v-icon>
                                     </v-btn>
                                 </v-toolbar>
                                 <v-card-text>
-                                    <RecordForm :inquiry="inquiry" :ref="'RecordForm' + index"></RecordForm>
+                                    <RecordForm :inquiry="inquiry" :ref="'RecordForm' + index" @refresh="$listeners['refresh']"></RecordForm>
                                 </v-card-text>
                                 <v-card-actions class="end">
-                                    <v-btn text @click="edit(index,inquiry.id)" color="primary">更新</v-btn>
-                                    <v-btn text @click="dialog.value = false" color="primary">閉じる</v-btn>
+                                    <v-btn text @click="edit(index, inquiry.id)" color="primary">更新</v-btn>
+                                    <v-btn text @click="aaa.value = false" color="primary">閉じる</v-btn>
                                 </v-card-actions>
                             </v-card>
                         </template>
                     </v-dialog>
-
 
                     <v-btn icon>
                         <v-icon>mdi-flag-variant-outline</v-icon>
@@ -125,9 +125,9 @@
                             </v-btn>
                         </template>
                         <v-list>
-                            <v-list-item v-for="(cardMenu, method,index) in cardMenus" :key="index" class="hover">
-                                <v-list-item-title @click="triggerClick(cardMenu.method,inquiry.id)">
-                                    {{cardMenu.title }}
+                            <v-list-item v-for="(cardMenu, method, index) in cardMenus" :key="index" class="hover">
+                                <v-list-item-title @click="triggerClick(cardMenu.method, inquiry.id)">
+                                    {{ cardMenu.title }}
                                 </v-list-item-title>
                             </v-list-item>
                         </v-list>
@@ -140,36 +140,42 @@
                             <v-col cols="2" xs="0">
                                 <v-layout justify-center>
                                     <v-avatar color="primary" size="56">
-                                        <img src="/storage/img/customer.jpeg" alt="お客様" style="width:auto;">
+                                        <img src="/storage/img/customer.jpeg" alt="お客様" style="width: auto" />
                                     </v-avatar>
                                 </v-layout>
 
                                 <div class="people">
-                                    <v-layout v-if="inquiry.questioner" justify-center>{{inquiry.questioner}}</v-layout>
+                                    <v-layout v-if="inquiry.questioner" justify-center>{{
+                    inquiry.questioner
+                  }}</v-layout>
                                     <v-layout v-else justify-center>不明</v-layout>
-                                    <span v-if="inquiry.phoneNumber" style="text-align: center;">
+                                    <span v-if="inquiry.phoneNumber" style="text-align: center">
                                         <v-icon size="4">mdi-phone</v-icon>
-                                        <span>{{inquiry.phoneNumber}}</span>
-                                        <v-btn icon style="height:;" @click="copyToClipboard(inquiry.phoneNumber)">
+                                        <span>{{ inquiry.phoneNumber }}</span>
+                                        <v-btn icon style="height: " @click="copyToClipboard(inquiry.phoneNumber)">
                                             <v-icon size="4">mdi-content-copy</v-icon>
                                         </v-btn>
                                     </span>
                                 </div>
                             </v-col>
                             <v-col cols="6">
-                                <span class="bigFont">{{inquiry.question}}</span>
+                                <span class="bigFont">{{ inquiry.question }}</span>
                             </v-col>
                             <v-col cols="4">
                                 <span class="">
-                                    <div><span class="subject">販売店:</span>
-                                        <span v-if="inquiry.dealer">{{inquiry.dealer}}</span>
+                                    <div>
+                                        <span class="subject">販売店:</span>
+                                        <span v-if="inquiry.dealer">{{ inquiry.dealer }}</span>
                                         <span v-else>不明</span>
                                     </div>
-                                    <div><span class="subject">ユーザー:</span>
-                                        <span v-if="inquiry.customer">{{inquiry.customer}}</span>
+                                    <div>
+                                        <span class="subject">ユーザー:</span>
+                                        <span v-if="inquiry.customer">{{ inquiry.customer }}</span>
                                         <span v-else>不明</span>
                                     </div>
-                                    <div><span class="subject">満足度:</span>{{inquiry.satisfaction}}</div>
+                                    <div>
+                                        <span class="subject">満足度:</span>{{ inquiry.satisfaction }}
+                                    </div>
                                 </span>
                             </v-col>
                         </v-row>
@@ -184,23 +190,22 @@
                                     <v-avatar color="primary" size="56">オペ</v-avatar>
                                 </v-layout>
                                 <v-layout justify-center>
-                                    {{inquiry.operator_id}}
+                                    {{ inquiry.operator_id }}
                                 </v-layout>
                             </v-col>
                             <v-col cols="6">
-                                <span class="bigFont">{{inquiry.answer}}</span>
+                                <span class="bigFont">{{ inquiry.answer }}</span>
                             </v-col>
                             <v-col cols="4">
                                 <span class="">
-                                    <div class="id">ID:
-                                        {{inquiry.previewAnchor}}</div>
+                                    <div class="id">ID: {{ inquiry.previewAnchor }}</div>
                                 </span>
                             </v-col>
                         </v-row>
                     </v-container>
                 </v-card-text>
             </span>
-        </v-card> -->
+        </v-card>
 
         <div class="text-center ma-2">
             <v-snackbar v-model="centerSnackbar.snackbar" :timeout="centerSnackbar.timeout">
@@ -222,7 +227,7 @@
     </div>
 </template>
 <script>
-    import RecordForm from '../layout/RecordForm'
+    import RecordForm from "../layout/RecordForm";
 
     export default {
         components: {
@@ -230,15 +235,16 @@
         },
         data() {
             return {
-                //dialog:{value:null},
+                editDialog: null,
+                dialog: [],
                 inquiries: null,
                 cardMenus: [{
-                        title: '削除',
-                        method: 'delete'
+                        title: "削除",
+                        method: "delete",
                     },
                     {
-                        title: 'ダミー',
-                        method: 'delete'
+                        title: "ダミー",
+                        method: "delete",
                     },
                 ],
 
@@ -251,111 +257,141 @@
                 },
                 deleteId: null,
                 anchor: [],
-            }
+
+                result: "",
+                resetFlag: true,
+            };
         },
         mounted() {
-            this.showArchive()
+            this.getArchiveLength();
         },
         methods: {
-            showArchive() {
-                axios.get('/api/inquiries/archive')
-                    .then(response => {
-                        this.inquiries = response.data.data.reverse()
-                    })
-            },
+            showArchive: async function () {
+                await axios.get("/api/inquiries/archive").then((response) => {
+                    //サーバーの処理が終わるまで待て
+                    this.inquiries = response.data.data.reverse();
+                });
 
-            closeDialog(){
-                this.dialog.value=false
+                return this.inquiries; //awaitの処理が終わったらリターン
             },
+            getArchiveLength: async function () {
+                let result = await this.showArchive(); //showArchive()の処理が完全に終わるまで待て
 
+                //終わったら残りの処理を実行
+                this.dialog = {
+                    post: null,
+                };
+
+                for (let i = 0; i < result.length; i++) {
+                    this.dialog[`edit${i}`] = null;
+                }
+                console.log(this.dialog)
+            },
+            closeDialog() {
+                this.dialog.post = false;
+            },
             submit() {
-                this.$refs.RecordForm.post()
-                this.closeDialog()
-                this.showArchive()                     
+                this.$refs.RecordForm.post();
             },
+            judge(result) {
+                //正常にpostできたらダイアログを閉じてアーカイブ再読み込み
+                //this.result = result;
+                this.closeDialog();
+                this.showArchive();
+
+                //フォームをリフレッシュ（再読み込み）
+                this.resetFlag = false;
+                this.$nextTick(() => (this.resetFlag = true));
+            },
+
             edit(index, id) {
-                const RecordFormStr = 'RecordForm' + index
-                this.$refs[RecordFormStr][0].update(id)
+                const RecordFormStr = "RecordForm" + index;
+                this.$refs[RecordFormStr][0].update(id);
+
+                // this.dialog[`edit${index}`] = false;
+                // console.log(this.dialog)
+                // this.showArchive();
+
+                //app.vueのfugaメソッドを発火させてarchive.vue自体を再読み込み
+                 //this.$emit('add');
             },
             inhert(index, id) {
-                console.log('親のinhert')
-
-                constRecordFormStr = 'RecordForm' + index
-
-                console.log(RecordFormStr)
-
-                this.$refs[RecordFormStr][0].inhert(id)
+                const RecordFormStr = "RecordForm" + index;
+                this.$refs[RecordFormStr][0].inhert(id);
                 //更新じゃなくて新規投稿
             },
             copyToClipboard(text) {
-                navigator.clipboard.writeText(text)
+                navigator.clipboard
+                    .writeText(text)
                     .then(() => {
-                        alert('copied')
+                        alert("copied");
                     })
-                    .catch(e => {
-                        console.error(e)
-                    })
+                    .catch((e) => {
+                        console.error(e);
+                    });
             },
             triggerClick(method, id) {
                 if (method === "delete") {
-                    this.deleteConfirm(id)
+                    this.deleteConfirm(id);
                 }
             },
             deleteConfirm(id) {
                 var activeClass = document.getElementById(id);
                 activeClass.classList.add("activeCard");
-                this.centerSnackbar.rebornButton = false
-                this.centerSnackbar.deleteButton = true
-                this.centerSnackbar.text = '削除しますか？'
-                this.centerSnackbar.snackbar = true; //スナックバーを表示 
-                this.deleteId = id //deleteやrebornメソッドで削除・復活させたいときに参照するID
+                this.centerSnackbar.rebornButton = false;
+                this.centerSnackbar.deleteButton = true;
+                this.centerSnackbar.text = "削除しますか？";
+                this.centerSnackbar.snackbar = true; //スナックバーを表示
+                this.deleteId = id; //deleteやrebornメソッドで削除・復活させたいときに参照するID
             },
             del(id) {
                 let postdata = {
-                    id: id
-                } //消したい記事のidをオブジェクトidに格納
-                axios.post('/api/inquiries/delete', postdata)
-                    .then(response => {
-                        //ここに成功した時に行いたい処理を記載                             
+                    id: id,
+                }; //消したい記事のidをオブジェクトidに格納
+                axios
+                    .post("/api/inquiries/delete", postdata)
+                    .then((response) => {
+                        //ここに成功した時に行いたい処理を記載
                         console.log(response); //成功してたらデータが返ってくる
                         //var activeClass = document.getElementById(id);
-                        
-                        this.centerSnackbar.text = '削除しました。'
-                        this.centerSnackbar.deleteButton = false //削除ボタンを非表示
-                        this.centerSnackbar.rebornButton = true //元に戻すボタンを表示
-                        this.centerSnackbar.snackbar = true; //スナックバーを表示   
-                        
-                        this.showArchive()
+
+                        this.centerSnackbar.text = "削除しました。";
+                        this.centerSnackbar.deleteButton = false; //削除ボタンを非表示
+                        this.centerSnackbar.rebornButton = true; //元に戻すボタンを表示
+                        this.centerSnackbar.snackbar = true; //スナックバーを表示
+
+                        this.showArchive();
                     })
                     .catch(function (error) {
-                        alert('削除できませんでした。');
+                        alert("削除できませんでした。");
                         console.log(error);
-                    })
+                    });
             },
             reborn(id) {
                 let postdata = {
-                    id: id
-                } //復活させたい記事のidをオブジェクトidに格納
-                axios.post('/api/inquiries/reborn', postdata)
-                    .then(response => {
-                        this.centerSnackbar.text = '復活させました。'
-                        this.centerSnackbar.rebornButton = false //元に戻すボタンを非表示
-                    
-                        this.showArchive()
+                    id: id,
+                }; //復活させたい記事のidをオブジェクトidに格納
+                axios
+                    .post("/api/inquiries/reborn", postdata)
+                    .then((response) => {
+                        this.centerSnackbar.text = "復活させました。";
+                        this.centerSnackbar.rebornButton = false; //元に戻すボタンを非表示
+
+                        this.showArchive();
                     })
                     .catch(function (error) {
-                        this.centerSnackbar.text = '復活させられませんでした。'
+                        this.centerSnackbar.text = "復活させられませんでした。";
                         console.log(error);
-                    })
+                    });
             },
             closeCenterSnackbar(id) {
-                this.centerSnackbar.snackbar = false
+                this.centerSnackbar.snackbar = false;
                 var activeClass = document.getElementById(id);
                 activeClass.classList.remove("activeCard");
-                this.centerSnackbar.deleteButton = false
+                this.centerSnackbar.deleteButton = false;
             },
         },
-    }
+    };
 
 </script>
 <style scoped>
@@ -364,7 +400,7 @@
     }
 
     .bigFont {
-        font-size: 1.0rem !important;
+        font-size: 1rem !important;
         white-space: break-spaces;
     }
 
@@ -392,17 +428,17 @@
         opacity: 0.7;
         background-color: rgba(49, 49, 49, 0.767);
         cursor: pointer;
-        color: #FFF !important;
+        color: #fff !important;
     }
 
     .activeCard {
         opacity: 0.5;
-        transition: .5s;
+        transition: 0.5s;
     }
 
     .deleting {
         opacity: 0.1;
-        transition: .5s;
+        transition: 0.5s;
     }
 
     .delete {

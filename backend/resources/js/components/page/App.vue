@@ -21,7 +21,7 @@
 
         <v-main>
             <v-container>
-                <router-view />
+                <router-view @refresh="refresh" v-if="resetFlag" />
             </v-container>
         </v-main>
     </v-app>
@@ -38,7 +38,16 @@
                 ['mdi-account', 'ユーザー登録', '/customer'],
                 ['mdi-alpha-p-box', '機種登録', '/types'],
             ],
+            resetFlag:true,
         }),
+       methods:  {
+            refresh(){
+                console.log('app.vueのメソッドが発火している')
+                this.resetFlag = false;
+                this.$nextTick(() => (this.resetFlag = true));
+                //archiveのdialogを閉じたいタイミングなどでコンポーネントを強制再読み込み
+            }
+        }
     }
 
 </script>

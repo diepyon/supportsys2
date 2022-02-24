@@ -1,10 +1,18 @@
 <template>
     <div>
-        <v-form ref="test_form" v-model="valid" lazy-validation>
-            <v-text-field v-model="value.name" label="機種名" hint="(例)APS100" required :rules="[rules.required]">
-            </v-text-field>
-        </v-form>
-        <v-btn text @click="submit" color="primary">登録</v-btn>
+
+        <p>文字列として選択候補に追加するだけなので、誤って削除しても投稿済みの受付記録には影響しません。</p>
+        <v-card>
+            <v-container>
+                <v-form ref="test_form" v-model="valid" lazy-validation @submit.prevent>
+
+                    <v-text-field v-model="value.name" label="機種名" hint="(例)APS100" required :rules="[rules.required]">
+                    </v-text-field>
+                    <v-btn text @click="submit" color="primary">登録</v-btn>
+                </v-form>
+            </v-container>
+        </v-card>
+
 
         <v-card>
             <v-card-title>
@@ -15,34 +23,7 @@
             </v-card-title>
             <v-data-table :headers="headers" :items="items" hide-default-footer :search="search">
                 <template v-slot:[`item.action`]="{ item }">
-                    <v-dialog max-width="500px" scrollable>
-                        <template v-slot:activator="{ on, attrs }">
-                            <v-btn color="primary" v-bind="attrs" v-on="on" tabindex="1">
-                                <v-icon>mdi-lead-pencil</v-icon>編集
-                            </v-btn>
-                        </template>
-                        <template v-slot:default="dialog">
-                            <v-form ref="test_form" v-model="valid" lazy-validation>
-                                <v-card class="dialogBg">
-                                    <v-toolbar color="primary" dark dense>機種編集
-                                        <v-spacer></v-spacer>
-                                        <v-btn icon @click="dialog.value = false">
-                                            <v-icon>mdi-window-close</v-icon>
-                                        </v-btn>
-                                    </v-toolbar>
-                                    <v-card-text>
-                                        <v-text-field v-model="item.name" label="機種名" required
-                                            :rules="[rules.required]"></v-text-field>
-                                    </v-card-text>
-                                    <v-card-actions class="end">
-                                        <v-btn text @click="update(item.name,item.id)" color="primary">編集</v-btn>
-                                        <v-btn text @click="dialog.value = false;showArchive()" color="primary">閉じる
-                                        </v-btn>
-                                    </v-card-actions>
-                                </v-card>
-                            </v-form>
-                        </template>
-                    </v-dialog>
+                    <v-btn @click="dialog = true;getItem(item)" color="primary">編集</v-btn>
                     <v-btn @click="onClickShow(item)">削除</v-btn>
                 </template>
             </v-data-table>
@@ -65,12 +46,38 @@
                 </template>
             </v-snackbar>
         </div>
+
+        <v-dialog max-width="500px" v-model="dialog">
+            <template v-slot:default="dialog">
+                <v-form ref="test_form" v-model="valid" lazy-validation @submit.prevent>
+                    <v-card class="dialogBg">
+                        <v-toolbar color="primary" dark dense>機種編集
+                            <v-spacer></v-spacer>
+                            <v-btn icon @click="dialog.value = false">
+                                <v-icon>mdi-window-close</v-icon>
+                            </v-btn>
+                        </v-toolbar>
+                        <v-card-text>
+                            <v-text-field v-model="name" label="機種名" required :rules="[rules.required]"></v-text-field>
+                        </v-card-text>
+                        <v-card-actions class="end">
+                            <v-btn text @click="update(name,id)" color="primary">更新</v-btn>
+                            <v-btn text @click="dialog.value = false;showArchive()" color="primary">閉じる
+                            </v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-form>
+            </template>
+        </v-dialog>
     </div>
 </template>
 <script>
     export default ({
         data() {
             return {
+                name: null,
+                id: null,
+                dialog: null,
                 valid: null,
                 rules: {
                     required: (v) => !!v || "必須",
@@ -106,6 +113,10 @@
             }
         },
         methods: {
+            getItem(item) {
+                this.name = item.name
+                this.id = item.id
+            },
             submit() {
                 let postData = {
                     name: this.value.name,
@@ -115,9 +126,13 @@
                     axios.post('/api/types/create', postData)
                         .then(response => {
                             console.log(response)
+                            this.showArchive()
+                            this.centerSnackbar.text = postData.name + 'を新規登録しました。'
+                            this.centerSnackbar.snackbar = true; //スナックバーを表示 
                         })
                         .catch(function (error) {
                             this.centerSnackbar.text = '登録できませんでした。'
+                            this.centerSnackbar.snackbar = true; //スナックバーを表示 
                             console.log(error);
                         })
                 } else {
@@ -143,11 +158,12 @@
                     .then(response => {
                         if (response.data === 0) { //削除したレコードの数がリターンされる
                             this.centerSnackbar.text = '削除できませんでした。'
+                            this.centerSnackbar.snackbar = true; //スナックバーを表示 
                         } else {
                             this.centerSnackbar.text = '削除しました。'
                             this.centerSnackbar.deleteButton = false //削除ボタンを非表示
                             //this.centerSnackbar.rebornButton = true //元に戻すボタンを表示
-                            this.centerSnackbar.snackbar = true; //スナックバーを表示  
+                            this.centerSnackbar.snackbar = true //スナックバーを表示  
                             this.showArchive()
                         }
                     })
@@ -171,18 +187,26 @@
                     name: name,
                     id: id
                 }
-                 if (this.$refs.test_form.validate()) {
-                axios.post('/api/types/update', postData)
-                    .then(response => {
-                        console.log(response.statusText)
-                    })
-                    .catch(function (error) {
-                        this.centerSnackbar.text = '編集できませんでした。'
-                        console.log(error);
-                    })}else{
-                        alert('入力してください。')
-                    }
-            }
+                if (this.$refs.test_form.validate()) {
+                    axios.post('/api/types/update', postData)
+                        .then(response => {
+                            console.log(response.statusText)
+                            //this.dialog = false
+                            this.centerSnackbar.text = postData.name + 'に更新しました。'
+                            this.centerSnackbar.snackbar = true; //スナックバーを表示                             
+                            this.dialog = false
+                            this.showArchive()
+                        })
+                        .catch(function (error) {
+                            this.centerSnackbar.text = '編集できませんでした。'
+                            this.centerSnackbar.snackbar = true; //スナックバーを表示 
+                            console.log(error);
+
+                        })
+                } else {
+                    alert('入力してください。')
+                }
+            },
         },
         mounted() {
             this.showArchive()
