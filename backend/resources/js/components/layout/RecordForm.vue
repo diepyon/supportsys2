@@ -1,5 +1,6 @@
 <template>
     <div style="padding-top: 16px">
+        {{kiroku}}
         <v-form ref="test_form" v-model="valid" lazy-validation>
             <v-autocomplete v-model="value.type" :items="items" dense filled label="機種名" required
                 :rules="[rules.required]" no-data-text="該当なし"></v-autocomplete>
@@ -73,7 +74,9 @@
         name: "RecordForm",
         props: {
             inquiry: Object,
+            inquiries: Array, //たぶんあってる
             action: String,
+            kiroku:Array,
         },
         data() {
             return {
@@ -112,20 +115,28 @@
                         return pattern.test(value) || "半角英数字のみで入力してください。";
                     },
                 },
-                result:'',
+                result: '',
             };
         },
         mounted() {
-            if (this.inquiry) {
-                this.value = Object.fromEntries(
-                    Object.entries(this.inquiry).map(([k, v]) => [k, v === null ? "" : v])
-                ); //投稿済み記事を参照する処理する場合は変数を上書き
-            }
+            console.log(this.kiroku)
+
             if (this.action == 'inhert') {
                 this.value.anchor = this.inquiry.inquiry_id
             }
         },
         methods: {
+            fuga(index) {
+                console.log('子コンポーネントのメソッド発火！')
+
+            // if (this.kiroku) {
+            //     this.value = Object.fromEntries(
+            //         Object.entries(this.kiroku).map(([k, v]) => [k, v === null ? "" : v])
+            //     ); //投稿済み記事を参照する処理する場合は変数を上書き
+            // }
+
+            },
+
             post(id) {
                 //投稿とボタンが押されたときに発動するメソッド
                 let postData = this.postData(id);
@@ -136,7 +147,7 @@
                         .post("/api/inquiries/create", postData) //api.phpのルートを指定。第2引数には渡したい変数を入れる（今回は入力された内容）
                         .then((response) => {
                             alert("投稿しました。");
-                            this.result=response.statusText;
+                            this.result = response.statusText;
                             this.$emit('parentMethod', this.result) //結果を親コンポーネントに受け渡し
                         })
                         .catch(function (error) {
@@ -168,27 +179,7 @@
                 };
                 return postData;
             },
-            update(id) {
-                let postData = this.postData(id);
 
-                if (this.$refs.test_form.validate()) {
-                    axios.post('/api/inquiries/edit', postData) //api.phpのルートを指定。第2引数には渡したい変数を入れる（今回は入力された内容）
-                        .then(response => {
-                            //ここに成功した時に行いたい処理を記載
-                            alert('更新しました。');
-                            this.result=response.statusText
-                            console.log(this.result)
-                            this.$emit('refresh') //結果を親コンポーネントに受け渡し   
-                        })
-                        .catch(function (error) {
-                            // handle error(axiosの処理にエラーが発生した場合に処理させたいことを記述)
-                            alert('あかんかったわ、コンソール見て');
-                            console.log(error);
-                        })
-                } else {
-                    alert('入力内容に不備があります。')
-                }
-            },
             inhert(id) {
                 let postData = this.postData(id);
 
