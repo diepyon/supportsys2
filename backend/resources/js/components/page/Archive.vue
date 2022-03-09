@@ -34,26 +34,28 @@
             </v-col>
         </v-row>
 
-        <v-dialog max-width="90%" scrollable persistent v-model="dialog.edit">
-            <template v-slot:default="editDialog">
+        <v-dialog max-width="90%" scrollable persistent v-model="dialog.posted">
+            <template v-slot:default="postedDialog">
                 <v-card class="dialogBg">
-                    <v-toolbar color="primary" dark dense>記録編集
+                    <v-toolbar color="primary" dark dense>{{actionTitleName}}
                         <v-spacer></v-spacer>
                         <v-btn icon @click="closeConfirm">
                             <v-icon>mdi-window-close</v-icon>
                         </v-btn>
                     </v-toolbar>
                     <v-card-text>
-                        <p class="text-right" style="padding-top: 16px">
-                            <v-icon>mdi-open-in-new</v-icon>
-                        </p>
-
-
                         <div style="padding-top: 16px">
                             <v-form ref="test_form" v-model="valid" lazy-validation>
-                                <v-autocomplete v-model="value.type" :items="items" dense filled label="機種名" required
-                                    :rules="[rules.required]" no-data-text="該当なし"></v-autocomplete>
-
+                                <v-autocomplete 
+                                    v-model="value.type" 
+                                    :items="types" 
+                                    dense filled label="機種名" 
+                                    required
+                                    :rules="[rules.required]" 
+                                    no-data-text="該当なし"
+                                    placeholder="検索できます"
+                                    prepend-icon="mdi-magnify"
+                                ></v-autocomplete>
                                 <v-text-field v-model="value.serial" label="シリアル番号" :rules="[rules.alphaNum]">
                                 </v-text-field>
 
@@ -68,9 +70,7 @@
                                         </v-text-field>
                                     </v-col>
                                 </v-row>
-
                                 <v-text-field v-model="value.customer" label="ユーザー"></v-text-field>
-
                                 <v-container fluid>
                                     <v-radio-group v-model="value.kinds" row>
                                         <v-radio label="設定" value="設定"></v-radio>
@@ -81,12 +81,10 @@
                                         <v-radio label="クレーム" value="クレーム"></v-radio>
                                     </v-radio-group>
                                 </v-container>
-
                                 <v-textarea v-model="value.question" label="問い合わせ内容" required :rules="[rules.required]">
                                 </v-textarea>
                                 <v-textarea v-model="value.answer" label="回答内容" required :rules="[rules.required]">
                                 </v-textarea>
-
                                 <v-container fluid>
                                     <v-radio-group v-model="value.remote" row>
                                         <template v-slot:label>
@@ -121,12 +119,14 @@
                                 </v-container>
                             </v-form>
                         </div>
-
                     </v-card-text>
                     <v-card-actions class="end">
-                        <v-btn text color="primary" @click="update(inquiryID)">更新</v-btn>
+                        <v-btn text color="primary" v-if="submitButtonName=='更新'" @click="update(inquiryID)">
+                            {{submitButtonName}}</v-btn>
+                        <v-btn text color="primary" v-if="submitButtonName=='引継'" @click="inhert(inquiryID)">
+                            {{submitButtonName}}</v-btn>
                         <v-btn text @click="closeConfirm" color="primary">閉じる</v-btn>
-                        <v-btn v-show="false" @click="editDialog.value = false;"></v-btn>
+                        <v-btn v-show="false" @click="postedDialog.value = false;"></v-btn>
                     </v-card-actions>
                 </v-card>
             </template>
@@ -139,10 +139,12 @@
                     <span class="overflow">機種名: {{ inquiry.type }}</span>
                     <span class="overflow">シリアル:{{ inquiry.serial }}</span>
                     <v-spacer></v-spacer>
-                    <v-btn icon @click="dialog.edit = true;hage(inquiry,index);id=inquiry.id">
+                    <v-btn icon @click="dialog.posted=true;inhertDialog(inquiry,index,'inhert');id=inquiry.id">
+                        <v-icon>mdi-subdirectory-arrow-left</v-icon>
+                    </v-btn>
+                    <v-btn icon @click="dialog.posted = true;updateDialog(inquiry,index);id=inquiry.id">
                         <v-icon>mdi-square-edit-outline</v-icon>
                     </v-btn>
-
 
                     <v-btn icon>
                         <v-icon>mdi-flag-variant-outline</v-icon>
@@ -248,7 +250,7 @@
                         元に戻す
                     </v-btn>
                     <v-btn v-if="centerSnackbar.discard" color="pink" text v-bind="attrs"
-                        @click="dialog.edit = false;closeCenterSnackbar()">
+                        @click="dialog.posted = false;closeCenterSnackbar()">
                         破棄する
                     </v-btn>
                     <v-btn v-if="centerSnackbar.notDiscard" color="pink" text v-bind="attrs"
@@ -274,7 +276,7 @@
         data() {
             return {
                 inquiryID: null,
-                editDialog: null,
+                postedDialog: null,
                 dialog: [],
                 inquiries: null,
                 cardMenus: [{
@@ -309,13 +311,10 @@
                 },
 
                 index: null,
-
                 deleteId: null,
                 anchor: [],
-
                 result: "",
                 resetFlag: true,
-
 
                 value: {
                     answer: "",
@@ -334,12 +333,15 @@
                     operator_id: "",
                     type: "",
                 },
+                actionTitleName: null,
+                action: null,
+                submitButtonName: null,
                 oldValue: null,
                 newValue: null,
 
                 valid: null,
                 model: null,
-                items: ["TDC200", "TD480", "UTM100", "UTM200", "EEW"],
+                types: [],
                 rules: {
                     tel: (value) =>
                         /^(0[5-9]0[0-9]{8}|0[1-9][1-9][0-9]{7})$/.test(
@@ -355,9 +357,13 @@
                 },
             };
         },
+        watch: {
 
+
+        },        
         mounted() {
-            this.getArchiveLength();
+            this.showArchive()
+            this.getTypes()
         },
         methods: {
             postData(id) {
@@ -380,23 +386,18 @@
                 };
                 return postData;
             },
-
-
             update(id) {
                 let postData = this.postData(id);
 
                 if (this.$refs.test_form.validate()) {
                     axios.post('/api/inquiries/edit', postData) //api.phpのルートを指定。第2引数には渡したい変数を入れる（今回は入力された内容）
                         .then(response => {
-                            //ここに成功した時に行いたい処理を記載
                             alert('更新しました。');
-                            this.result = response.statusText
-                            console.log(this.result)
+                            console.log(response.statusText)
                             this.showArchive()
-                            this.dialog.edit = false
+                            this.dialog.posted = false
                         })
                         .catch(function (error) {
-                            // handle error(axiosの処理にエラーが発生した場合に処理させたいことを記述)
                             alert('あかんかったわ、コンソール見て');
                             console.log(error);
                         })
@@ -404,8 +405,25 @@
                     alert('入力内容に不備があります。')
                 }
             },
-
-            showArchive: async function () {
+            inhert(id) {
+                let postData = this.postData(id);
+                if (this.$refs.test_form.validate()) {
+                    axios.post("/api/inquiries/create", postData)
+                        .then((response) => {
+                            alert("引き継ぎました。");
+                            console.log(response.statusText);
+                            this.showArchive()
+                            this.dialog.posted = false
+                        })
+                        .catch(function (error) {
+                            alert("あかんかったわ、コンソール見て");
+                            console.log(error);
+                        });
+                } else {
+                    alert("入力内容に不備があります。");
+                }
+            },
+            getInquiries: async function () {
                 await axios.get("/api/inquiries/archive").then((response) => {
                     //サーバーの処理が終わるまで待て
                     this.inquiries = response.data.data.reverse();
@@ -413,19 +431,14 @@
 
                 return this.inquiries; //awaitの処理が終わったらリターン
             },
-            getArchiveLength: async function () {
-                let result = await this.showArchive(); //showArchive()の処理が完全に終わるまで待て
+            showArchive: async function () {
+                let result = await this.getInquiries(); //showArchive()の処理が完全に終わるまで待て
 
-                //終わったら残りの処理を実行
+                //終わったら残りの処理を実行(ダイアログを確実に閉じておく)
                 this.dialog = {
                     post: null,
-                    edit: null,
+                    posted: null,
                 };
-
-                for (let i = 0; i < result.length; i++) {
-                    this.dialog[`edit${i}`] = null;
-                }
-                //console.log(this.dialog)
             },
             closeDialog() {
                 this.dialog.post = false;
@@ -433,9 +446,6 @@
             submit() {
                 this.$refs.RecordForm.post()
             },
-
-
-
             judge(result) {
                 //正常にpostできたらダイアログを閉じてアーカイブ再読み込み
                 //this.result = result;
@@ -445,12 +455,6 @@
                 //フォームをリフレッシュ（再読み込み）
                 this.resetFlag = false;
                 this.$nextTick(() => (this.resetFlag = true));
-            },
-
-            inhert(index, id) {
-                const RecordFormStr = "RecordForm" + index;
-                this.$refs[RecordFormStr][0].inhert(id);
-                //更新じゃなくて新規投稿
             },
             copyToClipboard(text) {
                 navigator.clipboard
@@ -468,12 +472,8 @@
                 }
             },
             deleteConfirm(id) {
-
                 this.snackbarDefaultStatus()
-
                 var activeClass = document.getElementById(id);
-
-
                 activeClass.classList.add("activeCard");
                 this.centerSnackbar.rebornButton = false;
                 this.centerSnackbar.discard = false;
@@ -485,8 +485,13 @@
                 this.deleteId = id; //deleteやrebornメソッドで削除・復活させたいときに参照するID
             },
             closeConfirm() {
-                //更新前のデータをjson形式に変換（なおかつnullは""に置き換え）
-                this.oldValue = JSON.stringify(Object.fromEntries(Object.entries(this.inquiries[this.index]).map(([k,
+                this.oldValue = this.inquiries[this.index]
+                if (this.action == 'inhert') {
+                    this.oldValue.anchor = this.inquiries[this.index].inquiry_id
+                } //inhertの場合引継ID初期値は引継元IDとして変化したかどうかを判断
+
+                //更新前のデータをjson形式に変換（なおかつnullは""に置き換え
+                this.oldValue = JSON.stringify(Object.fromEntries(Object.entries(this.oldValue).map(([k,
                     v
                 ]) => [k,
                     v === null ? "" : v
@@ -495,7 +500,8 @@
                 this.newValue = JSON.stringify(this.value)
 
                 if (this.oldValue == this.newValue) {
-                    this.dialog.edit = false
+                    this.dialog.posted = false
+                    this.action == null //actionを元に戻す
                     console.log('変更がなかったので警告なしで閉じます。')
                 } else {
                     this.snackbarDefaultStatus()
@@ -507,17 +513,30 @@
                     this.centerSnackbar.snackbar = true; //スナックバーを表示
                 }
             },
-
-            hage(inquiry, index) {
+            updateDialog(inquiry, index) {
+                this.actionTitleName = '記録編集'
+                this.submitButtonName = '更新'
                 this.inquiryID = inquiry.id
                 this.index = index
-
                 if (inquiry) {
                     this.value = Object.fromEntries(
                         Object.entries(inquiry).map(([k, v]) => [k, v === null ? "" : v])
                     ); //投稿済み記事を参照する処理する場合は変数を上書き
                 }
-
+                this.inquiry = this.value
+            },
+            inhertDialog(inquiry, index, action) {
+                this.actionTitleName = '記録引継'
+                this.action = action
+                this.submitButtonName = '引継'
+                this.inquiryID = inquiry.id
+                this.index = index
+                if (inquiry) {
+                    this.value = Object.fromEntries(
+                        Object.entries(inquiry).map(([k, v]) => [k, v === null ? "" : v])
+                    ); //投稿済み記事を参照する処理する場合は変数を上書き
+                }
+                this.value.anchor = inquiry.inquiry_id //引継元IDを取得(しかしIDを入力したとして変更扱いになりダイアログを閉じるときに無編集でも警告が出る)
                 this.inquiry = this.value
             },
             del(id) {
@@ -530,12 +549,10 @@
                         //ここに成功した時に行いたい処理を記載
                         console.log(response); //成功してたらデータが返ってくる
                         //var activeClass = document.getElementById(id);
-
                         this.centerSnackbar.text = "削除しました。";
                         this.centerSnackbar.deleteButton = false; //削除ボタンを非表示
                         this.centerSnackbar.rebornButton = true; //元に戻すボタンを表示
                         this.centerSnackbar.snackbar = true; //スナックバーを表示
-
                         this.showArchive();
                     })
                     .catch(function (error) {
@@ -552,7 +569,6 @@
                     .then((response) => {
                         this.centerSnackbar.text = "復活させました。";
                         this.centerSnackbar.rebornButton = false; //元に戻すボタンを非表示
-
                         this.showArchive();
                     })
                     .catch(function (error) {
@@ -569,8 +585,18 @@
             },
             snackbarDefaultStatus() {
                 this.centerSnackbar = this.centerSnackbarDefault
-                console.log(this.centerSnackbar)
-            }
+            },
+            getTypes() {
+                axios.get('/api/types/archive')
+                    .then(response => {
+                        const types = response.data.data                       
+                        types.forEach((value) => {
+                           this.types.push(value.name)
+                        })
+                        this.types.sort()
+                        console.log(this.types)
+                    })
+            },
         },
     };
 

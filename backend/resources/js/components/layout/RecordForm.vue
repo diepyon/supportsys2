@@ -1,8 +1,7 @@
 <template>
     <div style="padding-top: 16px">
-        {{kiroku}}
         <v-form ref="test_form" v-model="valid" lazy-validation>
-            <v-autocomplete v-model="value.type" :items="items" dense filled label="機種名" required
+            <v-autocomplete v-model="value.type" :types="types" dense filled label="機種名" required
                 :rules="[rules.required]" no-data-text="該当なし"></v-autocomplete>
 
             <v-text-field v-model="value.serial" label="シリアル番号" :rules="[rules.alphaNum]"></v-text-field>
@@ -76,7 +75,6 @@
             inquiry: Object,
             inquiries: Array, //たぶんあってる
             action: String,
-            kiroku:Array,
         },
         data() {
             return {
@@ -101,7 +99,7 @@
 
                 valid: null,
                 model: null,
-                items: ["TDC200", "TD480", "UTM100", "UTM200", "EEW"],
+                types: [],
                 rules: {
                     tel: (value) =>
                         /^(0[5-9]0[0-9]{8}|0[1-9][1-9][0-9]{7})$/.test(
@@ -119,24 +117,12 @@
             };
         },
         mounted() {
-            console.log(this.kiroku)
-
             if (this.action == 'inhert') {
                 this.value.anchor = this.inquiry.inquiry_id
-            }
+            }         
+            this.getTypes()   
         },
         methods: {
-            fuga(index) {
-                console.log('子コンポーネントのメソッド発火！')
-
-            // if (this.kiroku) {
-            //     this.value = Object.fromEntries(
-            //         Object.entries(this.kiroku).map(([k, v]) => [k, v === null ? "" : v])
-            //     ); //投稿済み記事を参照する処理する場合は変数を上書き
-            // }
-
-            },
-
             post(id) {
                 //投稿とボタンが押されたときに発動するメソッド
                 let postData = this.postData(id);
@@ -201,6 +187,19 @@
                     alert("入力内容に不備があります。");
                 }
             },
+            getTypes() {
+                axios.get('/api/types/archive')
+                    .then(response => {
+                        const hogehoge = response.data.data.reverse()
+                        console.log(hogehoge)
+
+                        hogehoge.forEach((value) => {
+                           this.types.push(value.name)
+                        });
+                        this.types=this.types.sort()
+                        console.log(this.types)
+                    })
+            },            
         },
     };
 

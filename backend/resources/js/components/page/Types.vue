@@ -180,6 +180,7 @@
                 axios.get('/api/types/archive')
                     .then(response => {
                         this.items = response.data.data.reverse()
+                        console.log(this.items)
                     })
             },
             update(name, id) {
