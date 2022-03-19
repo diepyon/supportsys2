@@ -18,7 +18,7 @@ class TypeResource extends JsonResource
             'name' => $this->name,
             'id' => $this->id,
             'price' => $this->created_at,
-            'date' =>  $this->created_at->isoFormat('YYYY/MM/DD'),
+            'date' =>  $this->created_at->isoFormat('YYYY/MM/DD'),//createdatがnullのレコードがあるとarchive丸ごと表示できなくなる
         ];
     }
 }

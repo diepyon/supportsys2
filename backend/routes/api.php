@@ -21,10 +21,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+
+Route::get('/inquiries',  [InquiryController::class, 'index']);//20件記事を表示する
+
 Route::post('/inquiries/create', [InquiryController::class, 'create']);
 Route::post('/inquiries/edit', [InquiryController::class, 'edit']);
 Route::post('/inquiries/inhert', [InquiryController::class, 'inhert']);
-Route::get('/inquiries/archive', [InquiryController::class, 'show']);
+
 Route::get('/inquiries/{id}', [InquiryController::class, 'single']);
 Route::post('/inquiries/delete', [InquiryController::class, 'delete']);
 Route::post('/inquiries/reborn', [InquiryController::class, 'reborn']);

@@ -19,7 +19,6 @@ class InquiryCollection extends ResourceCollection
     public function toArray($request)
     {//なくても動いた。必要性が分からない。
         return [
-            'inquiry_count' => $this->count(),
             'data' => $this->collection,
         ];
     }

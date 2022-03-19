@@ -1,7 +1,7 @@
 <template>
     <div style="padding-top: 16px">
         <v-form ref="test_form" v-model="valid" lazy-validation>
-            <v-autocomplete v-model="value.type" :types="types" dense filled label="機種名" required
+            <v-autocomplete v-model="value.type" :items="types" dense filled label="機種名" required
                 :rules="[rules.required]" no-data-text="該当なし"></v-autocomplete>
 
             <v-text-field v-model="value.serial" label="シリアル番号" :rules="[rules.alphaNum]"></v-text-field>
@@ -71,11 +71,7 @@
 <script>
     export default {
         name: "RecordForm",
-        props: {
-            inquiry: Object,
-            inquiries: Array, //たぶんあってる
-            action: String,
-        },
+
         data() {
             return {
                 //もしIDが指定されていないならvalueは下記（editで指定されてる版も別途指定が必要）
@@ -116,10 +112,7 @@
                 result: '',
             };
         },
-        mounted() {
-            if (this.action == 'inhert') {
-                this.value.anchor = this.inquiry.inquiry_id
-            }         
+        mounted() {     
             this.getTypes()   
         },
         methods: {
@@ -135,10 +128,13 @@
                             alert("投稿しました。");
                             this.result = response.statusText;
                             this.$emit('parentMethod', this.result) //結果を親コンポーネントに受け渡し
+
+                            //親コンポーネントのchangepage(1)を発火(引数は親側で指定)
+                            this.$emit('backToTop');
                         })
                         .catch(function (error) {
                             // handle error(axiosの処理にエラーが発生した場合に処理させたいことを記述)
-                            alert("あかんかったわ、コンソール見て");
+                            alert("投稿できませんでした。");
                             console.log(error);
                         });
                 } else {
@@ -165,41 +161,16 @@
                 };
                 return postData;
             },
-
-            inhert(id) {
-                let postData = this.postData(id);
-
-                if (this.$refs.test_form.validate()) {
-                    axios.post("/api/inquiries/create", postData) //api.phpのルートを指定。第2引数には渡したい変数を入れる（今回は入力された内容）
-                        .then((response) => {
-                            //ここに成功した時に行いたい処理を記載
-                            alert("引き継ぎました。");
-                            console.log(response.statusText); //成功してたらデータが返ってくる
-                            this.$emit('refresh')
-
-                        })
-                        .catch(function (error) {
-                            // handle error(axiosの処理にエラーが発生した場合に処理させたいことを記述)
-                            alert("あかんかったわ、コンソール見て");
-                            console.log(error);
-                        });
-                } else {
-                    alert("入力内容に不備があります。");
-                }
-            },
             getTypes() {
                 axios.get('/api/types/archive')
                     .then(response => {
-                        const hogehoge = response.data.data.reverse()
-                        console.log(hogehoge)
-
-                        hogehoge.forEach((value) => {
-                           this.types.push(value.name)
-                        });
-                        this.types=this.types.sort()
-                        console.log(this.types)
+                        const types = response.data.data
+                        types.forEach((value) => {
+                            this.types.push(value.name)
+                        })
+                        this.types.sort()
                     })
-            },            
+            },       
         },
     };
 

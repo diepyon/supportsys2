@@ -22,7 +22,8 @@
                                     <v-icon>mdi-open-in-new</v-icon>
                                     <a href="/recordpost">新しいタブで入力画面を開く</a>
                                 </p>
-                                <RecordForm v-if="resetFlag" ref="RecordForm" @parentMethod="judge"></RecordForm>
+                                <RecordForm v-if="resetFlag" ref="RecordForm" @parentMethod="judge"
+                                    @backToTop="changePage(1)"></RecordForm>
                             </v-card-text>
                             <v-card-actions class="end">
                                 <v-btn text @click="submit" color="primary">登録</v-btn>
@@ -46,15 +47,41 @@
                     <v-card-text>
                         <div style="padding-top: 16px">
                             <v-form ref="test_form" v-model="valid" lazy-validation>
-                                <v-autocomplete 
-                                    v-model="value.type" 
-                                    :items="types" 
-                                    dense filled label="機種名" 
-                                    required
-                                    :rules="[rules.required]" 
-                                    no-data-text="該当なし"
-                                    placeholder="検索できます"
-                                    prepend-icon="mdi-magnify"
+                                <template v-if="action=='update'">
+                                    <v-row>
+                                        <v-col cols="12" sm="3" md="4">
+                                            <v-menu v-model="menu" :close-on-content-click="false" :nudge-right="40"
+                                                transition="scale-transition" offset-y min-width="auto">
+                                                <template v-slot:activator="{ on, attrs }">
+                                                    <v-text-field v-model="date" label="対応日" :rules="[rules.required]"
+                                                        prepend-icon="mdi-calendar" readonly v-bind="attrs" v-on="on">
+                                                    </v-text-field>
+                                                </template>
+                                                <v-date-picker v-model="date" @input="menu = false" :max="today">
+                                                </v-date-picker>
+                                            </v-menu>
+                                        </v-col>
+
+                                        <v-col cols="6" sm="3" md="4">
+                                            <v-menu ref="menu" v-model="menu2" :close-on-content-click="false"
+                                                :nudge-right="40" :return-value.sync="time"
+                                                transition="scale-transition" offset-y max-width="290px"
+                                                min-width="290px">
+                                                <template v-slot:activator="{ on, attrs }">
+                                                    <v-text-field v-model="time" label="時刻"
+                                                        prepend-icon="mdi-clock-time-four-outline" readonly
+                                                        v-bind="attrs" v-on="on"></v-text-field>
+                                                </template>
+                                                <v-time-picker v-if="menu2" v-model="time" full-width format="24hr"
+                                                    :rules="[rules.required]" @click:minute="$refs.menu.save(time)">
+                                                </v-time-picker>
+                                            </v-menu>
+                                        </v-col>
+                                    </v-row>
+                                </template>
+
+                                <v-autocomplete v-model="value.type" :items="types" dense filled label="機種名" required
+                                    :rules="[rules.required]" no-data-text="該当なし" placeholder="検索できます"
                                 ></v-autocomplete>
                                 <v-text-field v-model="value.serial" label="シリアル番号" :rules="[rules.alphaNum]">
                                 </v-text-field>
@@ -142,7 +169,7 @@
                     <v-btn icon @click="dialog.posted=true;inhertDialog(inquiry,index,'inhert');id=inquiry.id">
                         <v-icon>mdi-subdirectory-arrow-left</v-icon>
                     </v-btn>
-                    <v-btn icon @click="dialog.posted = true;updateDialog(inquiry,index);id=inquiry.id">
+                    <v-btn icon @click="dialog.posted = true;updateDialog(inquiry,index,'update');id=inquiry.id">
                         <v-icon>mdi-square-edit-outline</v-icon>
                     </v-btn>
 
@@ -238,6 +265,10 @@
             </span>
         </v-card>
 
+        <div class="text-center">
+            <v-pagination v-model="current_page" :length="length" @input="changePage"></v-pagination>
+        </div>
+
         <div class="text-center ma-2">
             <v-snackbar v-model="centerSnackbar.snackbar" :timeout="centerSnackbar.timeout">
                 {{ centerSnackbar.text }}
@@ -250,7 +281,7 @@
                         元に戻す
                     </v-btn>
                     <v-btn v-if="centerSnackbar.discard" color="pink" text v-bind="attrs"
-                        @click="dialog.posted = false;closeCenterSnackbar()">
+                        @click="dialog.posted = false;closeCenterSnackbar();action = null">
                         破棄する
                     </v-btn>
                     <v-btn v-if="centerSnackbar.notDiscard" color="pink" text v-bind="attrs"
@@ -264,27 +295,34 @@
                 </template>
             </v-snackbar>
         </div>
+
     </div>
 </template>
 <script>
     import RecordForm from "../layout/RecordForm";
 
+
     export default {
         components: {
-            RecordForm
+            RecordForm,
         },
         data() {
             return {
+                inquiries: [],
+                current_page: 1,
+                lists: [],
+                length: null, //総ページ数
+
                 inquiryID: null,
                 postedDialog: null,
                 dialog: [],
-                inquiries: null,
+
                 cardMenus: [{
                         title: "削除",
                         method: "delete",
                     },
                     {
-                        title: "ダミー",
+                        title: "社内共有（未実装）",
                         method: "delete",
                     },
                 ],
@@ -332,6 +370,9 @@
                     serial: "",
                     operator_id: "",
                     type: "",
+
+                    date: null,
+                    time: null,
                 },
                 actionTitleName: null,
                 action: null,
@@ -342,6 +383,19 @@
                 valid: null,
                 model: null,
                 types: [],
+
+                //日時ピッカー
+                date: null,
+                today:(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+
+                time: null,
+                // ("0" + (new Date().getHours())).slice(-2) + ':' + ("0" + (new Date().getMinutes())).slice(-2),
+                menu: false,
+                modal: false,
+                menu2: false,
+                modal2: false,
+                dateTime: false, //日時ピッカーデフォルト非表示
+
                 rules: {
                     tel: (value) =>
                         /^(0[5-9]0[0-9]{8}|0[1-9][1-9][0-9]{7})$/.test(
@@ -357,16 +411,55 @@
                 },
             };
         },
-        watch: {
-
-
-        },        
         mounted() {
-            this.showArchive()
             this.getTypes()
+
+            if (this.$route.query.page) {
+                this.current_page = Number(this.$route.query.page)
+            } else {
+                this.current_page = 1
+            }
+            this.showArchive()
+        },
+        computed: {
+
         },
         methods: {
-            postData(id) {
+            async showArchive() {
+                const result = await axios.get(`/api/inquiries?page=${this.current_page}`)
+                const inquiries = result.data
+                this.inquiries = inquiries.data
+                this.dialog = {
+                    post: null,
+                    posted: null,
+                };
+
+                //総ページ数を取得
+                this.length = (Math.ceil(inquiries.meta.total / 20)) //（apiで取得したレコードの総数÷1ページ当たりの表示件数）を繰り上げ
+                //「10」はInquiryContorollerのindexメソッドにおけるpaginate(20)とそろえる必要がある
+            },
+
+            moveToTop() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth"
+                });
+            },
+
+            changePage(number) {
+                this.current_page = number
+                this.showArchive()
+
+                window.history.pushState({
+                        number
+                    },
+                    `Page${number}`,
+                    `${window.location.origin}/archive?page=${number}`
+                )
+                this.moveToTop()
+            },
+
+            postData(id, action) {
                 let postData = {
                     answer: this.value.answer,
                     anchor: this.value.anchor,
@@ -382,20 +475,27 @@
                     serial: this.value.serial, //コントローラー側で登録処理がまだ書かれてない
                     satisfaction: this.value.satisfaction,
                     type: this.value.type,
-                    operator_id: 1, //とりあえず1
-                };
+                    operator_id: 1, //いったん1
+                }
+
+                if (action === 'update') {
+                    //更新の時だけ投稿日のinputが存在する
+                    postData.dateAndTime = (this.date + ' ' + this.time + ':00')
+                }
                 return postData;
             },
             update(id) {
-                let postData = this.postData(id);
+                let postData = this.postData(id, 'update');
 
                 if (this.$refs.test_form.validate()) {
-                    axios.post('/api/inquiries/edit', postData) //api.phpのルートを指定。第2引数には渡したい変数を入れる（今回は入力された内容）
+                    axios.post('/api/inquiries/edit',
+                            postData) //api.phpのルートを指定。第2引数には渡したい変数を入れる（今回は入力された内容）
                         .then(response => {
                             alert('更新しました。');
                             console.log(response.statusText)
                             this.showArchive()
                             this.dialog.posted = false
+                            this.action = null
                         })
                         .catch(function (error) {
                             alert('あかんかったわ、コンソール見て');
@@ -406,7 +506,7 @@
                 }
             },
             inhert(id) {
-                let postData = this.postData(id);
+                let postData = this.postData(id, 'inhert');
                 if (this.$refs.test_form.validate()) {
                     axios.post("/api/inquiries/create", postData)
                         .then((response) => {
@@ -414,6 +514,9 @@
                             console.log(response.statusText);
                             this.showArchive()
                             this.dialog.posted = false
+                            this.action = null
+
+                            this.changePage(1) //先頭のページに戻る
                         })
                         .catch(function (error) {
                             alert("あかんかったわ、コンソール見て");
@@ -423,25 +526,10 @@
                     alert("入力内容に不備があります。");
                 }
             },
-            getInquiries: async function () {
-                await axios.get("/api/inquiries/archive").then((response) => {
-                    //サーバーの処理が終わるまで待て
-                    this.inquiries = response.data.data.reverse();
-                });
 
-                return this.inquiries; //awaitの処理が終わったらリターン
-            },
-            showArchive: async function () {
-                let result = await this.getInquiries(); //showArchive()の処理が完全に終わるまで待て
-
-                //終わったら残りの処理を実行(ダイアログを確実に閉じておく)
-                this.dialog = {
-                    post: null,
-                    posted: null,
-                };
-            },
             closeDialog() {
-                this.dialog.post = false;
+                this.dialog.post = false
+
             },
             submit() {
                 this.$refs.RecordForm.post()
@@ -486,9 +574,15 @@
             },
             closeConfirm() {
                 this.oldValue = this.inquiries[this.index]
+
                 if (this.action == 'inhert') {
+                    //inhertの場合引継ID初期値は引継元IDとして変化したかどうかを判断
                     this.oldValue.anchor = this.inquiries[this.index].inquiry_id
-                } //inhertの場合引継ID初期値は引継元IDとして変化したかどうかを判断
+                } else if (this.action == 'update') {
+                    //更新の場合日時を変更有無チェックに追加
+                    this.value.date = this.date
+                    this.value.time = this.time
+                }
 
                 //更新前のデータをjson形式に変換（なおかつnullは""に置き換え
                 this.oldValue = JSON.stringify(Object.fromEntries(Object.entries(this.oldValue).map(([k,
@@ -512,18 +606,34 @@
                     this.centerSnackbar.close = false; //「閉じる」だと紛らわしいので表示しない
                     this.centerSnackbar.snackbar = true; //スナックバーを表示
                 }
+                //valueをnullにする（日時が入ったままになるとややこしいので）
+                this.value.date = null
+                this.value.time = null
             },
-            updateDialog(inquiry, index) {
+            updateDialog(inquiry, index, action) {
+                this.dateTime = true
+                this.action = action
                 this.actionTitleName = '記録編集'
                 this.submitButtonName = '更新'
                 this.inquiryID = inquiry.id
                 this.index = index
+
+                //投稿済み記事を参照する処理する場合は変数を上書き
                 if (inquiry) {
                     this.value = Object.fromEntries(
                         Object.entries(inquiry).map(([k, v]) => [k, v === null ? "" : v])
-                    ); //投稿済み記事を参照する処理する場合は変数を上書き
+                    ); //nullを""置き換え
+
+                    //日時は別途指定
+                    this.date = inquiry.date
+                    this.time = inquiry.time
+
+                    //日時をvalueに格納(投稿時に参照される)
+                    this.value.date = this.date
+                    this.value.time = this.time
                 }
                 this.inquiry = this.value
+
             },
             inhertDialog(inquiry, index, action) {
                 this.actionTitleName = '記録引継'
@@ -567,20 +677,22 @@
                 axios
                     .post("/api/inquiries/reborn", postdata)
                     .then((response) => {
-                        this.centerSnackbar.text = "復活させました。";
+                        this.centerSnackbar.text = "復活させました。"
                         this.centerSnackbar.rebornButton = false; //元に戻すボタンを非表示
                         this.showArchive();
                     })
                     .catch(function (error) {
-                        this.centerSnackbar.text = "復活させられませんでした。";
+                        this.centerSnackbar.text = "復活させられませんでした。"
                         console.log(error);
                     });
             },
             closeCenterSnackbar(id) {
                 this.centerSnackbar.snackbar = false;
                 if (id) {
-                    var activeClass = document.getElementById(id);
-                    activeClass.classList.remove("activeCard");
+                    const activeClass = document.getElementById(id)
+                    if (activeClass) {
+                        activeClass.classList.remove("activeCard")
+                    }
                 }
             },
             snackbarDefaultStatus() {
@@ -589,12 +701,11 @@
             getTypes() {
                 axios.get('/api/types/archive')
                     .then(response => {
-                        const types = response.data.data                       
+                        const types = response.data.data
                         types.forEach((value) => {
-                           this.types.push(value.name)
+                            this.types.push(value.name)
                         })
                         this.types.sort()
-                        console.log(this.types)
                     })
             },
         },
@@ -655,5 +766,24 @@
     .v-dialog>.v-card {
         background: #ffffffde !important;
     }
+
+    .pagination {
+        display: flex;
+        list-style-type: none;
+    }
+
+    .pagination li {
+        border: 1px solid #ddd;
+        padding: 6px 12px;
+        text-align: center;
+    }
+
+    /* .active {
+    background-color: #337ab;
+    color:white;
+    }
+    .inactive{
+    color: #337ab;
+    } */
 
 </style>

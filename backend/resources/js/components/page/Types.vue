@@ -1,19 +1,19 @@
 <template>
     <div>
-
         <p>文字列として選択候補に追加するだけなので、誤って削除しても投稿済みの受付記録には影響しません。</p>
         <v-card>
             <v-container>
                 <v-form ref="test_form" v-model="valid" lazy-validation @submit.prevent>
-
-                    <v-text-field v-model="value.name" label="機種名" hint="(例)APS100" required :rules="[rules.required]">
-                    </v-text-field>
-                    <v-btn text @click="submit" color="primary">登録</v-btn>
+                    <template v-if="resetFlag">
+                        <v-text-field v-model="value.name" label="機種名" hint="(例)APS100" required
+                            :rules="[rules.required]">
+                        </v-text-field>
+                    </template>
+                    <v-btn text type="submit" @click="submit" color="primary">登録</v-btn>
                 </v-form>
             </v-container>
         </v-card>
-
-
+        <hr>
         <v-card>
             <v-card-title>
                 機種一覧
@@ -21,7 +21,7 @@
                 <v-text-field v-model="search" append-icon="mdi-magnify" label="検索" single-line hide-details>
                 </v-text-field>
             </v-card-title>
-            <v-data-table :headers="headers" :items="items" hide-default-footer :search="search">
+            <v-data-table :headers="headers" :items="items" :search="search" :items-per-page="20">
                 <template v-slot:[`item.action`]="{ item }">
                     <v-btn @click="dialog = true;getItem(item)" color="primary">編集</v-btn>
                     <v-btn @click="onClickShow(item)">削除</v-btn>
@@ -75,6 +75,7 @@
     export default ({
         data() {
             return {
+                resetFlag: true,
                 name: null,
                 id: null,
                 dialog: null,
@@ -125,16 +126,25 @@
                 if (this.$refs.test_form.validate()) {
                     axios.post('/api/types/create', postData)
                         .then(response => {
-                            console.log(response)
-                            this.showArchive()
-                            this.centerSnackbar.text = postData.name + 'を新規登録しました。'
-                            this.centerSnackbar.snackbar = true; //スナックバーを表示 
+                            console.log(response.data)
+
+                            if (response.data) {
+                                this.centerSnackbar.text = postData.name + 'は既に登録されています。'
+                                this.centerSnackbar.snackbar = true; //スナックバーを表示 
+                            } else {
+                                this.showArchive()
+                                this.centerSnackbar.text = postData.name + 'を新規登録しました。'
+                                this.centerSnackbar.snackbar = true; //スナックバーを表示 
+                                this.$router.go({path: this.$router.currentRoute.path, force: true})  //強制リロード 
+                            }
                         })
                         .catch(function (error) {
                             this.centerSnackbar.text = '登録できませんでした。'
                             this.centerSnackbar.snackbar = true; //スナックバーを表示 
                             console.log(error);
                         })
+
+                    //console.log(result)
                 } else {
                     alert("入力してください。");
                 }
@@ -180,7 +190,6 @@
                 axios.get('/api/types/archive')
                     .then(response => {
                         this.items = response.data.data.reverse()
-                        console.log(this.items)
                     })
             },
             update(name, id) {
