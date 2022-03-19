@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p>文字列として選択候補に追加するだけなので、誤って削除しても投稿済みの受付記録には影響しません。</p>
+        <p>文字列として機種選択候補に追加するだけなので、誤って削除しても投稿済みの受付記録には影響しません。</p>
         <v-card>
             <v-container>
                 <v-form ref="test_form" v-model="valid" lazy-validation @submit.prevent>
