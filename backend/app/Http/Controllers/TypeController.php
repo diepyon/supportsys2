@@ -4,10 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Type;
-
-use App\Http\Resources\TypeResource;
-use App\Http\Resources\TypeCollection;
-
+use App\Http\Resources\TypeResource;use App\Http\Resources\TypeCollection;
 use DB; 
 use Carbon\Carbon;
 

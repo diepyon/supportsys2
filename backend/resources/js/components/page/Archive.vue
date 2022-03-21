@@ -1,272 +1,282 @@
 <template>
     <div>
-        <h1>受付記録</h1>
-        <v-row justify="start">
-            <v-col cols="auto">
-                <v-dialog max-width="90%" scrollable v-model="dialog.post">
-                    <template v-slot:activator="{ on, attrs }">
-                        <v-btn color="primary" v-bind="attrs" v-on="on" tabindex="1">
-                            <v-icon>mdi-lead-pencil</v-icon>記録入力
-                        </v-btn>
-                    </template>
-                    <template v-slot:default="postDialog">
-                        <v-card class="dialogBg">
-                            <v-toolbar color="primary" dark dense>記録入力
-                                <v-spacer></v-spacer>
-                                <v-btn icon @click="postDialog.value = false">
-                                    <v-icon>mdi-window-close</v-icon>
-                                </v-btn>
-                            </v-toolbar>
-                            <v-card-text>
-                                <p class="text-right" style="padding-top: 16px">
-                                    <v-icon>mdi-open-in-new</v-icon>
-                                    <a href="/recordpost">新しいタブで入力画面を開く</a>
-                                </p>
-                                <RecordForm v-if="resetFlag" ref="RecordForm" @parentMethod="judge"
-                                    @backToTop="changePage(1)"></RecordForm>
-                            </v-card-text>
-                            <v-card-actions class="end">
-                                <v-btn text @click="submit" color="primary">登録</v-btn>
-                                <v-btn text @click="postDialog.value = false" color="primary">閉じる</v-btn>
-                            </v-card-actions>
-                        </v-card>
-                    </template>
-                </v-dialog>
-            </v-col>
-        </v-row>
-
-        <v-dialog max-width="90%" scrollable persistent v-model="dialog.posted">
-            <template v-slot:default="postedDialog">
-                <v-card class="dialogBg">
-                    <v-toolbar color="primary" dark dense>{{actionTitleName}}
-                        <v-spacer></v-spacer>
-                        <v-btn icon @click="closeConfirm">
-                            <v-icon>mdi-window-close</v-icon>
-                        </v-btn>
-                    </v-toolbar>
-                    <v-card-text>
-                        <div style="padding-top: 16px">
-                            <v-form ref="test_form" v-model="valid" lazy-validation>
-                                <template v-if="action=='update'">
-                                    <v-row>
-                                        <v-col cols="12" sm="3" md="4">
-                                            <v-menu v-model="menu" :close-on-content-click="false" :nudge-right="40"
-                                                transition="scale-transition" offset-y min-width="auto">
-                                                <template v-slot:activator="{ on, attrs }">
-                                                    <v-text-field v-model="date" label="対応日" :rules="[rules.required]"
-                                                        prepend-icon="mdi-calendar" readonly v-bind="attrs" v-on="on">
-                                                    </v-text-field>
-                                                </template>
-                                                <v-date-picker v-model="date" @input="menu = false" :max="today">
-                                                </v-date-picker>
-                                            </v-menu>
-                                        </v-col>
-
-                                        <v-col cols="6" sm="3" md="4">
-                                            <v-menu ref="menu" v-model="menu2" :close-on-content-click="false"
-                                                :nudge-right="40" :return-value.sync="time"
-                                                transition="scale-transition" offset-y max-width="290px"
-                                                min-width="290px">
-                                                <template v-slot:activator="{ on, attrs }">
-                                                    <v-text-field v-model="time" label="時刻"
-                                                        prepend-icon="mdi-clock-time-four-outline" readonly
-                                                        v-bind="attrs" v-on="on"></v-text-field>
-                                                </template>
-                                                <v-time-picker v-if="menu2" v-model="time" full-width format="24hr"
-                                                    :rules="[rules.required]" @click:minute="$refs.menu.save(time)">
-                                                </v-time-picker>
-                                            </v-menu>
-                                        </v-col>
-                                    </v-row>
-                                </template>
-
-                                <v-autocomplete v-model="value.type" :items="types" dense filled label="機種名" required
-                                    :rules="[rules.required]" no-data-text="該当なし" placeholder="検索できます"
-                                ></v-autocomplete>
-                                <v-text-field v-model="value.serial" label="シリアル番号" :rules="[rules.alphaNum]">
-                                </v-text-field>
-
-                                <v-text-field v-model="value.dealer" label="販売店"></v-text-field>
-                                <v-row justify="start">
-                                    <v-col cols="5">
-                                        <v-text-field v-model="value.questioner" label="問い合わせ者"></v-text-field>
-                                    </v-col>
-                                    <v-col cols="5">
-                                        <v-text-field id="tel" v-bind:type="'tel'" v-model="value.phoneNumber"
-                                            :counter="13" label="TEL(「 - 」有無どちらでも可)" :rules="[rules.tel]">
-                                        </v-text-field>
-                                    </v-col>
-                                </v-row>
-                                <v-text-field v-model="value.customer" label="ユーザー"></v-text-field>
-                                <v-container fluid>
-                                    <v-radio-group v-model="value.kinds" row>
-                                        <v-radio label="設定" value="設定"></v-radio>
-                                        <v-radio label="障害" value="障害"></v-radio>
-                                        <v-radio label="トラブル" value="トラブル"></v-radio>
-                                        <v-radio label="故障" value="故障"></v-radio>
-                                        <v-radio label="購入前" value="購入前"></v-radio>
-                                        <v-radio label="クレーム" value="クレーム"></v-radio>
-                                    </v-radio-group>
-                                </v-container>
-                                <v-textarea v-model="value.question" label="問い合わせ内容" required :rules="[rules.required]">
-                                </v-textarea>
-                                <v-textarea v-model="value.answer" label="回答内容" required :rules="[rules.required]">
-                                </v-textarea>
-                                <v-container fluid>
-                                    <v-radio-group v-model="value.remote" row>
-                                        <template v-slot:label>
-                                            <div>リモートメンテナンス</div>
-                                        </template>
-                                        <v-radio label="なし" value="なし"></v-radio>
-                                        <v-radio label="オリジナル" value="オリジナル"></v-radio>
-                                        <v-radio label="TeamViewer" value="TeamViewer"></v-radio>
-                                        <v-col cols="5">
-                                            <v-text-field v-if="value.remote == 'なし'" v-model="value.authorizer"
-                                                label="承認者" disabled>
-                                            </v-text-field>
-                                            <v-text-field v-if="value.remote == 'オリジナル'" v-model="value.authorizer"
-                                                label="承認者">
-                                            </v-text-field>
-                                            <v-text-field v-if="value.remote == 'TeamViewer'" v-model="value.authorizer"
-                                                label="承認者" required :rules="[rules.required]">
-                                            </v-text-field>
-                                        </v-col>
-                                    </v-radio-group>
-
-                                    <v-radio-group v-model="value.satisfaction" row>
-                                        <template v-slot:label>
-                                            <div>満足度</div>
-                                        </template>
-                                        <v-radio label="満足" value="満足"></v-radio>
-                                        <v-radio label="普通" value="普通"></v-radio>
-                                        <v-radio label="不満" value="不満"></v-radio>
-                                    </v-radio-group>
-                                    <v-text-field v-model="value.anchor" label="引き継ぎ元ID（調整中）" :rules="[rules.alphaNum]"
-                                        hint="引き継ぎ元のIDを1つだけ入力" tabindex="-1"></v-text-field>
-                                </v-container>
-                            </v-form>
-                        </div>
-                    </v-card-text>
-                    <v-card-actions class="end">
-                        <v-btn text color="primary" v-if="submitButtonName=='更新'" @click="update(inquiryID)">
-                            {{submitButtonName}}</v-btn>
-                        <v-btn text color="primary" v-if="submitButtonName=='引継'" @click="inhert(inquiryID)">
-                            {{submitButtonName}}</v-btn>
-                        <v-btn text @click="closeConfirm" color="primary">閉じる</v-btn>
-                        <v-btn v-show="false" @click="postedDialog.value = false;"></v-btn>
-                    </v-card-actions>
-                </v-card>
-            </template>
-        </v-dialog>
-
-        <v-card v-for="(inquiry,index) in inquiries" :key="inquiry.id" :id="inquiry.id" class="inquiry" flat>
-            <span class="inquiryBox">
-                <v-toolbar color="primary" dark dense>
-                    <span class="overflow">{{ inquiry.created_at }}</span>
-                    <span class="overflow">機種名: {{ inquiry.type }}</span>
-                    <span class="overflow">シリアル:{{ inquiry.serial }}</span>
-                    <v-spacer></v-spacer>
-                    <v-btn icon @click="dialog.posted=true;inhertDialog(inquiry,index,'inhert');id=inquiry.id">
-                        <v-icon>mdi-subdirectory-arrow-left</v-icon>
-                    </v-btn>
-                    <v-btn icon @click="dialog.posted = true;updateDialog(inquiry,index,'update');id=inquiry.id">
-                        <v-icon>mdi-square-edit-outline</v-icon>
-                    </v-btn>
-
-                    <v-btn icon>
-                        <v-icon>mdi-flag-variant-outline</v-icon>
-                    </v-btn>
-
-                    <v-menu offset-y>
+        <div :disabled="true">
+            <h1>受付記録</h1>
+            <v-row justify="start">
+                <v-col cols="auto">
+                    <v-dialog max-width="90%" scrollable v-model="dialog.post">
                         <template v-slot:activator="{ on, attrs }">
-                            <v-btn icon v-bind="attrs" v-on="on">
-                                <v-icon>mdi-dots-horizontal</v-icon>
+                            <v-btn color="primary" v-bind="attrs" v-on="on" tabindex="1"
+                                :disabled="centerSnackbar.snackbar">
+                                <v-icon>mdi-lead-pencil</v-icon>記録入力
                             </v-btn>
                         </template>
-                        <v-list>
-                            <v-list-item v-for="(cardMenu, method, index) in cardMenus" :key="index" class="hover">
-                                <v-list-item-title @click="triggerClick(cardMenu.method, inquiry.id)">
-                                    {{ cardMenu.title }}
-                                </v-list-item-title>
-                            </v-list-item>
-                        </v-list>
-                    </v-menu>
-                </v-toolbar>
+                        <template v-slot:default="postDialog">
+                            <v-card class="dialogBg">
+                                <v-toolbar color="primary" dark dense>記録入力
+                                    <v-spacer></v-spacer>
+                                    <v-btn icon @click="postDialog.value = false">
+                                        <v-icon>mdi-window-close</v-icon>
+                                    </v-btn>
+                                </v-toolbar>
+                                <v-card-text>
+                                    <p class="text-right" style="padding-top: 16px">
+                                        <v-icon>mdi-open-in-new</v-icon>
+                                        <a href="/recordpost">新しいタブで入力画面を開く</a>
+                                    </p>
+                                    <RecordForm v-if="resetFlag" ref="RecordForm" @parentMethod="judge"
+                                        @backToTop="changePage(1)"></RecordForm>
+                                </v-card-text>
+                                <v-card-actions class="end">
+                                    <v-btn text @click="submit" color="primary">登録</v-btn>
+                                    <v-btn text @click="postDialog.value = false" color="primary">閉じる</v-btn>
+                                </v-card-actions>
+                            </v-card>
+                        </template>
+                    </v-dialog>
+                </v-col>
+            </v-row>
 
-                <v-card-text>
-                    <v-container class="lighten-5">
-                        <v-row no-gutters>
-                            <v-col cols="2" xs="0">
-                                <v-layout justify-center>
-                                    <v-avatar color="primary" size="56">
-                                        <img src="/storage/img/customer.jpeg" alt="お客様" style="width: auto" />
-                                    </v-avatar>
-                                </v-layout>
+            <v-dialog max-width="90%" scrollable persistent v-model="dialog.posted">
+                <template v-slot:default="postedDialog">
+                    <v-card class="dialogBg">
+                        <v-toolbar color="primary" dark dense>{{actionTitleName}}
+                            <v-spacer></v-spacer>
+                            <v-btn icon @click="closeConfirm">
+                                <v-icon>mdi-window-close</v-icon>
+                            </v-btn>
+                        </v-toolbar>
+                        <v-card-text>
+                            <div style="padding-top: 16px">
+                                <v-form ref="test_form" v-model="valid" lazy-validation>
+                                    <template v-if="action=='update'">
+                                        <v-row>
+                                            <v-col cols="12" sm="3" md="4">
+                                                <v-menu v-model="menu" :close-on-content-click="false" :nudge-right="40"
+                                                    transition="scale-transition" offset-y min-width="auto">
+                                                    <template v-slot:activator="{ on, attrs }">
+                                                        <v-text-field v-model="date" label="対応日"
+                                                            :rules="[rules.required]" prepend-icon="mdi-calendar"
+                                                            readonly v-bind="attrs" v-on="on">
+                                                        </v-text-field>
+                                                    </template>
+                                                    <v-date-picker v-model="date" @input="menu = false" :max="today">
+                                                    </v-date-picker>
+                                                </v-menu>
+                                            </v-col>
 
-                                <div class="people">
-                                    <v-layout v-if="inquiry.questioner" justify-center>
-                                        {{inquiry.questioner}}</v-layout>
-                                    <v-layout v-else justify-center>不明</v-layout>
-                                    <span v-if="inquiry.phoneNumber" style="text-align: center">
-                                        <v-icon size="4">mdi-phone</v-icon>
-                                        <span>{{ inquiry.phoneNumber }}</span>
-                                        <v-btn icon style="height: " @click="copyToClipboard(inquiry.phoneNumber)">
-                                            <v-icon size="4">mdi-content-copy</v-icon>
-                                        </v-btn>
+                                            <v-col cols="6" sm="3" md="4">
+                                                <v-menu ref="menu" v-model="menu2" :close-on-content-click="false"
+                                                    :nudge-right="40" :return-value.sync="time"
+                                                    transition="scale-transition" offset-y max-width="290px"
+                                                    min-width="290px">
+                                                    <template v-slot:activator="{ on, attrs }">
+                                                        <v-text-field v-model="time" label="時刻"
+                                                            prepend-icon="mdi-clock-time-four-outline" readonly
+                                                            v-bind="attrs" v-on="on"></v-text-field>
+                                                    </template>
+                                                    <v-time-picker v-if="menu2" v-model="time" full-width format="24hr"
+                                                        :rules="[rules.required]" @click:minute="$refs.menu.save(time)">
+                                                    </v-time-picker>
+                                                </v-menu>
+                                            </v-col>
+                                        </v-row>
+                                    </template>
+
+                                    <v-autocomplete v-model="value.type" :items="types" dense filled label="機種名"
+                                        required :rules="[rules.required]" no-data-text="該当なし" placeholder="検索できます">
+                                    </v-autocomplete>
+                                    <v-text-field v-model="value.serial" label="シリアル番号" :rules="[rules.alphaNum]">
+                                    </v-text-field>
+
+                                    <v-text-field v-model="value.dealer" label="販売店"></v-text-field>
+                                    <v-row justify="start">
+                                        <v-col cols="5">
+                                            <v-text-field v-model="value.questioner" label="問い合わせ者"></v-text-field>
+                                        </v-col>
+                                        <v-col cols="5">
+                                            <v-text-field id="tel" v-bind:type="'tel'" v-model="value.phoneNumber"
+                                                :counter="13" label="TEL(「 - 」有無どちらでも可)" :rules="[rules.tel]">
+                                            </v-text-field>
+                                        </v-col>
+                                    </v-row>
+                                    <v-text-field v-model="value.customer" label="ユーザー"></v-text-field>
+                                    <v-container fluid>
+                                        <v-radio-group v-model="value.kinds" row>
+                                            <v-radio label="設定" value="設定"></v-radio>
+                                            <v-radio label="障害" value="障害"></v-radio>
+                                            <v-radio label="トラブル" value="トラブル"></v-radio>
+                                            <v-radio label="故障" value="故障"></v-radio>
+                                            <v-radio label="購入前" value="購入前"></v-radio>
+                                            <v-radio label="クレーム" value="クレーム"></v-radio>
+                                        </v-radio-group>
+                                    </v-container>
+                                    <v-textarea v-model="value.question" label="問い合わせ内容" required
+                                        :rules="[rules.required]">
+                                    </v-textarea>
+                                    <v-textarea v-model="value.answer" label="回答内容" required :rules="[rules.required]">
+                                    </v-textarea>
+                                    <v-container fluid>
+                                        <v-radio-group v-model="value.remote" row>
+                                            <template v-slot:label>
+                                                <div>リモートメンテナンス</div>
+                                            </template>
+                                            <v-radio label="なし" value="なし"></v-radio>
+                                            <v-radio label="オリジナル" value="オリジナル"></v-radio>
+                                            <v-radio label="TeamViewer" value="TeamViewer"></v-radio>
+                                            <v-col cols="5">
+                                                <v-text-field v-if="value.remote == 'なし'" v-model="value.authorizer"
+                                                    label="承認者" disabled>
+                                                </v-text-field>
+                                                <v-text-field v-if="value.remote == 'オリジナル'" v-model="value.authorizer"
+                                                    label="承認者">
+                                                </v-text-field>
+                                                <v-text-field v-if="value.remote == 'TeamViewer'"
+                                                    v-model="value.authorizer" label="承認者" required
+                                                    :rules="[rules.required]">
+                                                </v-text-field>
+                                            </v-col>
+                                        </v-radio-group>
+
+                                        <v-radio-group v-model="value.satisfaction" row>
+                                            <template v-slot:label>
+                                                <div>満足度</div>
+                                            </template>
+                                            <v-radio label="満足" value="満足"></v-radio>
+                                            <v-radio label="普通" value="普通"></v-radio>
+                                            <v-radio label="不満" value="不満"></v-radio>
+                                        </v-radio-group>
+                                        <v-text-field v-model="value.anchor" label="引き継ぎ元ID（調整中）"
+                                            :rules="[rules.alphaNum]" hint="引き継ぎ元のIDを1つだけ入力" tabindex="-1">
+                                        </v-text-field>
+                                    </v-container>
+                                </v-form>
+                            </div>
+                        </v-card-text>
+                        <v-card-actions class="end">
+                            <v-btn text color="primary" v-if="submitButtonName=='更新'" @click="update(inquiryID)">
+                                {{submitButtonName}}</v-btn>
+                            <v-btn text color="primary" v-if="submitButtonName=='引継'" @click="inhert(inquiryID)">
+                                {{submitButtonName}}</v-btn>
+                            <v-btn text @click="closeConfirm" color="primary">閉じる</v-btn>
+                            <v-btn v-show="false" @click="postedDialog.value = false;"></v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </template>
+            </v-dialog>
+
+            <v-card v-for="(inquiry,index) in inquiries" :key="inquiry.id" :id="inquiry.id" class="inquiry" flat>
+                <span class="inquiryBox">
+                    <v-toolbar color="primary" dark dense>
+                        <span class="overflow">{{ inquiry.created_at }}</span>
+                        <span class="overflow">機種名: {{ inquiry.type }}</span>
+                        <span class="overflow">シリアル:{{ inquiry.serial }}</span>
+                        <v-spacer></v-spacer>
+
+                        <v-btn icon @click="dialog.posted=true;inhertDialog(inquiry,index,'inhert');id=inquiry.id"
+                            :disabled="centerSnackbar.snackbar">
+                            <v-icon>mdi-subdirectory-arrow-left</v-icon>
+                        </v-btn>
+                        <v-btn icon @click="dialog.posted = true;updateDialog(inquiry,index,'update');id=inquiry.id"
+                            :disabled="centerSnackbar.snackbar">
+                            <v-icon>mdi-square-edit-outline</v-icon>
+                        </v-btn>
+
+                        <v-btn icon :disabled="centerSnackbar.snackbar">
+                            <v-icon>mdi-flag-variant-outline</v-icon>
+                        </v-btn>
+
+                        <v-menu offset-y>
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-btn icon v-bind="attrs" v-on="on" :disabled="centerSnackbar.snackbar">
+                                    <v-icon>mdi-dots-horizontal</v-icon>
+                                </v-btn>
+                            </template>
+                            <v-list>
+                                <v-list-item v-for="(cardMenu, method, index) in cardMenus" :key="index" class="hover">
+                                    <v-list-item-title @click="triggerClick(cardMenu.method, inquiry.id)">
+                                        {{ cardMenu.title }}
+                                    </v-list-item-title>
+                                </v-list-item>
+                            </v-list>
+                        </v-menu>
+                    </v-toolbar>
+
+                    <v-card-text>
+                        <v-container class="lighten-5">
+                            <v-row no-gutters>
+                                <v-col cols="2" xs="0">
+                                    <v-layout justify-center>
+                                        <v-avatar color="primary" size="56">
+                                            <img src="/storage/img/customer.jpeg" alt="お客様" style="width: auto" />
+                                        </v-avatar>
+                                    </v-layout>
+
+                                    <div class="people">
+                                        <v-layout v-if="inquiry.questioner" justify-center>
+                                            {{inquiry.questioner}}</v-layout>
+                                        <v-layout v-else justify-center>不明</v-layout>
+                                        <span v-if="inquiry.phoneNumber" style="text-align: center">
+                                            <v-icon size="4">mdi-phone</v-icon>
+                                            <span>{{ inquiry.phoneNumber }}</span>
+                                            <v-btn icon style="height: " @click="copyToClipboard(inquiry.phoneNumber)">
+                                                <v-icon size="4">mdi-content-copy</v-icon>
+                                            </v-btn>
+                                        </span>
+                                    </div>
+                                </v-col>
+                                <v-col cols="6">
+                                    <span class="bigFont">{{ inquiry.question }}</span>
+                                </v-col>
+                                <v-col cols="4">
+                                    <span class="">
+                                        <div>
+                                            <span class="subject">販売店:</span>
+                                            <span v-if="inquiry.dealer">{{ inquiry.dealer }}</span>
+                                            <span v-else>不明</span>
+                                        </div>
+                                        <div>
+                                            <span class="subject">ユーザー:</span>
+                                            <span v-if="inquiry.customer">{{ inquiry.customer }}</span>
+                                            <span v-else>不明</span>
+                                        </div>
+                                        <div>
+                                            <span class="subject">満足度:</span>{{ inquiry.satisfaction }}
+                                        </div>
                                     </span>
-                                </div>
-                            </v-col>
-                            <v-col cols="6">
-                                <span class="bigFont">{{ inquiry.question }}</span>
-                            </v-col>
-                            <v-col cols="4">
-                                <span class="">
-                                    <div>
-                                        <span class="subject">販売店:</span>
-                                        <span v-if="inquiry.dealer">{{ inquiry.dealer }}</span>
-                                        <span v-else>不明</span>
-                                    </div>
-                                    <div>
-                                        <span class="subject">ユーザー:</span>
-                                        <span v-if="inquiry.customer">{{ inquiry.customer }}</span>
-                                        <span v-else>不明</span>
-                                    </div>
-                                    <div>
-                                        <span class="subject">満足度:</span>{{ inquiry.satisfaction }}
-                                    </div>
-                                </span>
-                            </v-col>
-                        </v-row>
-                    </v-container>
-                </v-card-text>
-                <v-divider class="mx-4"></v-divider>
-                <v-card-text>
-                    <v-container class="lighten-5">
-                        <v-row no-gutters>
-                            <v-col cols="2">
-                                <v-layout justify-center>
-                                    <v-avatar color="primary" size="56">オペ</v-avatar>
-                                </v-layout>
-                                <v-layout justify-center>
-                                    {{ inquiry.operator_id }}
-                                </v-layout>
-                            </v-col>
-                            <v-col cols="6">
-                                <span class="bigFont">{{ inquiry.answer }}</span>
-                            </v-col>
-                            <v-col cols="4">
-                                <span class="">
-                                    <div class="id">ID: {{ inquiry.previewAnchor }}</div>
-                                </span>
-                            </v-col>
-                        </v-row>
-                    </v-container>
-                </v-card-text>
-            </span>
-        </v-card>
+                                </v-col>
+                            </v-row>
+                        </v-container>
+                    </v-card-text>
+                    <v-divider class="mx-4"></v-divider>
+                    <v-card-text>
+                        <v-container class="lighten-5">
+                            <v-row no-gutters>
+                                <v-col cols="2">
+                                    <v-layout justify-center>
+                                        <v-avatar color="primary" size="56">オペ</v-avatar>
+                                    </v-layout>
+                                    <v-layout justify-center>
+                                        {{ inquiry.operator_id }}
+                                    </v-layout>
+                                </v-col>
+                                <v-col cols="6">
+                                    <span class="bigFont">{{ inquiry.answer }}</span>
+                                </v-col>
+                                <v-col cols="4">
+                                    <span class="">
+                                        <div class="id">ID: {{ inquiry.previewAnchor }}</div>
+                                    </span>
+                                </v-col>
+                            </v-row>
+                        </v-container>
+                    </v-card-text>
+                </span>
+            </v-card>
 
-        <div class="text-center">
-            <v-pagination v-model="current_page" :length="length" @input="changePage"></v-pagination>
+            <div class="text-center">
+                <v-pagination v-model="current_page" :length="length" @input="changePage"></v-pagination>
+            </div>
         </div>
 
         <div class="text-center ma-2">
@@ -308,6 +318,11 @@
         },
         data() {
             return {
+
+
+
+                activeID: null,
+
                 inquiries: [],
                 current_page: 1,
                 lists: [],
@@ -386,7 +401,7 @@
 
                 //日時ピッカー
                 date: null,
-                today:(new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+                today: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
 
                 time: null,
                 // ("0" + (new Date().getHours())).slice(-2) + ':' + ("0" + (new Date().getMinutes())).slice(-2),
@@ -421,8 +436,19 @@
             }
             this.showArchive()
         },
-        computed: {
+        watch: {
+            'centerSnackbar.snackbar'(newVal, oldVal) {
+                // データが変化した時に行いたい処理
+                console.log(newVal+' -> '+oldVal)
+                if (newVal === false) {
+                    //スナックバーが非表示になったら、選択中を表すCSSクラスを剥奪
+                    const activeCart = document.getElementById(this.activeID);
+                    if (activeCart) {
+                        activeCart.classList.remove("activeCard")
+                    }
+                }
 
+            },
         },
         methods: {
             async showArchive() {
@@ -433,19 +459,17 @@
                     post: null,
                     posted: null,
                 };
-
                 //総ページ数を取得
-                this.length = (Math.ceil(inquiries.meta.total / 20)) //（apiで取得したレコードの総数÷1ページ当たりの表示件数）を繰り上げ
-                //「10」はInquiryContorollerのindexメソッドにおけるpaginate(20)とそろえる必要がある
-            },
+                this.length = (Math.ceil(inquiries.meta.total / inquiries.meta
+                    .per_page)) //（apiで取得したレコードの総数÷1ページ当たりの表示件数）を繰り上げ
 
+            },
             moveToTop() {
                 window.scrollTo({
                     top: 0,
                     behavior: "smooth"
                 });
             },
-
             changePage(number) {
                 this.current_page = number
                 this.showArchive()
@@ -458,7 +482,6 @@
                 )
                 this.moveToTop()
             },
-
             postData(id, action) {
                 let postData = {
                     answer: this.value.answer,
@@ -477,7 +500,6 @@
                     type: this.value.type,
                     operator_id: 1, //いったん1
                 }
-
                 if (action === 'update') {
                     //更新の時だけ投稿日のinputが存在する
                     postData.dateAndTime = (this.date + ' ' + this.time + ':00')
@@ -561,15 +583,17 @@
             },
             deleteConfirm(id) {
                 this.snackbarDefaultStatus()
-                var activeClass = document.getElementById(id);
-                activeClass.classList.add("activeCard");
-                this.centerSnackbar.rebornButton = false;
-                this.centerSnackbar.discard = false;
-                this.centerSnackbar.notDiscard = false;
-                this.centerSnackbar.deleteButton = true;
-                this.centerSnackbar.close = true;
-                this.centerSnackbar.text = "削除しますか？";
+                var activeClass = document.getElementById(id)
+                activeClass.classList.add("activeCard")
+                this.activeID = id //アクティブなカードのID番号を取得
+                this.centerSnackbar.rebornButton = false
+                this.centerSnackbar.discard = false
+                this.centerSnackbar.notDiscard = false
+                this.centerSnackbar.deleteButton = true
+                this.centerSnackbar.close = true
+                this.centerSnackbar.text = "削除しますか？"
                 this.centerSnackbar.snackbar = true; //スナックバーを表示
+
                 this.deleteId = id; //deleteやrebornメソッドで削除・復活させたいときに参照するID
             },
             closeConfirm() {
@@ -686,14 +710,8 @@
                         console.log(error);
                     });
             },
-            closeCenterSnackbar(id) {
+            closeCenterSnackbar() {
                 this.centerSnackbar.snackbar = false;
-                if (id) {
-                    const activeClass = document.getElementById(id)
-                    if (activeClass) {
-                        activeClass.classList.remove("activeCard")
-                    }
-                }
             },
             snackbarDefaultStatus() {
                 this.centerSnackbar = this.centerSnackbarDefault

@@ -1,20 +1,16 @@
 <?php
-
 namespace App\Http\Controllers;
 use App\Models\Inquiry;
 use Illuminate\Http\Request;
-
 use App\Http\Resources\InquiryResource;
 use App\Http\Resources\InquiryCollection;
-
 use App\Models\User;
-
 
 
 class InquiryController extends Controller
 {
     public function index(){
-        $inquiries =InquiryResource::collection(Inquiry::where('status','publish')->orderBy('created_at', 'desc')->paginate(20));
+        $inquiries =InquiryResource::collection(Inquiry::where('status','publish')->orderBy('created_at', 'desc')->paginate(10));
         return $inquiries;        
     }
 

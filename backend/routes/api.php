@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\InquiryController;
 use App\Http\Controllers\TypeController;
-
+use App\Http\Controllers\CustomerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,5 +36,6 @@ Route::post('/types/create', [TypeController::class, 'create']);
 Route::post('/types/delete', [TypeController::class, 'delete']);
 Route::post('/types/reborn', [TypeController::class, 'reborn']);
 Route::post('/types/update', [TypeController::class, 'update']);
-
 Route::get('/types/archive', [TypeController::class, 'show']);
+
+Route::post('/customers/create', [CustomerController::class, 'create']);
