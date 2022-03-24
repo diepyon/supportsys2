@@ -26,7 +26,7 @@ class CreateCustomersTable extends Migration
             $table->string('dealer');
             $table->string('name');
             $table->string('furigana');
-            $table->string('phoneNumnber');
+            $table->string('phoneNumber');
             $table->string('email');
             $table->string('address');
             $table->integer('NumberOfClient');//クライアント数

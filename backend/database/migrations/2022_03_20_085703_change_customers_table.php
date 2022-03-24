@@ -24,7 +24,7 @@ class ChangeCustomersTable extends Migration
             $table->string('dealer')->nullable()->change();
             $table->string('name')->nullable()->change();
             $table->string('furigana')->nullable()->change();
-            $table->string('phoneNumnber')->nullable()->change();
+            $table->string('phoneNumber')->nullable()->change();
             $table->string('email')->nullable()->change();
             $table->string('address')->nullable()->change();
             $table->string('NumberOfClient')->nullable()->change();
@@ -60,7 +60,7 @@ class ChangeCustomersTable extends Migration
             $table->string('dealer')->nullable(false)->change();
             $table->string('name')->nullable(false)->change();
             $table->string('furigana')->nullable(false)->change();
-            $table->string('phoneNumnber')->nullable(false)->change();
+            $table->string('phoneNumber')->nullable(false)->change();
             $table->string('email')->nullable(false)->change();
             $table->string('address')->nullable(false)->change();
             $table->string('NumberOfClient')->nullable(false)->change();

@@ -7,20 +7,21 @@
                     <v-autocomplete v-model="value.type" :items="types" dense filled label="機種名" required
                         :rules="[rules.required]" no-data-text="該当なし"></v-autocomplete>
 
-                    <v-text-field v-model="value.detail_type" label="機種名詳細" :counter="255" hint="(例)Cbu-α507 stdなど">
+                    <v-text-field v-model="value.detail_type" label="機種名詳細" :counter="255" hint="(例)Cbu-α507 stdなど"
+                        prepend-icon="mdi-alpha-p-box">
                     </v-text-field>
                     <p>stdとかもかけたほうがいいんかな？いちいち分ける意味わからんけど。</p>
 
                     <v-text-field v-model="value.lisence_type" label="ライセンスタイプ" :rules="[rules.alphaNum]" :counter="255"
-                        hint="S・M・L、5・6・7 など半角英数字で">
+                        hint="S・M・L、5・6・7 など半角英数字で" prepend-icon="mdi-certificate">
                     </v-text-field>
 
                     <v-text-field v-model="value.serial" label="シリアル" :rules="[rules.alphaNum,rules.required]"
-                        :counter="255" hint="半角英数字">
+                        :counter="255" hint="半角英数字" prepend-icon="mdi-alpha-s-box">
                     </v-text-field>
 
                     <v-text-field v-model="value.mac" label="MACアドレス" :rules="[rules.mac]" :counter="255"
-                        hint="半角英数字と「:」">
+                        prepend-icon="mdi-barcode" hint="半角英数字と「:」">
                     </v-text-field>
 
                     <v-row>
@@ -60,18 +61,105 @@
                         :counter="255" hint="全角カタカナ、「・」などの記号不可" prepend-icon="mdi-furigana-horizontal"></v-text-field>
 
                     <v-text-field id="tel" v-bind:type="'tel'" v-model="value.phoneNumber" :counter="13"
-                        label="ユーザー電話番号(「 - 」有無どちらでも可)" :rules="[rules.tel]" prepend-icon="mdi-PhoneInTalk">
+                        label="ユーザー電話番号(「 - 」有無どちらでも可)" :rules="[rules.tel]" prepend-icon="mdi-phone-in-talk">
                     </v-text-field>
 
-                    <p>顧客住所</p>
+                    <v-text-field v-model="value.address" label="顧客住所" :counter="255" hint="大阪府大阪市中央区安土町1-6-10"
+                        prepend-icon="mdi-map-marker "></v-text-field>
 
                     <v-text-field v-model="value.dealer" label="販売店名" :rules="[rules.required]" :counter="255"
-                        hint="(例)株式会社エコソリューションホールディングス"></v-text-field>
+                        hint="(例)株式会社エコソリューションホールディングス" prepend-icon="mdi-store"></v-text-field>
+
                     <v-text-field v-model="value.remoteInfo" label="リモート接続情報" :rules="[rules.alphaNum]" :counter="255"
                         hint="(例)https://172.21.25.33 などあれば自由に記載" prepend-icon="mdi-remote-desktop"></v-text-field>
+
+                    <v-text-field v-model="value.remoteInfo" label="備考" :counter="255" hint="何か追記したいことがあれば"
+                        prepend-icon="mdi-comment-processing-outline"></v-text-field>
                     <v-btn text @click="submit" color="primary">登録</v-btn>
                 </v-form>
             </v-container>
+        </v-card>
+
+        <v-card v-for="(customer,index) in customers" :key="customer.id" :id="customer.id" class="customer" flat>
+            <span class="customerBox">
+                <v-toolbar color="primary" dark dense>
+                    <span class="overflow">登録日:{{ customer.created_at }}&nbsp;</span>
+                    <span class="overflow">機種名: {{ customer.type }}&nbsp;{{ customer.detail_type }}&nbsp;</span>
+                    <span class="overflow">シリアル:{{ customer.serial }}</span>
+                    <v-spacer></v-spacer>
+
+                    <v-btn icon @click="dialog.posted = true;updateDialog(customer,index,'update');id=customer.id"
+                        :disabled="centerSnackbar.snackbar">
+                        <v-icon>mdi-square-edit-outline</v-icon>
+                    </v-btn>
+
+                    <!-- <v-btn icon :disabled="centerSnackbar.snackbar">
+                        <v-icon>mdi-flag-variant-outline</v-icon>
+                    </v-btn>
+
+                    <v-menu offset-y>
+                        <template v-slot:activator="{ on, attrs }">
+                            <v-btn icon v-bind="attrs" v-on="on" :disabled="centerSnackbar.snackbar">
+                                <v-icon>mdi-dots-horizontal</v-icon>
+                            </v-btn>
+                        </template>
+                        <v-list>
+                            <v-list-item v-for="(cardMenu, method, index) in cardMenus" :key="index" class="hover">
+                                <v-list-item-title @click="triggerClick(cardMenu.method, customer.id)">
+                                    {{ cardMenu.title }}
+                                </v-list-item-title>
+                            </v-list-item>
+                        </v-list>
+                    </v-menu> -->
+                </v-toolbar>
+
+                <v-card-text>
+                    <v-container class="lighten-5">
+                        <v-row no-gutters>
+                            <v-col cols="2" xs="0">
+                                <v-layout justify-center>
+                                    <v-avatar color="primary" size="56">
+                                        <img src="/storage/img/customer.jpeg" alt="お客様" style="width: auto" />
+                                    </v-avatar>
+                                </v-layout>
+
+                                <div class="people">
+                                    <v-layout v-if="customer.customerName" justify-center>
+                                        {{customer.customerName}}</v-layout>
+                                    <v-layout v-else justify-center>不明</v-layout>
+                                    <span v-if="customer.phoneNumber" style="text-align: center">
+                                        <v-icon size="4">mdi-phone</v-icon>
+                                        <span>{{ customer.phoneNumber }}</span>
+                                        <v-btn icon style="height: " @click="copyToClipboard(customer.phoneNumber)">
+                                            <v-icon size="4">mdi-content-copy</v-icon>
+                                        </v-btn>
+                                    </span>
+                                </div>
+                            </v-col>
+                            <v-col cols="6">
+                                <span class="bigFont">{{ customer.question }}</span>
+                            </v-col>
+                            <v-col cols="4">
+                                <span class="">
+                                    <div>
+                                        <span class="subject">販売店:</span>
+                                        <span v-if="customer.dealer">{{ customer.dealer }}</span>
+                                        <span v-else>不明</span>
+                                    </div>
+                                    <div>
+                                        <span class="subject">ユーザー:</span>
+                                        <span v-if="customer.customer">{{ customer.customer }}</span>
+                                        <span v-else>不明</span>
+                                    </div>
+                                    <div>
+                                        <span class="subject">満足度:</span>{{ customer.satisfaction }}
+                                    </div>
+                                </span>
+                            </v-col>
+                        </v-row>
+                    </v-container>
+                </v-card-text>
+            </span>
         </v-card>
 
         <div class="text-center ma-2">
@@ -101,7 +189,6 @@
                 value: {
                     type: "",
                     lisence_type: "",
-                    address:"",
                     serial: "",
                     mac: "",
                     customerName: "",
@@ -110,6 +197,7 @@
                         .substr(0, 10),
                     lisence_stop: null,
                     phoneNumber: "",
+                    address: "",
                     dealer: "",
                     remoteInfo: "",
                     detail_type: "",
@@ -117,6 +205,7 @@
                 },
                 valid: null,
                 types: [],
+                customers: [],
 
                 menu: false,
                 menu2: false,
@@ -153,7 +242,7 @@
         },
         mounted() {
             this.getTypes()
-
+            this.getCustomers()
         },
         methods: {
             getTypes() {
@@ -166,6 +255,16 @@
                         this.types.sort()
                     })
             },
+            getCustomers() {
+                axios.get('/api/customers/archive')
+                    .then(response => {
+                        const customers = response.data.data
+                        this.customers = customers.reverse()
+                        //revirceしたほうがいいのと、status publichに絞り込んだほうがいい
+                        console.log(this.customers[7].phoneNumber)
+                    })
+            },
+
             TodayInTheFuture() {
                 const today = (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().split(
                     'T')[0]
@@ -187,9 +286,12 @@
                     axios.post('/api/customers/create', postData)
                         .then(response => {
                             console.log(response)
-                            //     this.centerSnackbar.text = postData.name + 'を新規登録しました。'
-                            //     this.centerSnackbar.snackbar = true; //スナックバーを表示 
-                            //     this.$router.go({path: this.$router.currentRoute.path, force: true})  //強制リロード 
+                            this.centerSnackbar.text = postData.name + 'を新規登録しました。'
+                            this.centerSnackbar.snackbar = true; //スナックバーを表示 
+                            this.$router.go({
+                                path: this.$router.currentRoute.path,
+                                force: true
+                            }) //強制リロード]
                         })
                         .catch(function (error) {
                             // this.centerSnackbar.text = '登録できませんでした。'

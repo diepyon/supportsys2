@@ -10,7 +10,7 @@ use App\Models\User;
 class InquiryController extends Controller
 {
     public function index(){
-        $inquiries =InquiryResource::collection(Inquiry::where('status','publish')->orderBy('created_at', 'desc')->paginate(10));
+        $inquiries =InquiryResource::collection(Inquiry::where('status','publish')->orderBy('created_at', 'desc')->paginate(20));
         return $inquiries;        
     }
 
