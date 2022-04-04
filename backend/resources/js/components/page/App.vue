@@ -38,10 +38,10 @@
                 ['mdi-account', 'ユーザー登録', '/customer'],
                 ['mdi-alpha-p-box', '機種登録', '/types'],
             ],
-            resetFlag:true,
+            resetFlag: true,
         }),
-       methods:  {
-            refresh(){
+        methods: {
+            refresh() {
                 console.log('app.vueのメソッドが発火している')
                 this.resetFlag = false;
                 this.$nextTick(() => (this.resetFlag = true));
@@ -70,6 +70,10 @@
 
     i.v-icon.notranslate.mdi.mdi-menu.theme--light {
         color: black;
+    }
+
+    ::v-deep .cardMargin {
+        margin: 2em 0;
     }
 
 </style>

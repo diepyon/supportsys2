@@ -40,3 +40,4 @@ Route::get('/types/archive', [TypeController::class, 'show']);
 
 Route::post('/customers/create', [CustomerController::class, 'create']);
 Route::get('/customers/archive', [CustomerController::class, 'show']);
+Route::post('/customers/update', [CustomerController::class, 'update']);

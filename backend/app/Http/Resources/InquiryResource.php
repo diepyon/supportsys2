@@ -21,12 +21,10 @@ class InquiryResource extends JsonResource
         $inquiry =  new Inquiry;
         return [
             'id'=>$this->id,
-             'created_at'=> $this->created_at->isoFormat('YYYY/MM/DD(ddd) HH:mm'),
-             'updated_at'=> $this->updated_at->isoFormat('YYYY/MM/DD(ddd) HH:mm'),
-            
+            'created_at'=> $this->created_at->isoFormat('YYYY/MM/DD(ddd) HH:mm'),
+            'updated_at'=> $this->updated_at->isoFormat('YYYY/MM/DD(ddd) HH:mm'),
             'date'=> $this->created_at->isoFormat('YYYY-MM-DD'),
             'time'=> $this->created_at->isoFormat('HH:mm'),
-            
             'dealer'=> $this->dealer,
             'questioner'=> $this->questioner,
             'phoneNumber'=> $this->phoneNumber,

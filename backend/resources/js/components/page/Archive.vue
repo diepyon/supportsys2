@@ -165,7 +165,7 @@
                 </template>
             </v-dialog>
 
-            <v-card v-for="(inquiry,index) in inquiries" :key="inquiry.id" :id="inquiry.id" class="inquiry" flat>
+            <v-card v-for="(inquiry,index) in inquiries" :key="inquiry.id" :id="inquiry.id" class="cardMargin" flat>
                 <span class="inquiryBox">
                     <v-toolbar color="primary" dark dense>
                         <span class="overflow">{{ inquiry.created_at }}</span>
@@ -216,7 +216,7 @@
                                         <v-layout v-if="inquiry.questioner" justify-center>
                                             {{inquiry.questioner}}</v-layout>
                                         <v-layout v-else justify-center>不明</v-layout>
-                                        <span v-if="inquiry.phoneNumber" style="text-align: center">
+                                        <span v-if="inquiry.phoneNumber" class="layout justify-center">
                                             <v-icon size="4">mdi-phone</v-icon>
                                             <span>{{ inquiry.phoneNumber }}</span>
                                             <v-btn icon style="height: " @click="copyToClipboard(inquiry.phoneNumber)">
@@ -318,11 +318,7 @@
         },
         data() {
             return {
-
-
-
                 activeID: null,
-
                 inquiries: [],
                 current_page: 1,
                 lists: [],
@@ -495,7 +491,7 @@
                     question: this.value.question,
                     questioner: this.value.questioner,
                     remote: this.value.remote,
-                    serial: this.value.serial, //コントローラー側で登録処理がまだ書かれてない
+                    serial: this.value.serial,
                     satisfaction: this.value.satisfaction,
                     type: this.value.type,
                     operator_id: 1, //いったん1
@@ -646,7 +642,7 @@
                 if (inquiry) {
                     this.value = Object.fromEntries(
                         Object.entries(inquiry).map(([k, v]) => [k, v === null ? "" : v])
-                    ); //nullを""置き換え
+                    ); //nullを""に置き換え
 
                     //日時は別途指定
                     this.date = inquiry.date
@@ -656,6 +652,7 @@
                     this.value.date = this.date
                     this.value.time = this.time
                 }
+                //this.valueの内容を
                 this.inquiry = this.value
 
             },
@@ -731,10 +728,6 @@
 
 </script>
 <style scoped>
-    .inquiry {
-        margin: 2em 0;
-    }
-
     .bigFont {
         font-size: 1rem !important;
         white-space: break-spaces;

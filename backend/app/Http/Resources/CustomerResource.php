@@ -38,6 +38,7 @@ class CustomerResource extends JsonResource
             'remarks' => $this->remarks,
             'detail_type' => $this->detail_type,
             'shipdate' => $this->shipdate,
+            'lisence_start' => $this->lisence_start,
             'lisence_stop' => $this->lisence_stop,
 
             'other01' => $this->other01,

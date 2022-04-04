@@ -10,13 +10,15 @@
                     <v-text-field v-model="value.detail_type" label="機種名詳細" :counter="255" hint="(例)Cbu-α507 stdなど"
                         prepend-icon="mdi-alpha-p-box">
                     </v-text-field>
-                    <p>stdとかもかけたほうがいいんかな？いちいち分ける意味わからんけど。</p>
+                    <p>
+                        stdとかもかけたほうがいいんかな？いちいち分ける意味わからんけど。
+                    </p>
 
                     <v-text-field v-model="value.lisence_type" label="ライセンスタイプ" :rules="[rules.alphaNum]" :counter="255"
                         hint="S・M・L、5・6・7 など半角英数字で" prepend-icon="mdi-certificate">
                     </v-text-field>
 
-                    <v-text-field v-model="value.serial" label="シリアル" :rules="[rules.alphaNum,rules.required]"
+                    <v-text-field v-model="value.serial" label="シリアル" :rules="[rules.alphaNum, rules.required]"
                         :counter="255" hint="半角英数字" prepend-icon="mdi-alpha-s-box">
                     </v-text-field>
 
@@ -26,28 +28,29 @@
 
                     <v-row>
                         <v-col cols="12" sm="3" md="4">
-                            <v-menu v-model="menu" :close-on-content-click="false" :nudge-right="40"
+                            <v-menu v-model="postDateMenu.shipdate" :close-on-content-click="false" :nudge-right="40"
                                 transition="scale-transition" offset-y min-width="auto">
                                 <template v-slot:activator="{ on, attrs }">
                                     <v-text-field v-model="value.shipdate" label="出荷日" prepend-icon="mdi-calendar"
                                         readonly v-bind="attrs" v-on="on">
                                     </v-text-field>
                                 </template>
-                                <v-date-picker v-model="value.shipdate" @input="menu = false" :max="value.lisence_stop">
+                                <v-date-picker v-model="value.shipdate" @input="postDateMenu.shipdate = false"
+                                    :max="value.lisence_stop">
                                 </v-date-picker>
                             </v-menu>
                         </v-col>
 
                         <v-col cols="12" sm="3" md="4">
-                            <v-menu v-model="menu2" :close-on-content-click="false" :nudge-right="40"
-                                transition="scale-transition" offset-y min-width="auto">
+                            <v-menu v-model="postDateMenu.lisence_stop" :close-on-content-click="false"
+                                :nudge-right="40" transition="scale-transition" offset-y min-width="auto">
                                 <template v-slot:activator="{ on, attrs }">
                                     <v-text-field v-model="value.lisence_stop" label="ライセンス期限"
                                         prepend-icon="mdi-calendar-clock" readonly v-bind="attrs" v-on="on"
                                         @click="TodayInTheFuture()" hint="カレンダー上の年をクリックで任意の西暦に移動可能">
                                     </v-text-field>
                                 </template>
-                                <v-date-picker v-model="value.lisence_stop" @input="menu2 = false"
+                                <v-date-picker v-model="value.lisence_stop" @input="postDateMenu.lisence_stop = false"
                                     :min="value.shipdate">
                                 </v-date-picker>
                             </v-menu>
@@ -57,7 +60,7 @@
                     <v-text-field v-model="value.customerName" label="ユーザー名" :rules="[rules.required]" :counter="255"
                         hint="(例)株式会社亜田岡建築工房" prepend-icon="mdi-account"></v-text-field>
 
-                    <v-text-field v-model="value.furigana" label="ユーザー名フリガナ" :rules="[rules.required,rules.katakana]"
+                    <v-text-field v-model="value.furigana" label="ユーザー名フリガナ" :rules="[rules.furigana]"
                         :counter="255" hint="全角カタカナ、「・」などの記号不可" prepend-icon="mdi-furigana-horizontal"></v-text-field>
 
                     <v-text-field id="tel" v-bind:type="'tel'" v-model="value.phoneNumber" :counter="13"
@@ -65,7 +68,7 @@
                     </v-text-field>
 
                     <v-text-field v-model="value.address" label="顧客住所" :counter="255" hint="大阪府大阪市中央区安土町1-6-10"
-                        prepend-icon="mdi-map-marker "></v-text-field>
+                        prepend-icon="mdi-map-marker"></v-text-field>
 
                     <v-text-field v-model="value.dealer" label="販売店名" :rules="[rules.required]" :counter="255"
                         hint="(例)株式会社エコソリューションホールディングス" prepend-icon="mdi-store"></v-text-field>
@@ -73,26 +76,138 @@
                     <v-text-field v-model="value.remoteInfo" label="リモート接続情報" :rules="[rules.alphaNum]" :counter="255"
                         hint="(例)https://172.21.25.33 などあれば自由に記載" prepend-icon="mdi-remote-desktop"></v-text-field>
 
-                    <v-text-field v-model="value.remoteInfo" label="備考" :counter="255" hint="何か追記したいことがあれば"
+                    <v-text-field v-model="value.remarks" label="備考" :counter="255" hint="何か追記したいことがあれば"
                         prepend-icon="mdi-comment-processing-outline"></v-text-field>
                     <v-btn text @click="submit" color="primary">登録</v-btn>
                 </v-form>
             </v-container>
         </v-card>
 
-        <v-card v-for="(customer,index) in customers" :key="customer.id" :id="customer.id" class="customer" flat>
+        <v-dialog max-width="90%" scrollable persistent v-model="dialog.posted">
+            <template v-slot:default="postedDialog">
+                <v-card class="dialogBg">
+                    <v-toolbar color="primary" dark dense>{{actionTitleName}}
+                        <v-spacer></v-spacer>
+                        <v-btn icon @click="closeConfirm">
+                            <v-icon>mdi-window-close</v-icon>
+                        </v-btn>
+                    </v-toolbar>
+                    <v-card-text>
+                        <div style="padding-top: 16px">
+                            <v-form ref="test_form" v-model="valid" lazy-validation>
+                                <v-autocomplete v-model="value.type" :items="types" dense filled label="機種名" required
+                                    :rules="[rules.required]" no-data-text="該当なし"></v-autocomplete>
+
+                                <v-text-field v-model="value.detail_type" label="機種名詳細" :counter="255"
+                                    hint="(例)Cbu-α507 stdなど" prepend-icon="mdi-alpha-p-box">
+                                </v-text-field>
+                                <p>
+                                    stdとかもかけたほうがいいんかな？いちいち分ける意味わからんけど。
+                                </p>
+
+                                <v-text-field v-model="value.lisence_type" label="ライセンスタイプ" :rules="[rules.alphaNum]"
+                                    :counter="255" hint="S・M・L、5・6・7 など半角英数字で" prepend-icon="mdi-certificate">
+                                </v-text-field>
+
+                                <v-text-field v-model="value.serial" label="シリアル"
+                                    :rules="[rules.alphaNum, rules.required]" :counter="255" hint="半角英数字"
+                                    prepend-icon="mdi-alpha-s-box">
+                                </v-text-field>
+
+                                <v-text-field v-model="value.mac" label="MACアドレス" :rules="[rules.mac]" :counter="255"
+                                    prepend-icon="mdi-barcode" hint="半角英数字と「:」">
+                                </v-text-field>
+
+                                <v-row>
+                                    <v-col cols="12" sm="3" md="4">
+                                        <v-menu v-model="menu" :close-on-content-click="false" :nudge-right="40"
+                                            transition="scale-transition" offset-y min-width="auto">
+                                            <template v-slot:activator="{ on, attrs }">
+                                                <v-text-field v-model="value.shipdate" label="出荷日"
+                                                    prepend-icon="mdi-calendar" readonly v-bind="attrs" v-on="on">
+                                                </v-text-field>
+                                            </template>
+                                            <v-date-picker v-model="value.shipdate" @input="menu = false"
+                                                :max="value.lisence_stop">
+                                            </v-date-picker>
+                                        </v-menu>
+                                    </v-col>
+
+                                    <v-col cols="12" sm="3" md="4">
+                                        <v-menu v-model="menu2" :close-on-content-click="false" :nudge-right="40"
+                                            transition="scale-transition" offset-y min-width="auto">
+                                            <template v-slot:activator="{ on, attrs }">
+                                                <v-text-field v-model="value.lisence_stop" label="ライセンス期限"
+                                                    prepend-icon="mdi-calendar-clock" readonly v-bind="attrs" v-on="on"
+                                                    @click="TodayInTheFuture()" hint="カレンダー上の年をクリックで任意の西暦に移動可能">
+                                                </v-text-field>
+                                            </template>
+                                            <v-date-picker v-model="value.lisence_stop" @input="menu2 = false"
+                                                :min="value.shipdate">
+                                            </v-date-picker>
+                                        </v-menu>
+                                    </v-col>
+                                </v-row>
+
+                                <v-text-field v-model="value.customerName" label="ユーザー名" :rules="[rules.required]"
+                                    :counter="255" hint="(例)株式会社亜田岡建築工房" prepend-icon="mdi-account"></v-text-field>
+
+                                <v-text-field v-model="value.furigana" label="ユーザー名フリガナ"
+                                    :rules="[rules.furigana]" :counter="255" hint="全角カタカナ、「・」などの記号不可"
+                                    prepend-icon="mdi-furigana-horizontal"></v-text-field>
+
+                                <v-text-field id="tel" v-bind:type="'tel'" v-model="value.phoneNumber" :counter="13"
+                                    label="ユーザー電話番号(「 - 」有無どちらでも可)" :rules="[rules.tel]"
+                                    prepend-icon="mdi-phone-in-talk">
+                                </v-text-field>
+
+                                <v-text-field v-model="value.address" label="顧客住所" :counter="255"
+                                    hint="大阪府大阪市中央区安土町1-6-10" prepend-icon="mdi-map-marker"></v-text-field>
+
+                                <v-text-field v-model="value.dealer" label="販売店名" :rules="[rules.required]"
+                                    :counter="255" hint="(例)株式会社エコソリューションホールディングス" prepend-icon="mdi-store">
+                                </v-text-field>
+
+                                <v-text-field v-model="value.remoteInfo" label="リモート接続情報" :rules="[rules.alphaNum]"
+                                    :counter="255" hint="(例)https://172.21.25.33 などあれば自由に記載"
+                                    prepend-icon="mdi-remote-desktop"></v-text-field>
+
+                                <v-text-field v-model="value.remarks" label="備考" :counter="255" hint="何か追記したいことがあれば"
+                                    prepend-icon="mdi-comment-processing-outline"></v-text-field>
+                            </v-form>
+                        </div>
+                    </v-card-text>
+                    <v-card-actions class="end">
+                        <v-btn text color="primary" v-if="submitButtonName=='更新'" @click="update(customerID)">
+                            {{submitButtonName}}</v-btn>
+                        <v-btn text @click="closeConfirm" color="primary">閉じる</v-btn>
+                        <v-btn v-show="false" @click="postedDialog.value = false;"></v-btn>
+                    </v-card-actions>
+                </v-card>
+            </template>
+        </v-dialog>
+
+        <v-card v-for="(customer, index) in customers" :key="customer.id" :id="customer.id" class="cardMargin" flat>
             <span class="customerBox">
                 <v-toolbar color="primary" dark dense>
                     <span class="overflow">登録日:{{ customer.created_at }}&nbsp;</span>
-                    <span class="overflow">機種名: {{ customer.type }}&nbsp;{{ customer.detail_type }}&nbsp;</span>
+                    <span class="overflow">機種名: {{ customer.type }}&nbsp;{{
+              customer.detail_type
+            }}&nbsp;</span>
                     <span class="overflow">シリアル:{{ customer.serial }}</span>
                     <v-spacer></v-spacer>
 
-                    <v-btn icon @click="dialog.posted = true;updateDialog(customer,index,'update');id=customer.id"
-                        :disabled="centerSnackbar.snackbar">
+                    <v-btn icon @click="
+              dialog.posted = true;
+              updateDialog(customer, index, 'update');
+              id = customer.id;
+            " :disabled="centerSnackbar.snackbar">
                         <v-icon>mdi-square-edit-outline</v-icon>
                     </v-btn>
 
+
+
+                    <!-- メニュー右の・・・ -->
                     <!-- <v-btn icon :disabled="centerSnackbar.snackbar">
                         <v-icon>mdi-flag-variant-outline</v-icon>
                     </v-btn>
@@ -124,37 +239,138 @@
                                 </v-layout>
 
                                 <div class="people">
-                                    <v-layout v-if="customer.customerName" justify-center>
-                                        {{customer.customerName}}</v-layout>
-                                    <v-layout v-else justify-center>不明</v-layout>
-                                    <span v-if="customer.phoneNumber" style="text-align: center">
-                                        <v-icon size="4">mdi-phone</v-icon>
-                                        <span>{{ customer.phoneNumber }}</span>
-                                        <v-btn icon style="height: " @click="copyToClipboard(customer.phoneNumber)">
-                                            <v-icon size="4">mdi-content-copy</v-icon>
-                                        </v-btn>
+                                    <v-layout justify-center>
+                                        {{ customer.customerName }}</v-layout>
+
+                                    <span class="layout justify-center">
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on, attrs }">
+                                                <v-icon color="primary" dark v-bind="attrs" v-on="on">
+                                                    mdi-phone </v-icon>{{ customer.phoneNumber }}
+                                            </template>
+                                            <span>電話番号</span>
+                                        </v-tooltip>
+
+                                        <v-tooltip bottom>
+                                            <template v-slot:activator="{ on, attrs }">
+                                                <v-btn icon style="height: "
+                                                    @click="copyToClipboard(customer.phoneNumber)"
+                                                    v-if="customer.phoneNumber != '不明'">
+                                                    <v-icon color="primary" dark v-bind="attrs" v-on="on">
+                                                        mdi-content-copy
+                                                    </v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>電話番号コピー</span>
+                                        </v-tooltip>
                                     </span>
                                 </div>
                             </v-col>
                             <v-col cols="6">
-                                <span class="bigFont">{{ customer.question }}</span>
+                                <div>
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ on, attrs }">
+                                            <v-icon color="primary" dark v-bind="attrs" v-on="on">
+                                                mdi-alpha-p-box </v-icon>
+                                            {{customer.detail_type}}
+                                        </template>
+                                        <span>機種名詳細</span>
+                                    </v-tooltip>
+                                </div>
+
+                                <div>
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ on, attrs }">
+                                            <v-icon color="primary" dark v-bind="attrs" v-on="on">
+                                                mdi-certificate
+                                            </v-icon>
+                                            {{ customer.lisence_type }}
+                                        </template>
+                                        <span>ライセンスタイプ</span>
+                                    </v-tooltip>
+                                </div>
+
+                                <div>
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ on, attrs }">
+                                            <v-icon color="primary" dark v-bind="attrs" v-on="on">
+                                                mdi-clock-start </v-icon>
+                                            {{ customer.lisence_start }}～{{ customer.lisence_stop }}
+                                        </template>
+                                        <span>ライセンス期間</span>
+                                    </v-tooltip>
+                                </div>
+
+                                <div>
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ on, attrs }">
+                                            <v-icon color="primary" dark v-bind="attrs" v-on="on">
+                                                mdi-map-marker </v-icon>{{ customer.address }}
+                                        </template>
+                                        <span>住所</span>
+                                    </v-tooltip>
+                                </div>
+
+                                <div>
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ on, attrs }">
+                                            <v-icon color="primary" dark v-bind="attrs" v-on="on">
+                                                mdi-barcode
+                                            </v-icon>
+                                            {{ customer.mac }}
+                                        </template>
+                                        <span>MACアドレス</span>
+                                    </v-tooltip>
+                                </div>
+
+                                <div>
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ on, attrs }">
+                                            <v-icon color="primary" dark v-bind="attrs" v-on="on">
+                                                mdi-remote-desktop
+                                            </v-icon>
+                                            {{ customer.remoteInfo }}
+                                        </template>
+                                        <span>リモート接続情報</span>
+                                    </v-tooltip>
+                                </div>
+
+                                <div>
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ on, attrs }">
+                                            <v-icon color="primary" dark v-bind="attrs" v-on="on">
+                                                mdi-calendar
+                                            </v-icon>
+                                            {{ customer.shipdate }}
+                                        </template>
+                                        <span>出荷日</span>
+                                    </v-tooltip>
+                                </div>
+
+                                <div>
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ on, attrs }">
+                                            <v-icon color="primary" dark v-bind="attrs" v-on="on">
+                                                mdi-comment-processing-outline
+                                            </v-icon>
+                                            {{ customer.remarks }}
+                                        </template>
+                                        <span>備考</span>
+                                    </v-tooltip>
+                                </div>
                             </v-col>
                             <v-col cols="4">
-                                <span class="">
-                                    <div>
-                                        <span class="subject">販売店:</span>
-                                        <span v-if="customer.dealer">{{ customer.dealer }}</span>
-                                        <span v-else>不明</span>
-                                    </div>
-                                    <div>
-                                        <span class="subject">ユーザー:</span>
-                                        <span v-if="customer.customer">{{ customer.customer }}</span>
-                                        <span v-else>不明</span>
-                                    </div>
-                                    <div>
-                                        <span class="subject">満足度:</span>{{ customer.satisfaction }}
-                                    </div>
-                                </span>
+                                <div>
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ on, attrs }">
+                                            <v-icon color="primary" dark v-bind="attrs" v-on="on">
+                                                mdi-store
+                                            </v-icon>
+                                            {{ customer.dealer }}
+                                        </template>
+                                        <span>販売店</span>
+                                    </v-tooltip>
+                                </div>
                             </v-col>
                         </v-row>
                     </v-container>
@@ -179,11 +395,10 @@
                 </template>
             </v-snackbar>
         </div>
-
     </div>
 </template>
 <script>
-    export default ({
+    export default {
         data() {
             return {
                 value: {
@@ -193,8 +408,10 @@
                     mac: "",
                     customerName: "",
                     furigana: "",
-                    shipdate: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString()
+                    shipdate: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+                        .toISOString()
                         .substr(0, 10),
+                    lisence_start: null,
                     lisence_stop: null,
                     phoneNumber: "",
                     address: "",
@@ -203,12 +420,28 @@
                     detail_type: "",
                     shipdate: null,
                 },
+                customerID: null,
+                index: null,
+                dialog: {
+                    posted: false
+                },
+                actionTitleName: "ユーザー情報編集",
+                submitButtonName: "更新",
+
                 valid: null,
                 types: [],
                 customers: [],
 
                 menu: false,
                 menu2: false,
+
+                postDateMenu: {
+                    shipdate: false,
+                    lisence_stop: false
+                },
+
+
+
                 rules: {
                     tel: (v) =>
                         /^(0[5-9]0[0-9]{8}|0[1-9][1-9][0-9]{7})$/.test(
@@ -223,12 +456,20 @@
                     },
                     mac: (v) => {
                         const macAddress = /^([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}$/;
-                        return (macAddress.test(v) || v == '') || "MACアドレスの形式で入力してください。";
+                        return (
+                            macAddress.test(v) ||
+                            v == "" ||
+                            "MACアドレスの形式で入力してください。"
+                        );
                     },
-                    katakana: (v) => {
-                        const pattern = /^[ア-ン゛゜ァ-ォャ-ョー「」、]+$/
-                        return pattern.test(v) || "全角カタカナのみで入力してください。（アルファベットも許可したい）"
-                    }
+                    furigana: (v) => {
+                        const furigana = /^[ァ-ヴー0-9a-zA-Z]+$/                        
+                        return (
+                            furigana.test(v) ||
+                            v == "" ||
+                            "全角カタカナか半角英数で入力してください。（省略可）"
+                        );
+                    },
                 },
                 centerSnackbar: {
                     snackbar: false,
@@ -238,69 +479,128 @@
                     timeout: 20000,
                 },
                 deleteId: null,
-            }
+            };
         },
         mounted() {
-            this.getTypes()
-            this.getCustomers()
+            this.getTypes();
+            this.getCustomers();
         },
         methods: {
+            closeConfirm() {
+                alert('未作成')
+            },
             getTypes() {
-                axios.get('/api/types/archive')
-                    .then(response => {
-                        const types = response.data.data
-                        types.forEach((value) => {
-                            this.types.push(value.name)
-                        })
-                        this.types.sort()
-                    })
+                axios.get("/api/types/archive").then((response) => {
+                    const types = response.data.data;
+                    types.forEach((value) => {
+                        this.types.push(value.name);
+                    });
+                    this.types.sort();
+                });
             },
             getCustomers() {
-                axios.get('/api/customers/archive')
-                    .then(response => {
-                        const customers = response.data.data
-                        this.customers = customers.reverse()
-                        //revirceしたほうがいいのと、status publichに絞り込んだほうがいい
-                        console.log(this.customers[7].phoneNumber)
-                    })
+                axios.get("/api/customers/archive").then((response) => {
+                    const customersCount = response.data.data.length; //ここは実際の1ページ当たりの記事数に修正する必要がある
+
+                    for (let i = 0; i < customersCount; i++) {
+                        this.customers = response.data.data.reverse();
+                        //status publichに絞り込んだほうがいい
+
+                        this.customers[i] = Object.fromEntries(
+                            Object.entries(this.customers[i]).map(([k, v]) => [
+                                k,
+                                v === null ? "不明" : v,
+                            ])
+                        ); //nullを不明に置き換え
+
+                        //日時整形
+                        this.customers[i].lisence_start =
+                            this.customers[i].lisence_start.split(" ")[0]
+                        this.customers[i].lisence_stop =
+                            this.customers[i].lisence_stop.split(" ")[0]
+                    }
+                    //console.log(this.customers)
+                });
+            },
+            updateDialog(customer, index, action) {
+                if (customer) {
+                    this.value = Object.fromEntries(
+                        Object.entries(customer).map(([k, v]) => [k, v === null ? "" : v])
+                    ) //nullを""に置き換え
+
+                    this.value = Object.fromEntries(
+                        Object.entries(customer).map(([k, v]) => [k, v === "不明" ? "" : v])
+                    ) //不明を"""に置き換え
+
+                    this.value.shipdate = this.value.shipdate.split(" ")[0] //日付から時間を除外  
+                    this.customer = this.value //this.valueの内容を反映
+                    this.customerID = customer.id
+                    this.index = customer.index
+                }
+            },
+            update(id) {
+                let postData = this.value
+                if (this.$refs.test_form.validate()) {
+                    axios.post('/api/customers/update',
+                            postData) //api.phpのルートを指定。第2引数には渡したい変数を入れる（今回は入力された内容）
+                        .then(response => {
+                            alert('更新しました。');
+                            console.log(response.statusText)
+                            this.getCustomers()
+                            this.dialog.posted = false
+                            this.action = null
+                        })
+                        .catch(function (error) {
+                            alert('あかんかったわ、コンソール見て');
+                            console.log(error);
+                        })
+                } else {
+                    alert('入力内容に不備があります。')
+                }
+            },
+
+            copyToClipboard() {
+                alert("未作成");
             },
 
             TodayInTheFuture() {
-                const today = (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().split(
-                    'T')[0]
-                const splitDate = today.split('-')
-                const year = String(Number(splitDate[0]) + 5)
-                const date = splitDate[1] + '-' + splitDate[2]
-                const future = year + '-' + date
-                this.value.lisence_stop = future
+                const today = new Date(
+                        Date.now() - new Date().getTimezoneOffset() * 60000
+                    )
+                    .toISOString()
+                    .split("T")[0];
+                const splitDate = today.split("-");
+                const year = String(Number(splitDate[0]) + 5);
+                const date = splitDate[1] + "-" + splitDate[2];
+                const future = year + "-" + date;
+                this.value.lisence_stop = future;
             },
-            clearShipdate() {
-
-            },
+            clearShipdate() {},
             clearLisenceStop() {},
 
             submit() {
                 let postData = this.value
-                console.log(postData)
+                console.log(postData);
                 if (this.$refs.test_form.validate()) {
-                    axios.post('/api/customers/create', postData)
-                        .then(response => {
-                            console.log(response)
-                            this.centerSnackbar.text = postData.name + 'を新規登録しました。'
-                            this.centerSnackbar.snackbar = true; //スナックバーを表示 
+                    axios
+                        .post("/api/customers/create", postData)
+                        .then((response) => {
+                            console.log(response);
+                            this.centerSnackbar.text = postData.name + "を新規登録しました。";
+                            this.centerSnackbar.snackbar = true; //スナックバーを表示
                             this.$router.go({
                                 path: this.$router.currentRoute.path,
-                                force: true
-                            }) //強制リロード]
+                                force: true,
+                            }); //強制リロード]
                         })
                         .catch(function (error) {
                             // this.centerSnackbar.text = '登録できませんでした。'
-                            // this.centerSnackbar.snackbar = true; //スナックバーを表示 
+                            // this.centerSnackbar.snackbar = true; //スナックバーを表示
                             console.log(error);
-                        })
+                        });
                 }
             },
-        }
-    })
+        },
+    };
 
 </script>
