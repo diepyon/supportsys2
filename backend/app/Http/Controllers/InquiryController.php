@@ -30,7 +30,7 @@ class InquiryController extends Controller
             //引き継ぎID自動登録 送られてきたIDのレコードを参照してinquiry_idを特定して、親の投稿とみなす
         }
         $inquiry->kinds=$request->input('kinds');
-        $inquiry->Number=$request->input('phoneNumber');//ハイフン以外の文字列があったら取り除きたい
+        $inquiry->phoneNumber=$request->input('phoneNumber');//ハイフン以外の文字列があったら取り除きたい
         $inquiry->question=$request->input('question');
         $inquiry->questioner=$request->input('questioner');
         $inquiry->remote=$request->input('remote');

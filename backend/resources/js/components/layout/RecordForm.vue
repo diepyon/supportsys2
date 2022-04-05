@@ -122,8 +122,7 @@
                 console.log(postData);
 
                 if (this.$refs.test_form.validate()) {
-                    axios
-                        .post("/api/inquiries/create", postData) //api.phpのルートを指定。第2引数には渡したい変数を入れる（今回は入力された内容）
+                    axios.post("/api/inquiries/create", postData) //api.phpのルートを指定。第2引数には渡したい変数を入れる（今回は入力された内容）
                         .then((response) => {
                             alert("投稿しました。");
                             this.result = response.statusText;

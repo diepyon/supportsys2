@@ -60,8 +60,8 @@
                     <v-text-field v-model="value.customerName" label="ユーザー名" :rules="[rules.required]" :counter="255"
                         hint="(例)株式会社亜田岡建築工房" prepend-icon="mdi-account"></v-text-field>
 
-                    <v-text-field v-model="value.furigana" label="ユーザー名フリガナ" :rules="[rules.furigana]"
-                        :counter="255" hint="全角カタカナ、「・」などの記号不可" prepend-icon="mdi-furigana-horizontal"></v-text-field>
+                    <v-text-field v-model="value.furigana" label="ユーザー名フリガナ" :rules="[rules.furigana]" :counter="255"
+                        hint="全角カタカナ、「・」などの記号不可" prepend-icon="mdi-furigana-horizontal"></v-text-field>
 
                     <v-text-field id="tel" v-bind:type="'tel'" v-model="value.phoneNumber" :counter="13"
                         label="ユーザー電話番号(「 - 」有無どちらでも可)" :rules="[rules.tel]" prepend-icon="mdi-phone-in-talk">
@@ -152,9 +152,9 @@
                                 <v-text-field v-model="value.customerName" label="ユーザー名" :rules="[rules.required]"
                                     :counter="255" hint="(例)株式会社亜田岡建築工房" prepend-icon="mdi-account"></v-text-field>
 
-                                <v-text-field v-model="value.furigana" label="ユーザー名フリガナ"
-                                    :rules="[rules.furigana]" :counter="255" hint="全角カタカナ、「・」などの記号不可"
-                                    prepend-icon="mdi-furigana-horizontal"></v-text-field>
+                                <v-text-field v-model="value.furigana" label="ユーザー名フリガナ" :rules="[rules.furigana]"
+                                    :counter="255" hint="全角カタカナ、「・」などの記号不可" prepend-icon="mdi-furigana-horizontal">
+                                </v-text-field>
 
                                 <v-text-field id="tel" v-bind:type="'tel'" v-model="value.phoneNumber" :counter="13"
                                     label="ユーザー電話番号(「 - 」有無どちらでも可)" :rules="[rules.tel]"
@@ -378,6 +378,10 @@
             </span>
         </v-card>
 
+        <div class="text-center">
+            <v-pagination v-model="current_page" :length="length" @input="changePage"></v-pagination>
+        </div>
+
         <div class="text-center ma-2">
             <v-snackbar v-model="centerSnackbar.snackbar" :timeout="centerSnackbar.timeout">
                 {{ centerSnackbar.text }}
@@ -420,6 +424,8 @@
                     detail_type: "",
                     shipdate: null,
                 },
+                current_page: 1,
+                length: null, //総ページ数
                 customerID: null,
                 index: null,
                 dialog: {
@@ -439,8 +445,6 @@
                     shipdate: false,
                     lisence_stop: false
                 },
-
-
 
                 rules: {
                     tel: (v) =>
@@ -463,7 +467,7 @@
                         );
                     },
                     furigana: (v) => {
-                        const furigana = /^[ァ-ヴー0-9a-zA-Z]+$/                        
+                        const furigana = /^[ァ-ヴー0-9a-zA-Z]+$/
                         return (
                             furigana.test(v) ||
                             v == "" ||
@@ -484,6 +488,12 @@
         mounted() {
             this.getTypes();
             this.getCustomers();
+
+            if (this.$route.query.page) {
+                this.current_page = Number(this.$route.query.page)
+            } else {
+                this.current_page = 1
+            }
         },
         methods: {
             closeConfirm() {
@@ -498,30 +508,56 @@
                     this.types.sort();
                 });
             },
-            getCustomers() {
-                axios.get("/api/customers/archive").then((response) => {
-                    const customersCount = response.data.data.length; //ここは実際の1ページ当たりの記事数に修正する必要がある
+            async getCustomers() {
+                const result = await axios.get(`/api/customers?page=${this.current_page}`)
 
-                    for (let i = 0; i < customersCount; i++) {
-                        this.customers = response.data.data.reverse();
-                        //status publichに絞り込んだほうがいい
+                console.log(result.data.meta)
 
-                        this.customers[i] = Object.fromEntries(
-                            Object.entries(this.customers[i]).map(([k, v]) => [
-                                k,
-                                v === null ? "不明" : v,
-                            ])
-                        ); //nullを不明に置き換え
+                const customers = result.data
+                this.customers = customers.data
 
-                        //日時整形
-                        this.customers[i].lisence_start =
-                            this.customers[i].lisence_start.split(" ")[0]
-                        this.customers[i].lisence_stop =
-                            this.customers[i].lisence_stop.split(" ")[0]
-                    }
-                    //console.log(this.customers)
+                this.dialog = {
+                    post: null,
+                    posted: null,
+                };
+
+                //総ページ数を取得
+                this.length = (Math.ceil(customers.meta.total / customers.meta.per_page)) //（テーブルのレコード総数÷1ページ当たりの表示件数）を繰り上げ
+
+                //現在のページに表示されている記事数分だけ繰り返す
+                for (let i = 0; i <  this.customers.length; i++) {
+                    this.customers[i] = Object.fromEntries(
+                        Object.entries(this.customers[i]).map(([k, v]) => [
+                            k,
+                            v === null ? "不明" : v,
+                        ])
+                    ); //nullを不明に置き換え
+
+                    //日時整形
+                    this.customers[i].lisence_start =
+                        this.customers[i].lisence_start.split(" ")[0]
+                    this.customers[i].lisence_stop =
+                        this.customers[i].lisence_stop.split(" ")[0]
+                }
+            },
+            moveToTop() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth"
                 });
             },
+            changePage(number) {
+                this.current_page = number
+                this.getCustomers()
+                window.history.pushState({
+                        number
+                    },
+                    `Page${number}`,
+                    `${window.location.origin}/customer?page=${number}`
+                )
+                this.moveToTop()
+            },
+
             updateDialog(customer, index, action) {
                 if (customer) {
                     this.value = Object.fromEntries(
@@ -582,16 +618,17 @@
                 let postData = this.value
                 console.log(postData);
                 if (this.$refs.test_form.validate()) {
-                    axios
-                        .post("/api/customers/create", postData)
+                    axios.post("/api/customers/create", postData)
                         .then((response) => {
-                            console.log(response);
+                            //console.log('スナックバー前')
                             this.centerSnackbar.text = postData.name + "を新規登録しました。";
                             this.centerSnackbar.snackbar = true; //スナックバーを表示
-                            this.$router.go({
-                                path: this.$router.currentRoute.path,
-                                force: true,
-                            }); //強制リロード]
+                            //console.log('リロード前')
+                            // this.$router.go({
+                            //     path: this.$router.currentRoute.path,
+                            //     force: true,
+                            // }); //強制リロード]
+                            this.changePage(1)
                         })
                         .catch(function (error) {
                             // this.centerSnackbar.text = '登録できませんでした。'

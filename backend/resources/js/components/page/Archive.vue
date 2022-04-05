@@ -458,7 +458,6 @@
                 //総ページ数を取得
                 this.length = (Math.ceil(inquiries.meta.total / inquiries.meta
                     .per_page)) //（apiで取得したレコードの総数÷1ページ当たりの表示件数）を繰り上げ
-
             },
             moveToTop() {
                 window.scrollTo({
