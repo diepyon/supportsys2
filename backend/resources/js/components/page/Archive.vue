@@ -435,7 +435,7 @@
         watch: {
             'centerSnackbar.snackbar'(newVal, oldVal) {
                 // データが変化した時に行いたい処理
-                console.log(newVal+' -> '+oldVal)
+                console.log(newVal + ' -> ' + oldVal)
                 if (newVal === false) {
                     //スナックバーが非表示になったら、選択中を表すCSSクラスを剥奪
                     const activeCart = document.getElementById(this.activeID);
@@ -443,7 +443,6 @@
                         activeCart.classList.remove("activeCard")
                     }
                 }
-
             },
         },
         methods: {
@@ -455,14 +454,13 @@
                     post: null,
                     posted: null,
                 };
-                //総ページ数を取得
-                this.length = (Math.ceil(inquiries.meta.total / inquiries.meta
-                    .per_page)) //（apiで取得したレコードの総数÷1ページ当たりの表示件数）を繰り上げ
+
+                this.length = inquiries.meta.last_page //総ページ数を取得
             },
             moveToTop() {
                 window.scrollTo({
                     top: 0,
-                    behavior: "smooth"
+                    behavior: "auto",
                 });
             },
             changePage(number) {
@@ -549,6 +547,7 @@
 
             },
             submit() {
+                console.log('hoge')
                 this.$refs.RecordForm.post()
             },
             judge(result) {

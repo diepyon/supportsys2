@@ -40,7 +40,10 @@ class InquiryResource extends JsonResource
             'serial' => $this->serial,
             'type' => $this->type,
             'anchor' => $this->anchor,
-            'previewAnchor'=> $inquiry->anchorRelation($this->id),//リレー形式で関連記事を表示する部分
+
+            //リレー形式で関連記事を表示する部分
+            //存在しない記事を手動で引き継い偽もとにするとページ全体がばぐる
+            'previewAnchor'=> $inquiry->anchorRelation($this->id),
         ];
     }
 }
