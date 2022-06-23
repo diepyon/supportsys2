@@ -16,12 +16,11 @@ class InquiryController extends Controller
 
     public function create(Request $request ,Inquiry $inquiry) 
     {
-        $inquiry->inquiry_id=substr(bin2hex(random_bytes(8)), 0, 8);
-        $inquiry->fill($request->only([
-            'kinds', 'phoneNumber', 'question', 'questioner', 'remote','satisfaction','serial','operator_id','type','answer','customer','dealer'
-        ])    
-        )->save();
+        $inquiry->fill(array_merge($request->all(),
+             ['inquiry_id' => substr(bin2hex(random_bytes(8)), 0, 8)],
+        ))->save();       
 
+        //下記もonlyを使う
         if($request->remote !='なし'){//remoteがなしなら承認者は登録しない
             $inquiry->authorizer=$request->authorizer;
         }
@@ -34,27 +33,28 @@ class InquiryController extends Controller
         $inquiry->save();
     }
 
-    public function inhert(Request $request ,Inquiry $inquiry){
-        //もしかしらcreateと統一でききるか
-        //$inquiry->answer =$request->answer;
-        if($request->remote !='なし'){//remoteがなしなら承認者は登録しない
-            $inquiry->authorizer=$request->authorizer;
-        }
-        $inquiry->customer=$request->customer;
-        $inquiry->dealer=$request->dealer;
-        $inquiry->anchor=$request->anchor;//引き継ぎID
-        $inquiry->kinds=$request->kinds;
-        $inquiry->phoneNumber=$request->phoneNumber;//ハイフン以外の文字列があったら取り除きたい
-        $inquiry->question=$request->question;
-        $inquiry->questioner=$request->questioner;
-        $inquiry->remote=$request->remote;
-        $inquiry->satisfaction=$request->satisfaction;
-        $inquiry->serial=$request->serial;
-        $inquiry->type=$request->type;
-        $inquiry->operator_id=$request->operator_id;
-        $inquiry->inquiry_id=substr(bin2hex(random_bytes(8)), 0, 8);
-        $inquiry->save();
-    }    
+    //createと統一できた
+    // public function inhert(Request $request ,Inquiry $inquiry){
+    //     
+    //     //$inquiry->answer =$request->answer;
+    //     if($request->remote !='なし'){//remoteがなしなら承認者は登録しない
+    //         $inquiry->authorizer=$request->authorizer;
+    //     }
+    //     $inquiry->customer=$request->customer;
+    //     $inquiry->dealer=$request->dealer;
+    //     $inquiry->anchor=$request->anchor;//引き継ぎID
+    //     $inquiry->kinds=$request->kinds;
+    //     $inquiry->phoneNumber=$request->phoneNumber;//ハイフン以外の文字列があったら取り除きたい
+    //     $inquiry->question=$request->question;
+    //     $inquiry->questioner=$request->questioner;
+    //     $inquiry->remote=$request->remote;
+    //     $inquiry->satisfaction=$request->satisfaction;
+    //     $inquiry->serial=$request->serial;
+    //     $inquiry->type=$request->type;
+    //     $inquiry->operator_id=$request->operator_id;
+    //     $inquiry->inquiry_id=substr(bin2hex(random_bytes(8)), 0, 8);
+    //     $inquiry->save();
+    // }    
 
     public function edit(Request $request ,Inquiry $inquiry){
         $inquiry = $inquiry::where('id',$request->id);

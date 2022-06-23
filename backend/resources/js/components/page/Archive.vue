@@ -523,7 +523,7 @@
             inhert(id) {
                 let postData = this.postData(id, 'inhert');
                 if (this.$refs.test_form.validate()) {
-                    axios.post("/api/inquiries/create", postData)
+                    axios.post("/api/inquiries/create", postData)//結局createに投げてる
                         .then((response) => {
                             alert("引き継ぎました。");
                             console.log(response.statusText);
