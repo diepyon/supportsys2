@@ -20,7 +20,7 @@ class InquiryController extends Controller
              ['inquiry_id' => substr(bin2hex(random_bytes(8)), 0, 8)],
         ))->save();       
 
-        //下記もonlyを使う
+        //下記もonlyを使いたい
         if($request->remote !='なし'){//remoteがなしなら承認者は登録しない
             $inquiry->authorizer=$request->authorizer;
         }

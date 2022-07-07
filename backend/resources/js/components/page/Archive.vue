@@ -146,8 +146,9 @@
                                             <v-radio label="普通" value="普通"></v-radio>
                                             <v-radio label="不満" value="不満"></v-radio>
                                         </v-radio-group>
-                                        <v-text-field v-model="value.anchor" label="引き継ぎ元ID（調整中）"
-                                            :rules="[rules.alphaNum]" hint="引き継ぎ元のIDを1つだけ入力" tabindex="-1">
+                                        <v-text-field :label="'引継元ID:'+value.anchor"
+                                          disabled    tabindex="-1">
+                          
                                         </v-text-field>
                                     </v-container>
                                 </v-form>
@@ -458,10 +459,8 @@
                 this.length = inquiries.meta.last_page //総ページ数を取得
             },
             moveToTop() {
-                window.scrollTo({
-                    top: 0,
-                    behavior: "auto",
-                });
+                console.log('スクロールするぜ')
+                window.scroll(0,0)
             },
             changePage(number) {
                 this.current_page = number
@@ -497,6 +496,8 @@
                     //更新の時だけ投稿日のinputが存在する
                     postData.dateAndTime = (this.date + ' ' + this.time + ':00')
                 }
+                
+
                 return postData;
             },
             update(id) {
