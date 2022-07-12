@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\InquiryController;
 use App\Http\Controllers\TypeController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\Api\Auth\RegisterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,3 +42,6 @@ Route::get('/types/archive', [TypeController::class, 'show']);
 Route::get('/customers', [CustomerController::class, 'index']);
 Route::post('/customers/create', [CustomerController::class, 'create']);
 Route::post('/customers/update', [CustomerController::class, 'update']);
+
+//会員登録
+Route::post('/register', [RegisterController::class, 'register']);
