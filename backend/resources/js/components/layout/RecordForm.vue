@@ -62,8 +62,7 @@
                     <v-radio label="普通" value="普通"></v-radio>
                     <v-radio label="不満" value="不満"></v-radio>
                 </v-radio-group>
-                <v-text-field v-model="value.anchor" label="引き継ぎ元ID（調整中）" :rules="[rules.alphaNum]"
-                    hint="引き継ぎ元のIDを1つだけ入力" tabindex="-1"></v-text-field>
+
             </v-container>
         </v-form>
     </div>
@@ -77,7 +76,6 @@
                 //もしIDが指定されていないならvalueは下記（editで指定されてる版も別途指定が必要）
                 value: {
                     answer: "",
-                    anchor: "",
                     authorizer: "",
                     customer: "",
                     dealer: "",

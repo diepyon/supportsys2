@@ -2,7 +2,7 @@
     <div>
         <p>文字列として機種選択候補に追加するだけなので、誤って削除しても投稿済みの受付記録には影響しません。</p>
         <v-card>
-            <v-container>
+                <v-card-text> 
                 <v-form ref="test_form" v-model="valid" lazy-validation @submit.prevent>
                     <template v-if="resetFlag">
                         <v-text-field v-model="value.name" label="機種名" hint="(例)APS100" required
@@ -11,7 +11,7 @@
                     </template>
                     <v-btn text type="submit" @click="submit" color="primary">登録</v-btn>
                 </v-form>
-            </v-container>
+                </v-card-text> 
         </v-card>
         <hr>
         <v-card>
@@ -21,12 +21,14 @@
                 <v-text-field v-model="search" append-icon="mdi-magnify" label="検索" single-line hide-details>
                 </v-text-field>
             </v-card-title>
+            <v-card-text> 
             <v-data-table :headers="headers" :items="items" :search="search" :items-per-page="20">
                 <template v-slot:[`item.action`]="{ item }">
                     <v-btn @click="dialog = true;getItem(item)" color="primary">編集</v-btn>
                     <v-btn @click="onClickShow(item)">削除</v-btn>
                 </template>
             </v-data-table>
+            </v-card-text> 
         </v-card>
 
         <div class="text-center ma-2">
