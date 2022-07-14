@@ -11,17 +11,16 @@
                             :rules="[rules.required,rules.email]" />
                         <v-text-field v-model="postData.password" v-bind:type="showPassword ? 'text' : 'password'"
                             prepend-icon="mdi-lock" v-bind:append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                            label="パスワード" required :rules="[rules.required]"
+                            label="パスワード" required :rules="[rules.required,rules.password]"
                             @click:append="showPassword = !showPassword" />
 
                         <v-text-field v-model="postData.passwordConfirm"
                             v-bind:type="showPasswordConfirm ? 'text' : 'password'" prepend-icon="mdi-lock"
                             v-bind:append-icon="showPasswordConfirm ? 'mdi-eye' : 'mdi-eye-off'" label="パスワード再入力"
-                            required :rules="[rules.required,(postData.password === postData.passwordConfirm) || 'Password must match']"
+                            required
+                            :rules="[rules.required,rules.password,(postData.password === postData.passwordConfirm) || 'パスワードが一致しません。']"
                             @click:append="showPasswordConfirm = !showPasswordConfirm" />
-
                         <v-btn class="info" @click="submit">新規登録</v-btn>
-
                     </v-form>
                 </v-card-text>
             </v-card>
@@ -61,8 +60,14 @@
                         /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
                     return pattern.test(v) || 'メールアドレス形式で入力してください。'
                 },
-                //confirmPassword:(value) => value === this.postData.password || 'The password confirmation does not match.'
-                   
+                password: v => {
+                    const pattern = /^[ -~]+$/
+                    return (
+                        pattern.test(v) ||
+                        v == "" ||
+                        "半角英数記号だけが使えます。"
+                    );
+                },
             },
             centerSnackbar: {
                 snackbar: false,
@@ -78,26 +83,25 @@
             },
         }),
 
+        mounted() {
+            //passsword表示ボタンはタブキーでの移動から除外
+            const elements = document.getElementsByClassName('v-icon--link');
+            elements[0].tabIndex = -1;
+            elements[1].tabIndex = -1;
+        },
+
         components: {
 
         },
         methods: {
             submit() {
                 if (this.$refs.test_form.validate()) {
-                    axios.post('/api/register', this.postData)
+                    axios.post('/api/operatorregister', this.postData)
                         .then(response => {
                             console.log(response.data)
                             this.centerSnackbar.text = this.postData.email + "を新規登録しました。"
                             this.centerSnackbar.snackbar = true //スナックバーを表示
-
-                            if (response.data) {
-                                // this.centerSnackbar.text = postData.name + 'は既に登録されています。'
-                                // this.centerSnackbar.snackbar = true; //スナックバーを表示 
-                            } else {
-                                // this.centerSnackbar.text = postData.name + 'を新規登録しました。'
-                                // this.centerSnackbar.snackbar = true; //スナックバーを表示 
-                                // this.$router.go({path: this.$router.currentRoute.path, force: true})  //強制リロード 
-                            }
+                            this.$refs.test_form.reset();
                         })
                         .catch(error => {
                             if (error.response.data.errors.email[0] == 'The email has already been taken.') {

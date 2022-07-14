@@ -5,7 +5,7 @@
                 <p>機種によっては入力不要の項目もあるので、最低限埋めるだけでもOK</p>
                 <v-form ref="test_form" v-model="valid" lazy-validation>
                     <v-autocomplete v-model="value.type" :items="types" dense filled label="機種名" required
-                        :rules="[rules.required]" no-data-text="該当なし"></v-autocomplete>
+                      prepend-icon="mdi-trash-can"   :rules="[rules.required]" no-data-text="該当なし"></v-autocomplete>
 
                     <v-text-field v-model="value.detail_type" label="機種名詳細" :counter="255" hint="(例)Cbu-α507 stdなど"
                         prepend-icon="mdi-alpha-p-box">
@@ -19,7 +19,7 @@
                     </v-text-field>
 
                     <v-text-field v-model="value.serial" label="シリアル" :rules="[rules.alphaNum, rules.required]"
-                        :counter="255" hint="半角英数字" prepend-icon="mdi-alpha-s-box">
+                       filled :counter="255" hint="半角英数字" prepend-icon="mdi-alpha-s-box">
                     </v-text-field>
 
                     <v-text-field v-model="value.mac" label="MACアドレス" :rules="[rules.mac]" :counter="255"
@@ -58,7 +58,7 @@
                     </v-row>
 
                     <v-text-field v-model="value.customerName" label="ユーザー名" :rules="[rules.required]" :counter="255"
-                        hint="(例)株式会社亜田岡建築工房" prepend-icon="mdi-account"></v-text-field>
+                       filled hint="(例)株式会社亜田岡建築工房" prepend-icon="mdi-account"></v-text-field>
 
                     <v-text-field v-model="value.furigana" label="ユーザー名フリガナ" :rules="[rules.furigana]" :counter="255"
                         hint="全角カタカナ、「・」などの記号不可" prepend-icon="mdi-furigana-horizontal"></v-text-field>
@@ -71,7 +71,7 @@
                         prepend-icon="mdi-map-marker"></v-text-field>
 
                     <v-text-field v-model="value.dealer" label="販売店名" :rules="[rules.required]" :counter="255"
-                        hint="(例)株式会社エコソリューションホールディングス" prepend-icon="mdi-store"></v-text-field>
+                        filled hint="(例)株式会社エコソリューションホールディングス" prepend-icon="mdi-store"></v-text-field>
 
                     <v-text-field v-model="value.remoteInfo" label="リモート接続情報" :rules="[rules.alphaNum]" :counter="255"
                         hint="(例)https://172.21.25.33 などあれば自由に記載" prepend-icon="mdi-remote-desktop"></v-text-field>
@@ -109,8 +109,9 @@
                                     :counter="255" hint="S・M・L、5・6・7 など半角英数字で" prepend-icon="mdi-certificate">
                                 </v-text-field>
 
-                                <v-text-field v-model="value.serial" label="シリアル"
+                                <v-text-field v-model="value.serial"
                                     :rules="[rules.alphaNum, rules.required]" :counter="255" hint="半角英数字"
+                                    filled
                                     prepend-icon="mdi-alpha-s-box">
                                 </v-text-field>
 
@@ -522,10 +523,11 @@
                 };
 
                 //総ページ数を取得
-                this.length = (Math.ceil(customers.meta.total / customers.meta.per_page)) //（テーブルのレコード総数÷1ページ当たりの表示件数）を繰り上げ
+                this.length = (Math.ceil(customers.meta.total / customers.meta
+                    .per_page)) //（テーブルのレコード総数÷1ページ当たりの表示件数）を繰り上げ
 
                 //現在のページに表示されている記事数分だけ繰り返す
-                for (let i = 0; i <  this.customers.length; i++) {
+                for (let i = 0; i < this.customers.length; i++) {
                     this.customers[i] = Object.fromEntries(
                         Object.entries(this.customers[i]).map(([k, v]) => [
                             k,
@@ -616,18 +618,12 @@
 
             submit() {
                 let postData = this.value
-                console.log(postData);
                 if (this.$refs.test_form.validate()) {
                     axios.post("/api/customers/create", postData)
                         .then((response) => {
-                            //console.log('スナックバー前')
-                            this.centerSnackbar.text = postData.name + "を新規登録しました。";
+                            this.centerSnackbar.text = postData.customerName + "を新規登録しました。";
                             this.centerSnackbar.snackbar = true; //スナックバーを表示
-                            //console.log('リロード前')
-                            // this.$router.go({
-                            //     path: this.$router.currentRoute.path,
-                            //     force: true,
-                            // }); //強制リロード]
+                            this.$refs.test_form.reset(); //フォームリセット
                             this.changePage(1)
                         })
                         .catch(function (error) {

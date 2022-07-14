@@ -6,6 +6,7 @@ use App\Http\Controllers\InquiryController;
 use App\Http\Controllers\TypeController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\Api\Auth\RegisterController;
+use App\Http\Controllers\Api\Auth\LoginController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,4 +45,10 @@ Route::post('/customers/create', [CustomerController::class, 'create']);
 Route::post('/customers/update', [CustomerController::class, 'update']);
 
 //会員登録
-Route::post('/register', [RegisterController::class, 'register']);
+Route::post('/operatorregister', [RegisterController::class, 'operatorregister']);
+
+Route::post('/login', [LoginController::class, 'login']);
+
+// Route::middleware('auth:sanctum')->get('/loginCheck',function (Request $request) {
+//     return $request->user();
+// });

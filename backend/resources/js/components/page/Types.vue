@@ -137,7 +137,8 @@
                                 this.showArchive()
                                 this.centerSnackbar.text = postData.name + 'を新規登録しました。'
                                 this.centerSnackbar.snackbar = true; //スナックバーを表示 
-                                this.$router.go({path: this.$router.currentRoute.path, force: true})  //強制リロード 
+                                 this.$refs.test_form.reset();
+
                             }
                         })
                         .catch(function (error) {

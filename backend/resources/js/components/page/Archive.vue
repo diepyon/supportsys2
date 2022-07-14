@@ -37,6 +37,19 @@
                 </v-col>
             </v-row>
 
+            <div class="my-5" />
+            <v-text-field
+                v-model="key"
+                append-icon="mdi-magnify" 
+                label="Search" 
+                single-line 
+              
+                solo  
+                @click:append="search"
+                hint="検索の説明"
+            >
+            </v-text-field>
+
             <v-dialog max-width="90%" scrollable persistent v-model="dialog.posted">
                 <template v-slot:default="postedDialog">
                     <v-card class="dialogBg">
@@ -48,6 +61,7 @@
                         </v-toolbar>
                         <v-card-text>
                             <div style="padding-top: 16px">
+
                                 <v-form ref="test_form" v-model="valid" lazy-validation>
                                     <template v-if="action=='update'">
                                         <v-row>
@@ -111,10 +125,11 @@
                                             <v-radio label="クレーム" value="クレーム"></v-radio>
                                         </v-radio-group>
                                     </v-container>
-                                    <v-textarea v-model="value.question" label="問い合わせ内容" required
+                                    <v-textarea v-model="value.question" filled label="問い合わせ内容" required
                                         :rules="[rules.required]">
                                     </v-textarea>
-                                    <v-textarea v-model="value.answer" label="回答内容" required :rules="[rules.required]">
+                                    <v-textarea v-model="value.answer" filled label="回答内容" required
+                                        :rules="[rules.required]">
                                     </v-textarea>
                                     <v-container fluid>
                                         <v-radio-group v-model="value.remote" row>
@@ -146,9 +161,8 @@
                                             <v-radio label="普通" value="普通"></v-radio>
                                             <v-radio label="不満" value="不満"></v-radio>
                                         </v-radio-group>
-                                        <v-text-field :label="'引継元ID:'+value.anchor"
-                                          disabled    tabindex="-1">
-                          
+                                        <v-text-field :label="'引継元ID:'+value.anchor" disabled tabindex="-1">
+
                                         </v-text-field>
                                     </v-container>
                                 </v-form>
@@ -312,7 +326,6 @@
 <script>
     import RecordForm from "../layout/RecordForm";
 
-
     export default {
         components: {
             RecordForm,
@@ -408,6 +421,8 @@
                 modal2: false,
                 dateTime: false, //日時ピッカーデフォルト非表示
 
+                key: null,
+
                 rules: {
                     tel: (value) =>
                         /^(0[5-9]0[0-9]{8}|0[1-9][1-9][0-9]{7})$/.test(
@@ -455,12 +470,22 @@
                     post: null,
                     posted: null,
                 };
-
                 this.length = inquiries.meta.last_page //総ページ数を取得
+
+            },
+            search() {
+                console.log(this.key)
+                // result = axios.get('/api/search', {
+                //     params: {
+                //         key: this.key,
+                //     }
+                // });
+
+                //ページネーションは別メソッドにまとめてた方がいいかも。
             },
             moveToTop() {
                 console.log('スクロールするぜ')
-                window.scroll(0,0)
+                window.scroll(0, 0)
             },
             changePage(number) {
                 this.current_page = number
@@ -496,8 +521,6 @@
                     //更新の時だけ投稿日のinputが存在する
                     postData.dateAndTime = (this.date + ' ' + this.time + ':00')
                 }
-                
-
                 return postData;
             },
             update(id) {
@@ -524,7 +547,7 @@
             inhert(id) {
                 let postData = this.postData(id, 'inhert');
                 if (this.$refs.test_form.validate()) {
-                    axios.post("/api/inquiries/create", postData)//結局createに投げてる
+                    axios.post("/api/inquiries/create", postData) //結局createに投げてる
                         .then((response) => {
                             alert("引き継ぎました。");
                             console.log(response.statusText);
@@ -548,7 +571,6 @@
 
             },
             submit() {
-                console.log('hoge')
                 this.$refs.RecordForm.post()
             },
             judge(result) {

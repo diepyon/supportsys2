@@ -14,9 +14,13 @@
             </v-list>
         </v-navigation-drawer>
 
-        <v-app-bar app>
+        <v-app-bar app hide-on-scroll>
             <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
             <v-toolbar-title>Application</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn text color="accent-4" to="/login">
+                ログイン
+            </v-btn>
         </v-app-bar>
 
         <v-main>

@@ -31,9 +31,9 @@
                 </v-radio-group>
             </v-container>
 
-            <v-textarea v-model="value.question" label="問い合わせ内容" required :rules="[rules.required]">
+            <v-textarea v-model="value.question" filled label="問い合わせ内容" required :rules="[rules.required]">
             </v-textarea>
-            <v-textarea v-model="value.answer" label="回答内容" required :rules="[rules.required]"></v-textarea>
+            <v-textarea v-model="value.answer"  filled label="回答内容" required :rules="[rules.required]"></v-textarea>
 
             <v-container fluid>
                 <v-radio-group v-model="value.remote" row>

@@ -5,6 +5,7 @@ import RecordPost from './components/page/RecordPost'
 import Types from './components/page/Types'
 import Customer from './components/page/Customer'
 import OperatorRegister from './components/page/OperatorRegister'
+import Login from './components/page/Login'
 export default new Router({
     mode: 'history',
     routes: [{
@@ -42,5 +43,10 @@ export default new Router({
             name: 'operatorregister',
             component: OperatorRegister
         },        
+        {
+            path: '/login',
+            name: 'login',
+            component: Login
+        },         
     ]
 });
