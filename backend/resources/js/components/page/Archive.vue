@@ -38,16 +38,10 @@
             </v-row>
 
             <div class="my-5" />
-            <v-text-field
-                v-model="key"
-                append-icon="mdi-magnify" 
-                label="Search" 
-                single-line 
-              
-                solo  
-                @click:append="search"
-                hint="検索の説明"
-            >
+            <p v-if="searchKeyword">「{{searchKeyword}}」の検索結果 {{total}}件ヒット</p>
+            <p v-else>全件表示</p>
+            <v-text-field v-model="key" append-icon="mdi-magnify" label="Search" single-line solo
+                @click:append="search();changePage(1)" hint="日付のフォーマットは説明が必要、電話番号はハイフン有り無しどちらでも検索可能にする">
             </v-text-field>
 
             <v-dialog max-width="90%" scrollable persistent v-model="dialog.posted">
@@ -422,6 +416,7 @@
                 dateTime: false, //日時ピッカーデフォルト非表示
 
                 key: null,
+                searchKeyword: null, //表示用
 
                 rules: {
                     tel: (value) =>
@@ -446,7 +441,16 @@
             } else {
                 this.current_page = 1
             }
-            this.showArchive()
+
+            if (this.$route.query.key) {
+                this.key = this.$route.query.key
+                this.search()
+            } else {
+                this.showArchive()
+            }
+
+            window.addEventListener("popstate", this.handlePopstate) //ブラウザバックも正常動作させる
+
         },
         watch: {
             'centerSnackbar.snackbar'(newVal, oldVal) {
@@ -473,31 +477,69 @@
                 this.length = inquiries.meta.last_page //総ページ数を取得
 
             },
-            search() {
-                console.log(this.key)
-                // result = axios.get('/api/search', {
-                //     params: {
-                //         key: this.key,
-                //     }
-                // });
+            async search() {
+                const result = await axios.get('/api/inquiries/search', {
+                    params: {
+                        key: this.key,
+                        page: this.current_page,
+                    }
+                })
+                this.searchKeyword = this.key
+
+                const inquiries = result.data
+                this.inquiries = inquiries.data
+
+                this.dialog = {
+                    post: null,
+                    posted: null,
+                };
+
+                this.total = inquiries.meta.total
+                this.length = inquiries.meta.last_page //総ページ数を取得   
 
                 //ページネーションは別メソッドにまとめてた方がいいかも。
             },
+            handlePopstate() {
+                this.current_page = Number(this.$route.query.page) || 1
+
+                if (this.$route.query.key != undefined) {
+                    this.key = this.$route.query.key
+                } else {
+                    this.key = ''
+                }
+                this.search()
+            },
+
             moveToTop() {
                 console.log('スクロールするぜ')
                 window.scroll(0, 0)
             },
             changePage(number) {
                 this.current_page = number
-                this.showArchive()
 
+                let url = null
+                url = `${window.location.origin}/archive?page=${number}`
+
+                if (this.key) {
+                    url = `${window.location.origin}/archive?key=${this.key}&page=${number}`
+                    console.log('検索キーワードあり')
+
+                    //ここに検索結果の2ページ目を表示するapi
+                    this.search()
+                } else { //検索キーワードがあるならurlが変わる
+                    url = `${window.location.origin}/archive?page=${number}`
+                    this.showArchive()
+
+                    console.log('検索キーワードなし')
+                }
                 window.history.pushState({
                         number
                     },
                     `Page${number}`,
-                    `${window.location.origin}/archive?page=${number}`
+                    url
                 )
                 this.moveToTop()
+
             },
             postData(id, action) {
                 let postData = {

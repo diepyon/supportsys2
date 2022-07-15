@@ -13,6 +13,34 @@ class InquiryController extends Controller
         $inquiries =InquiryResource::collection(Inquiry::where('status','publish')->orderBy('created_at', 'desc')->paginate(20));
         return $inquiries;        
     }
+    public function search(Request $request){
+        $inquiry = Inquiry::query();
+
+        $pat = '%' . addcslashes($request->key, '%_\\') . '%';
+        
+         if($request->key){
+            $inquiry->where(function ($query) use ($pat) {
+                $query->where('question','LIKE',$pat)
+                    ->orWhere('created_at','LIKE',$pat)//ハイフンやコロンが入るとバグる
+                    ->orWhere('type','LIKE',$pat)//ハイフン有り無しどっちでもよくした
+                    ->orWhere('dealer','LIKE',$pat)
+                    ->orWhere('questioner','LIKE',$pat)
+                    ->orWhere('phoneNumber','LIKE',$pat)//ハイフン有り無しどっちでもよくしたい、全角半角どっちでもよくしたい
+                    ->orWhere('customer','LIKE',$pat)
+                    ->orWhere('kinds','LIKE',$pat)
+                    ->orWhere('question','LIKE',$pat)
+                    ->orWhere('authorizer','LIKE',$pat)
+                    ->orWhere('satisfaction','LIKE',$pat)
+                    ->orWhere('inquiry_id','LIKE',$pat)
+                    ->orWhere('anchor','LIKE',$pat)
+                    ->orWhere('serial','LIKE',$pat)
+                    ->orWhere('answer','LIKE',$pat);
+                });
+         }
+
+         
+        return InquiryResource::collection($inquiry->where('status','publish')->orderBy('created_at', 'desc') ->paginate(20));  
+    }    
 
     public function create(Request $request ,Inquiry $inquiry) 
     {
@@ -32,29 +60,6 @@ class InquiryController extends Controller
         }
         $inquiry->save();
     }
-
-    //createと統一できた
-    // public function inhert(Request $request ,Inquiry $inquiry){
-    //     
-    //     //$inquiry->answer =$request->answer;
-    //     if($request->remote !='なし'){//remoteがなしなら承認者は登録しない
-    //         $inquiry->authorizer=$request->authorizer;
-    //     }
-    //     $inquiry->customer=$request->customer;
-    //     $inquiry->dealer=$request->dealer;
-    //     $inquiry->anchor=$request->anchor;//引き継ぎID
-    //     $inquiry->kinds=$request->kinds;
-    //     $inquiry->phoneNumber=$request->phoneNumber;//ハイフン以外の文字列があったら取り除きたい
-    //     $inquiry->question=$request->question;
-    //     $inquiry->questioner=$request->questioner;
-    //     $inquiry->remote=$request->remote;
-    //     $inquiry->satisfaction=$request->satisfaction;
-    //     $inquiry->serial=$request->serial;
-    //     $inquiry->type=$request->type;
-    //     $inquiry->operator_id=$request->operator_id;
-    //     $inquiry->inquiry_id=substr(bin2hex(random_bytes(8)), 0, 8);
-    //     $inquiry->save();
-    // }    
 
     public function edit(Request $request ,Inquiry $inquiry){
         $inquiry = $inquiry::where('id',$request->id);
