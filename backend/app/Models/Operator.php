@@ -22,7 +22,6 @@ class Operator extends Authenticatable //変更
         'name',
         'email',
         'password',
-        'remember_token',//追記
     ];
 
     /**
