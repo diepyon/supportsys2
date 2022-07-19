@@ -41,6 +41,7 @@
             <p v-if="searchKeyword">「{{searchKeyword}}」の検索結果 {{total}}件ヒット</p>
             <p v-else>全件表示</p>
             <v-text-field v-model="key" append-icon="mdi-magnify" label="Search" single-line solo
+                v-on:keydown.enter="search();changePage(1)"
                 @click:append="search();changePage(1)" hint="日付のフォーマットは説明が必要、電話番号はハイフン有り無しどちらでも検索可能にする">
             </v-text-field>
 
@@ -417,6 +418,7 @@
 
                 key: null,
                 searchKeyword: null, //表示用
+                total:null,
 
                 rules: {
                     tel: (value) =>
@@ -448,7 +450,6 @@
             } else {
                 this.showArchive()
             }
-
             window.addEventListener("popstate", this.handlePopstate) //ブラウザバックも正常動作させる
 
         },

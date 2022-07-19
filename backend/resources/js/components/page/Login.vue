@@ -38,7 +38,7 @@
         name: 'OperatorRegister',
 
         data: () => ({
-            loggedIn:false,
+            loggedIn: false,
             showPassword: false,
             showPasswordConfirm: false,
             postData: {
@@ -89,14 +89,10 @@
                 if (this.$refs.test_form.validate()) {
                     axios.post('/api/login', this.postData)
                         .then(response => {
-                            //console.log(response.data)
+                            console.log(response)
                             //console.log('ログイン成功')
                             this.loggedIn = true;
-                            console.log(this.loggedIn)
 
-                            // this.centerSnackbar.text = this.postData.email + "を新規登録しました。"
-                            // this.centerSnackbar.snackbar = true //スナックバーを表示
-                            // this.$refs.test_form.reset();
                         })
                         .catch(error => {
                             console.log(error.response.data)
@@ -120,6 +116,27 @@
                 axios.get("/api/user")
                     .then(response => {
                         console.log(response)
+
+
+                        let currentUser = response.data
+                        console.log(currentUser)
+                        this.user.name = currentUser.name
+                        this.user.email = currentUser.email
+
+                        this.user.name = this.user.name
+                        this.user.email = this.user.email
+                        this.user.id = response.data.id //カレントユーザーのIDを取得
+
+                        //vuexでリアルタイムにユーザーの情報を更新（ヘッダーが変化を監視）
+                        let userInfo = {
+                            name: this.user.name,
+                            email: this.user.name,
+                            //アイコンの情報もヘッダーに表示したいなら必要かも
+                        }
+                        this.$store.commit("checkLogin", userInfo)
+
+
+                        
                     })
                     .catch(error => {
                         console.log(error)

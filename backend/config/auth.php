@@ -40,6 +40,13 @@ return [
             'driver' => 'session',
             'provider' => 'operators',
         ],
+
+        //追記
+        'api' => [
+            'driver' => 'token',
+            'provider' => 'operators',
+            'hash' => false,
+        ],        
     ],
 
     /*
@@ -62,7 +69,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => App\Models\User::class,
+            'model' => App\Models\User::class,//変更
         ],
        'operators' => [
            'driver' => 'eloquent',
@@ -91,7 +98,7 @@ return [
 
     'passwords' => [
         'users' => [
-            'provider' => 'users',
+            'provider' => 'operators',//変更
             'table' => 'password_resets',
             'expire' => 60,
             'throttle' => 60,
