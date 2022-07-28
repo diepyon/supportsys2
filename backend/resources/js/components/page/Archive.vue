@@ -41,9 +41,11 @@
             <p v-if="searchKeyword">「{{searchKeyword}}」の検索結果 {{total}}件ヒット</p>
             <p v-else>全件表示</p>
             <v-text-field v-model="key" append-icon="mdi-magnify" label="Search" single-line solo
-                v-on:keydown.enter="search();changePage(1)"
-                @click:append="search();changePage(1)" hint="日付のフォーマットは説明が必要、電話番号はハイフン有り無しどちらでも検索可能にする">
+                v-on:keydown.enter="search();changePage(1)" @click:append="search();changePage(1)"
+                hint="日時は「2021-12-28 01:00:00」のように検索　電話番号ハイフン有り無しともにできるようにしたい">
             </v-text-field>
+
+             <p v-if="total==0">見つかりませんでした。</p>
 
             <v-dialog max-width="90%" scrollable persistent v-model="dialog.posted">
                 <template v-slot:default="postedDialog">
@@ -267,7 +269,7 @@
                                         <v-avatar color="primary" size="56">オペ</v-avatar>
                                     </v-layout>
                                     <v-layout justify-center>
-                                        {{ inquiry.operator_id }}
+                                        {{ inquiry.operatorName }}
                                     </v-layout>
                                 </v-col>
                                 <v-col cols="6">
@@ -418,7 +420,7 @@
 
                 key: null,
                 searchKeyword: null, //表示用
-                total:null,
+                total: null,
 
                 rules: {
                     tel: (value) =>
@@ -498,6 +500,7 @@
                 this.total = inquiries.meta.total
                 this.length = inquiries.meta.last_page //総ページ数を取得   
 
+                console.log(this.inquiries)
                 //ページネーションは別メソッドにまとめてた方がいいかも。
             },
             handlePopstate() {
@@ -787,6 +790,10 @@
                         this.types.sort()
                     })
             },
+        },
+        beforeDestroy() {
+            //追加した。問題起きたらここを確認。
+            window.removeEventListener("popstate", this.handlePopstate);
         },
     };
 

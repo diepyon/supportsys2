@@ -37,9 +37,7 @@ class InquiryController extends Controller
                     ->orWhere('answer','LIKE',$pat);
                 });
          }
-
-         
-        return InquiryResource::collection($inquiry->where('status','publish')->orderBy('created_at', 'desc') ->paginate(20));  
+        return InquiryResource::collection($inquiry->where('status','publish')->orderBy('created_at', 'desc')->paginate(20));
     }    
 
     public function create(Request $request ,Inquiry $inquiry) 

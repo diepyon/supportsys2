@@ -18,7 +18,10 @@
             <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
             <v-toolbar-title>Application</v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn text color="accent-4" to="/login">
+            <v-btn v-if="loggedIn">
+                ログイン済み
+            </v-btn>
+            <v-btn v-else text color="accent-4" to="/login">
                 ログイン
             </v-btn>
         </v-app-bar>
@@ -44,7 +47,19 @@
                 ['mdi-headset', 'オペレーター登録', '/operatorregister'],
             ],
             resetFlag: true,
+            loggedIn: false,
         }),
+        mounted() {
+            axios.get('/api/user')
+                .then(response => {
+                    console.log('app.vueでユーザー情報を取得')
+                    console.log(response)
+                    this.loggedIn = true;
+                })
+                .catch(error => {
+                    this.isLoggedIn = false
+                })
+        },
         methods: {
             refresh() {
                 console.log('app.vueのメソッドが発火している')

@@ -13,6 +13,14 @@
                             prepend-icon="mdi-lock" v-bind:append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                             label="パスワード" required :rules="[rules.required,rules.password]"
                             @click:append="showPassword = !showPassword" />
+
+                        <template>
+                            <v-container class="px-0" fluid>
+                                <v-checkbox v-model="remember" label="ログイン情報を記憶する">
+                                </v-checkbox>
+                            </v-container>
+                        </template>
+
                         <v-btn class="info" @click="submit">ログイン</v-btn>
                     </v-form>
                     <p>新規登録にも誘導したい</p>
@@ -45,6 +53,7 @@
                 email: null,
                 password: null,
             },
+            remember: false,
             rules: {
                 required: v => !!v || "必須",
                 email: v => {
@@ -79,6 +88,10 @@
             //passsword表示ボタンはタブキーでの移動から除外
             const elements = document.getElementsByClassName('v-icon--link');
             elements[0].tabIndex = -1;
+
+            //ログイン情報に必要なクッキーを取得してthis.emailとthis.passswordに格納したい
+            console.log(this.cookie)
+            
         },
 
         components: {
@@ -90,8 +103,24 @@
                     axios.post('/api/login', this.postData)
                         .then(response => {
                             console.log(response)
-                            //console.log('ログイン成功')
                             this.loggedIn = true;
+
+                            if (this.remember) {
+                                //ログイン情報を保存する場合
+                                document.cookie = "email=" + this.postData.email
+                                document.cookie = "password=" + this.postData.password
+                            }else{
+                                //保存しない場合
+                                //クッキーを削除
+                                document.cookie = "email=; expires=0"
+                                document.cookie = "password=; expires=0"
+                            }
+
+
+
+
+
+                            //this.$router.push('/')
 
                         })
                         .catch(error => {
@@ -116,8 +145,6 @@
                 axios.get("/api/user")
                     .then(response => {
                         console.log(response)
-
-
                         let currentUser = response.data
                         console.log(currentUser)
                         this.user.name = currentUser.name
@@ -136,7 +163,7 @@
                         this.$store.commit("checkLogin", userInfo)
 
 
-                        
+
                     })
                     .catch(error => {
                         console.log(error)

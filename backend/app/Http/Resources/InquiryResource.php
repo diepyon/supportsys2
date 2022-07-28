@@ -7,6 +7,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Carbon\Carbon;
 use App\Http\Resources\InquiryCollection;
 use App\Models\Inquiry;
+use App\Models\Operator;
 
 class InquiryResource extends JsonResource
 {
@@ -19,6 +20,8 @@ class InquiryResource extends JsonResource
     public function toArray($request)
     {
         $inquiry =  new Inquiry;
+        $operator = new Operator;
+
         return [
             'id'=>$this->id,
             'created_at'=> $this->created_at->isoFormat('YYYY/MM/DD(ddd) HH:mm'),
@@ -28,6 +31,7 @@ class InquiryResource extends JsonResource
             'dealer'=> $this->dealer,
             'questioner'=> $this->questioner,
             'phoneNumber'=> $this->phoneNumber,
+            'phoneNumberWithoutHyphen'=>str_replace('-','', $this->phoneNumber),
             'customer'=> $this->customer,
             'kinds'=> $this->kinds,
             'question'=> $this->question,
@@ -35,6 +39,7 @@ class InquiryResource extends JsonResource
             'authorizer'=> $this->authorizer,
             'satisfaction'=> $this->satisfaction,
             'operator_id'=> $this->operator_id,
+            'operatorName'=>$operator->where('id',$this->operator_id)->first()->name,
             'inquiry_id'=> $this->inquiry_id,
             'answer' => $this->answer,
             'serial' => $this->serial,
